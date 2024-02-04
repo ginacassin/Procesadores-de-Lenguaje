@@ -1,0 +1,289 @@
+\title{Memoria: Procesadores de Lenguaje - Lenguaje Tiny}
+\author{Burgos Sosa, Rodrigo \and Cassin, Gina Andrea \and Estebán Velasco, Luis \and Rabbia, Santiago Elias}
+\date{Curso 2024}
+
+% Preamble
+\documentclass[11pt]{article}
+
+% Packages
+\usepackage{amsmath}
+\usepackage{graphicx}
+\graphicspath{ {/} }
+
+% Document
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+    \begin{center}
+        \large Grupo G03
+    \end{center}
+
+    \newpage
+
+    \section{Introducción}
+        En el siguiente documento se expondrá una memoria sobre el desarrollo de analizadores léxicos aplicado sobre dos lenguajes de programación, Tiny y Tiny(0) - un subconjunto de Tiny.
+        Se presentará una descripción de las clases léxicas y una especificación formal de ambos lenguajes, y un analizador léxico para Tiny(0).
+
+    \section{Análisis léxico}
+    La función de un analizador léxico es segmentar el programa de entrada en una secuencia de componentes léxicos o tokens. La primera fase en el desarrollo del analizador léxico (y la fase
+más importante) es llevar a cabo su especificación léxica. Esto se llevará a cabo a continuación:
+
+    \subsection{Tiny(0)}
+    \subsubsection{Clases léxicas}
+        A continuación se presentan las clases léxicas del lenguaje Tiny(0):
+        \subsubsection*{Clases léxicas}
+        \begin{itemize}
+            \item \textbf{Identificador (variable)}: Comienzan necesariamente por una letra o subrayado (\_), seguida de una secuencia de cero o más letras, dígitos, o subrayado (\_).
+            \item \textbf{Una clase léxica por cada tipo de variable}:
+                \begin{itemize}
+                    \item \textbf{int}: representa los números enteros.
+                    \item \textbf{real}: representa los números reales.
+                    \item \textbf{bool}: representa los valores booleanos (true o false).
+                \end{itemize}
+            \item \textbf{Literal entero}
+            \item \textbf{Literal real}
+            \item \textbf{Literal booleano}
+            \item \textbf{Una clase léxica por cada operador aritmético}:
+                \begin{itemize}
+                    \item \textbf{+}: suma.
+                    \item \textbf{-}: resta.
+                    \item \textbf{*}: multiplicación.
+                    \item \textbf{/}: división.
+                \end{itemize}
+            \item \textbf{Una clase léxica por cada operador lógico}:
+                \begin{itemize}
+                    \item \textbf{and}: conjunción.
+                    \item \textbf{or}: disyunción.
+                    \item \textbf{not}: negación.
+                \end{itemize}
+            \item \textbf{Una clase léxica por cada operador relacional}:
+                \begin{itemize}
+                    \item \textbf{\textless}: menor que.
+                    \item \textbf{\textgreater}: mayor que.
+                    \item \textbf{\textless=}: menor o igual que.
+                    \item \textbf{\textgreater=}: mayor o igual que.
+                    \item \textbf{==}: igual que.
+                    \item \textbf{!=}: distinto que.
+                \end{itemize}
+            \item \textbf{Una clase léxica por cada símbolo de puntuación}:
+                \begin{itemize}
+                    \item \textbf{(}: paréntesis izquierdo. Sirve para asociatividad.
+                    \item \textbf{)}: paréntesis derecho. Sirve para asociatividad.
+                    \item \textbf{;}: punto y coma. Sirve para separar declaraciones en la seccion de declaraciones, o separar instrucciones en la seccion de instrucciones. 
+                    \item \textbf{.}: punto. Para los decimales.
+                    \item \textbf{\{}: llave izquierda. Indica el inicio de un bloque de código.
+                    \item \textbf{\}}: llave derecha. Indica el fin de un bloque de código.
+                    \item \textbf{$\&\&$}: doble signo et. Indica el fin de declaraciones.
+                \end{itemize}
+            \item \textbf{Operador de asignación}: =
+            \item \textbf{Operador de evaluación}: @
+        \end{itemize}
+        \subsubsection*{Cadenas ignorables}
+        \begin{itemize}
+            \item \textbf{Espacios en blanco}.
+            \item \textbf{Retroceso}: \textbackslash b
+            \item \textbf{Tabulador}: \textbackslash t
+            \item \textbf{Retorno de carro}: \textbackslash r
+            \item \textbf{Salto de línea}: \textbackslash n
+        \end{itemize}
+    \subsubsection{Especificación formal}
+        \subsubsection*{Definiciones auxiliares}
+        \begin{itemize}
+            \item \textbf{letra }$\equiv$ [a-z,A-Z]
+            \item \textbf{digito }$\equiv$ [0-9]
+            \item \textbf{digitoSinCero }$\equiv$ [1-9]
+            \item \textbf{parteEntera }$\equiv$ (\{digitoSinCero\} \{digito\}*) \textbar\ 0
+            \item \textbf{parteDecimal }$\equiv$ (\{digito\}* \{digitoSinCero\}) \textbar\ 0
+        \end{itemize}
+        \subsubsection*{Definiciones léxicas}
+        \begin{itemize}
+            \item \textbf{suma }$\equiv$ \textbackslash+
+            \item \textbf{resta }$\equiv$ \textbackslash-
+            \item \textbf{mul }$\equiv$ \textbackslash*
+            \item \textbf{div }$\equiv$ /
+            \item \textbf{parentesisAbrir }$\equiv$ \textbackslash(
+            \item \textbf{parentesisCerrar }$\equiv$ \textbackslash)
+            \item \textbf{abrirBloque }$\equiv$ \textbackslash\{
+            \item \textbf{cerrarBloque }$\equiv$ \textbackslash\}
+            \item \textbf{separadorDeclaraciones }$\equiv$ ;
+            \item \textbf{finDeclaraciones }$\equiv \&\& $
+            \item \textbf{asignacion }$\equiv$ \textbackslash=
+            \item \textbf{menor }$\equiv$ \textless
+            \item \textbf{mayor }$\equiv$ \textgreater
+            \item \textbf{menorIgual }$\equiv$ \textless\textbackslash=
+            \item \textbf{mayorIgual }$\equiv$ \textgreater\textbackslash=
+            \item \textbf{igual }$\equiv$ \textbackslash=\textbackslash=
+            \item \textbf{no igual }$\equiv$ !\textbackslash=
+            \item \textbf{and }$\equiv$ and
+            \item \textbf{or }$\equiv$ or
+            \item \textbf{not }$\equiv$ not
+            \item \textbf{true }$\equiv$ true
+            \item \textbf{false }$\equiv$ false
+            \item \textbf{tipo entero }$\equiv$ int
+            \item \textbf{tipo real }$\equiv$ real
+            \item \textbf{tipo booleano }$\equiv$ bool
+            \item \textbf{eval }$\equiv$ @
+            \item \textbf{punto }$\equiv$ \textbackslash.
+            \item \textbf{identificador }$\equiv$ (\{letra\} \textbar\ \_) (\{letra\} \textbar\ \{dígito\} \textbar\ \_ )*
+            \item \textbf{literalEntero }$\equiv$ ( \textbackslash + \textbar\ \textbackslash - )? \{parteEntera\}
+            \item \textbf{literalReal }  $\equiv$ \{literalEntero\}((\textbackslash.\{parteDecimal\})((e \textbar\ E)\{literalEntero\})) \textbar\ (\textbackslash.\{parteDecimal\}) \textbar\ ((e \textbar\ E)\{literalEntero\})
+        \end{itemize}
+        \subsubsection*{Definiciones cadenas ignorables}
+        \begin{itemize}
+            \item \textbf{separador }$\equiv$ [ ,\textbackslash t,\textbackslash r,\textbackslash b,\textbackslash n]
+        \end{itemize}
+    \subsubsection{Diagrama de transiciones}
+        \includegraphics[width=\paperwidth, angle=90]{tiny0}
+    \subsection{Tiny}
+        \subsubsection{Clases léxicas}
+        A continuación se presentan las clases léxicas del lenguaje Tiny:
+        \subsubsection*{Clases léxicas}
+        \begin{itemize}
+            \item \textbf{Identificador (variable)}: Comienzan necesariamente por una letra o subrayado (\_), seguida de una secuencia de cero o más letras, dígitos, o subrayado (\_).
+            \item \textbf{Una clase léxica por cada tipo de variable}:
+            \begin{itemize}
+                \item \textbf{int}: representa los números enteros.
+                \item \textbf{real}: representa los números reales.
+                \item \textbf{bool}: representa los valores booleanos (true o false).
+                \item \textbf{string}: representa las cadenas de caracteres.
+                \item \textbf{array}: representa los arreglos.
+            \end{itemize}
+            \item \textbf{Literal entero}
+            \item \textbf{Literal real}
+            \item \textbf{Literal booleano}
+            \item \textbf{Literal cadena}
+            \item \textbf{Una clase léxica por cada operador aritmético}:
+            \begin{itemize}
+                \item \textbf{+}: suma.
+                \item \textbf{-}: resta.
+                \item \textbf{*}: multiplicación.
+                \item \textbf{/}: división.
+            \end{itemize}
+            \item \textbf{Una clase léxica por cada operador lógico}:
+            \begin{itemize}
+                \item \textbf{and}: conjunción.
+                \item \textbf{or}: disyunción.
+                \item \textbf{not}: negación.
+            \end{itemize}
+            \item \textbf{Una clase léxica por cada operador relacional}:
+            \begin{itemize}
+                \item \textbf{\textless}: menor que.
+                \item \textbf{\textgreater}: mayor que.
+                \item \textbf{\textless=}: menor o igual que.
+                \item \textbf{\textgreater=}: mayor o igual que.
+                \item \textbf{==}: igual que.
+                \item \textbf{!=}: distinto que.
+            \end{itemize}
+            \item \textbf{Una clase léxica por cada símbolo de puntuación}:
+            \begin{itemize}
+                \item \textbf{(}: paréntesis izquierdo.
+                \item \textbf{)}: paréntesis derecho.
+                \item \textbf{;}: punto y coma.
+                \item \textbf{,}: coma.
+                \item \textbf{.}: punto.
+                \item \textbf{\{}: llave izquierda.
+                \item \textbf{\}}: llave derecha.
+                \item \textbf{$\&$}: signo et simple.
+                \item \textbf{$\&\&$}: doble signo et.
+                \item \textbf{[}: corchete izquierdo.
+                \item \textbf{]}: corchete derecho.
+                \item \textbf{\%}: porcentaje.
+                \item \textbf{\^{}}: acento circunflejo.
+            \end{itemize}
+            \item \textbf{Operador de asignación}: =
+            \item \textbf{Operador de evaluación}: @
+            \item \textbf{Una clase léxica por cada palabra reservada}:
+                \begin{itemize}
+                    \item \textbf{null}: representa el valor nulo.
+                    \item \textbf{proc}: palabra reservada para definir un procedimiento.
+                    \item \textbf{if}: palabra reservada para definir una condición.
+                    \item \textbf{else}: palabra reservada para definir una condición alternativa.
+                    \item \textbf{while}: palabra reservada para definir un bucle.
+                    \item \textbf{struct}: palabra reservada para definir una estructura.
+                    \item \textbf{new}: palabra reservada para instrucción de reserva de memoria.
+                    \item \textbf{delete}: palabra reservada para instrucción de liberación de memoria.
+                    \item \textbf{read}: palabra reservada para instrucción de lectura.
+                    \item \textbf{write}: palabra reservada para instrucción de escritura.
+                    \item \textbf{nl}: palabra reservada para instrucción de nueva linea.
+                    \item \textbf{type}: palabra reservada para declaración de tipo.
+                    \item \textbf{call}: palabra reservada para instrucción de invocación a procedimiento.
+                \end{itemize}
+        \end{itemize}
+        \subsubsection*{Cadenas ignorables}
+        \begin{itemize}
+            \item \textbf{Espacios en blanco}.
+            \item \textbf{Retroceso}: \textbackslash b
+            \item \textbf{Tabulador}: \textbackslash t
+            \item \textbf{Retorno de carro}: \textbackslash r
+            \item \textbf{Salto de línea}: \textbackslash n
+            \item \textbf{Comentarios}: comienzan con \#\# y terminan con un salto de línea.
+        \end{itemize}
+        \subsubsection{Especificación formal}
+        \subsubsection*{Definiciones auxiliares}
+        \begin{itemize}
+            \item \textbf{letra }$\equiv$ [a-z,A-Z]
+            \item \textbf{digito }$\equiv$ [0-9]
+            \item \textbf{digitoSinCero }$\equiv$ [1-9]
+            \item \textbf{parteEntera }$\equiv$ (\{digitoSinCero\} \{digito\}*) \textbar\ 0
+            \item \textbf{parteDecimal }$\equiv$ (\{digito\}* \{digitoSinCero\}) \textbar\ 0
+        \end{itemize}
+        \subsubsection*{Definiciones léxicas}
+        \begin{itemize}
+            \item \textbf{suma }$\equiv$ \textbackslash+
+            \item \textbf{resta }$\equiv$ \textbackslash-
+            \item \textbf{mul }$\equiv$ \textbackslash*
+            \item \textbf{div }$\equiv$ /
+            \item \textbf{parentesisAbrir }$\equiv$ \textbackslash(
+            \item \textbf{parentesisCerrar }$\equiv$ \textbackslash)
+            \item \textbf{abrirBloque }$\equiv$ \textbackslash\{
+            \item \textbf{cerrarBloque }$\equiv$ \textbackslash\}
+            \item \textbf{tamañoAbrir  }$\equiv$ [
+            \item \textbf{tamañoCerrar }$\equiv$ ]
+            \item \textbf{finDeclaraciones }$\equiv \&\& $
+            \item \textbf{asignacion }$\equiv$ \textbackslash=
+            \item \textbf{menor }$\equiv$ \textless
+            \item \textbf{mayor }$\equiv$ \textgreater
+            \item \textbf{menorIgual }$\equiv$ \textless\textbackslash=
+            \item \textbf{mayorIgual }$\equiv$ \textgreater\textbackslash=
+            \item \textbf{igual }$\equiv$ \textbackslash=\textbackslash=
+            \item \textbf{no igual }$\equiv$ !\textbackslash=
+            \item \textbf{and }$\equiv$ and
+            \item \textbf{or }$\equiv$ or
+            \item \textbf{not }$\equiv$ not
+            \item \textbf{true }$\equiv$ true
+            \item \textbf{false }$\equiv$ false
+            \item \textbf{modulo }$\equiv$ \%
+            \item \textbf{puntero }$\equiv$ \^{}
+            \item \textbf{bitwiseAnd }$\equiv$ $\&$
+            \item \textbf{tipo entero }$\equiv$ int
+            \item \textbf{tipo real }$\equiv$ real
+            \item \textbf{tipo booleano }$\equiv$ bool
+            \item \textbf{tipo string }$\equiv$ string
+            \item \textbf{tipo array }$\equiv$ array
+            \item \textbf{creacionTipo }$\equiv$ type
+            \item \textbf{null }$\equiv$ null
+            \item \textbf{procedimiento }$\equiv$ proc
+            \item \textbf{if }$\equiv$ if
+            \item \textbf{else }$\equiv$ else
+            \item \textbf{while }$\equiv$ while
+            \item \textbf{estructura }$\equiv$ struct
+            \item \textbf{new }$\equiv$ new
+            \item \textbf{delete }$\equiv$ delete
+            \item \textbf{read }$\equiv$ read
+            \item \textbf{write }$\equiv$ write
+            \item \textbf{nl }$\equiv$ nl
+            \item \textbf{call }$\equiv$ call
+            \item \textbf{eval }$\equiv$ @
+            \item \textbf{punto }$\equiv$ \textbackslash.
+            \item \textbf{identificador }$\equiv$ (\{letra\} \textbar\ \_) (\{letra\} \textbar\ \{dígito\} \textbar\ \_ )*
+            \item \textbf{literalEntero }$\equiv$ ( \textbackslash + \textbar\ \textbackslash - )? \{parteEntera\}
+            \item \textbf{literalReal }  $\equiv$ \{literalEntero\}((\textbackslash.\{parteDecimal\})((e \textbar\ E)\{literalEntero\})) \textbar\ (\textbackslash.\{parteDecimal\}) \textbar\ ((e \textbar\ E)\{literalEntero\})
+        \end{itemize}
+        \subsubsection*{Definiciones cadenas ignorables}
+        \begin{itemize}
+            \item \textbf{separador }$\equiv$ [ ,\textbackslash t,\textbackslash r,\textbackslash b,\textbackslash n]
+            \item \textbf{comentario }$\equiv$ \#\#([\^{}\textbackslash n, EOF])*
+        \end{itemize}
+
+
+\end{document}
