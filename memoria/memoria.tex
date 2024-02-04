@@ -176,19 +176,19 @@ más importante) es llevar a cabo su especificación léxica. Esto se llevará a
             \end{itemize}
             \item \textbf{Una clase léxica por cada símbolo de puntuación}:
             \begin{itemize}
-                \item \textbf{(}: paréntesis izquierdo.
-                \item \textbf{)}: paréntesis derecho.
-                \item \textbf{;}: punto y coma.
-                \item \textbf{,}: coma.
-                \item \textbf{.}: punto.
-                \item \textbf{\{}: llave izquierda.
-                \item \textbf{\}}: llave derecha.
-                \item \textbf{$\&$}: signo et simple.
-                \item \textbf{$\&\&$}: doble signo et.
-                \item \textbf{[}: corchete izquierdo.
-                \item \textbf{]}: corchete derecho.
-                \item \textbf{\%}: porcentaje.
-                \item \textbf{\^{}}: acento circunflejo.
+                \item \textbf{(}: paréntesis izquierdo. Sirve para asociatividad. También indica el inicio de una lista de parámetros cuando se definen procedimientos y el inicio de argumentos cuando se llama una función.
+                \item \textbf{)}: paréntesis derecho. Sirve para asociatividad. También indica el fin de una lista de parámetros cuando se definen procedimientos y el fin de argumentos cuando se llama una función.
+                \item \textbf{;}: punto y coma. Sirve para separar declaraciones en la sección de declaraciones, o separar instrucciones en la sección de instrucciones.
+                \item \textbf{,}: coma. Separa los campos dentro de la definición de un struct, los parámetros en la definición de un procedimiento, y los argumentos en la llamada a una función.
+                \item \textbf{.}: punto. Para los decimales, y es un operador de "acceso a registro".
+                \item \textbf{\{}: llave izquierda. Indica el inicio de un bloque de código. También indica el inicio de la definición de un struct.
+                \item \textbf{\}}: llave derecha. Indica el fin de un bloque de código. También indica el fin de la definición de un struct.
+                \item \textbf{$\&$}: signo et simple. Indica que un parámetro de un procedimiento se pasa por referencia.
+                \item \textbf{$\&\&$}: doble signo et. Indica el fin de declaraciones.
+                \item \textbf{[}: corchete izquierdo. Operador de indexación.
+                \item \textbf{]}: corchete derecho. Operador de indexación.
+                \item \textbf{\%}: operador módulo.
+                \item \textbf{\^{}}: acento circunflejo. Se usa para definir un puntero. También es el operador de indirección.
             \end{itemize}
             \item \textbf{Operador de asignación}: =
             \item \textbf{Operador de evaluación}: @
