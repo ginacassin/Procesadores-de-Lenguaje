@@ -85,6 +85,7 @@ más importante) es llevar a cabo su especificación léxica. Esto se llevará a
             \item \textbf{Tabulador}: \textbackslash t
             \item \textbf{Retorno de carro}: \textbackslash r
             \item \textbf{Salto de línea}: \textbackslash n
+            \item \textbf{Comentarios}: comienzan con \#\# y terminan con un salto de línea.
         \end{itemize}
     \subsubsection{Especificación formal}
         \subsubsection*{Definiciones auxiliares}
@@ -131,9 +132,10 @@ más importante) es llevar a cabo su especificación léxica. Esto se llevará a
         \subsubsection*{Definiciones cadenas ignorables}
         \begin{itemize}
             \item \textbf{separador }$\equiv$ [ ,\textbackslash t,\textbackslash r,\textbackslash b,\textbackslash n]
+            \item \textbf{comentario }$\equiv$ \#\#([\^{}\textbackslash n, EOF])*
         \end{itemize}
     \subsubsection{Diagrama de transiciones}
-        \includegraphics[width=\paperwidth, angle=90]{tiny0}
+        \includegraphics[scale=0.2]{tiny0}
     \subsection{Tiny}
         \subsubsection{Clases léxicas}
         A continuación se presentan las clases léxicas del lenguaje Tiny:
