@@ -42,7 +42,8 @@ más importante) es llevar a cabo su especificación léxica. Esto se llevará a
                 \end{itemize}
             \item \textbf{Literal entero}
             \item \textbf{Literal real}
-            \item \textbf{Literal booleano}
+            \item \textbf{Literal verdadero}
+            \item \textbf{Literal falso}
             \item \textbf{Una clase léxica por cada operador aritmético}:
                 \begin{itemize}
                     \item \textbf{+}: suma.
@@ -120,9 +121,9 @@ más importante) es llevar a cabo su especificación léxica. Esto se llevará a
             \item \textbf{not }$\equiv$ (n \textbar\ N)(o \textbar\ O)(t \textbar\ T)
             \item \textbf{true }$\equiv$ (t \textbar\ T)(r \textbar\ R)(u \textbar\ U)(e \textbar\ E)
             \item \textbf{false }$\equiv$ (f \textbar\ F)(a \textbar\ A)(l \textbar\ L)(s \textbar\ S)(e \textbar\ E)
-            \item \textbf{tipo entero }$\equiv$ int
-            \item \textbf{tipo real }$\equiv$ real
-            \item \textbf{tipo booleano }$\equiv$ bool
+            \item \textbf{tipo entero }$\equiv$ (i \textbar\ I)(n \textbar\ N)(t \textbar\ T)
+            \item \textbf{tipo real }$\equiv$ (r \textbar\ R)(e \textbar\ E)(a \textbar\ A)(l \textbar\ L)
+            \item \textbf{tipo booleano }$\equiv$ (b \textbar\ B)(o \textbar\ O)(o \textbar\ O)(l \textbar\ L)
             \item \textbf{eval }$\equiv$ @
             \item \textbf{punto }$\equiv$ \textbackslash.
             \item \textbf{identificador }$\equiv$ (\{letra\} \textbar\ \_) (\{letra\} \textbar\ \{dígito\} \textbar\ \_ )*
@@ -148,11 +149,11 @@ más importante) es llevar a cabo su especificación léxica. Esto se llevará a
                 \item \textbf{real}: representa los números reales.
                 \item \textbf{bool}: representa los valores booleanos (true o false).
                 \item \textbf{string}: representa las cadenas de caracteres.
-                \item \textbf{array}: representa los arreglos.
             \end{itemize}
             \item \textbf{Literal entero}
             \item \textbf{Literal real}
-            \item \textbf{Literal booleano}
+            \item \textbf{Literal verdadero}
+            \item \textbf{Literal falso}
             \item \textbf{Literal cadena}
             \item \textbf{Una clase léxica por cada operador aritmético}:
             \begin{itemize}
@@ -239,8 +240,8 @@ más importante) es llevar a cabo su especificación léxica. Esto se llevará a
             \item \textbf{parentesisCerrar }$\equiv$ \textbackslash)
             \item \textbf{abrirBloque }$\equiv$ \textbackslash\{
             \item \textbf{cerrarBloque }$\equiv$ \textbackslash\}
-            \item \textbf{tamañoAbrir  }$\equiv$ [
-            \item \textbf{tamañoCerrar }$\equiv$ ]
+            \item \textbf{tamañoAbrir  }$\equiv$ \textbackslash[
+            \item \textbf{tamañoCerrar }$\equiv$ \textbackslash]
             \item \textbf{finDeclaraciones }$\equiv \&\& $
             \item \textbf{asignacion }$\equiv$ \textbackslash=
             \item \textbf{menor }$\equiv$ \textless
@@ -257,11 +258,10 @@ más importante) es llevar a cabo su especificación léxica. Esto se llevará a
             \item \textbf{modulo }$\equiv$ \%
             \item \textbf{puntero }$\equiv$ \^{}
             \item \textbf{bitwiseAnd }$\equiv$ $\&$
-            \item \textbf{tipo entero }$\equiv$ int
-            \item \textbf{tipo real }$\equiv$ real
-            \item \textbf{tipo booleano }$\equiv$ bool
-            \item \textbf{tipo string }$\equiv$ string
-            \item \textbf{tipo array }$\equiv$ array
+            \item \textbf{tipo entero }$\equiv$ (i \textbar\ I)(n \textbar\ N)(t \textbar\ T)
+            \item \textbf{tipo real }$\equiv$ (r \textbar\ R)(e \textbar\ E)(a \textbar\ A)(l \textbar\ L)
+            \item \textbf{tipo booleano }$\equiv$ (b \textbar\ B)(o \textbar\ O)(o \textbar\ O)(l \textbar\ L)
+            \item \textbf{tipo string }$\equiv$ (s \textbar\ S)(t \textbar\ T)(r \textbar\ R)(i \textbar\ I)(n \textbar\ N)(g \textbar\ G)
             \item \textbf{null }$\equiv$ (n \textbar\ N)(u \textbar\ U)(l \textbar\ L)(l \textbar\ L)
             \item \textbf{proc }$\equiv$ (p \textbar\ P)(r \textbar\ R)(o \textbar\ O)(c \textbar\ C)
             \item \textbf{if }$\equiv$ (i \textbar\ I)(f \textbar\ F)
@@ -277,9 +277,12 @@ más importante) es llevar a cabo su especificación léxica. Esto se llevará a
             \item \textbf{call }$\equiv$ (c \textbar\ C)(a \textbar\ A)(l \textbar\ L)(l \textbar\ L)
             \item \textbf{eval }$\equiv$ @
             \item \textbf{punto }$\equiv$ \textbackslash.
+            \item \textbf{coma }$\equiv$ \textbackslash,
+            \item \textbf{punto y coma }$\equiv$ \textbackslash;
             \item \textbf{identificador }$\equiv$ (\{letra\} \textbar\ \_) (\{letra\} \textbar\ \{dígito\} \textbar\ \_ )*
             \item \textbf{literalEntero }$\equiv$ ( \textbackslash + \textbar\ \textbackslash - )? \{parteEntera\}
             \item \textbf{literalReal }  $\equiv$ \{literalEntero\}((\textbackslash.\{parteDecimal\})((e \textbar\ E)\{literalEntero\})) \textbar\ (\textbackslash.\{parteDecimal\}) \textbar\ ((e \textbar\ E)\{literalEntero\})
+            \item \textbf{literalCadena }  $\equiv$ "[^"]*"
         \end{itemize}
         \subsubsection*{Definiciones cadenas ignorables}
         \begin{itemize}
