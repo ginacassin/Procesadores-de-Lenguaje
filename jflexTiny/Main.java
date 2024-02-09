@@ -8,7 +8,7 @@ import java.io.Reader;
 
 public class Main {
     public static void main(String[] args) throws FileNotFoundException, IOException {
-        Reader input = new InputStreamReader(new FileInputStream("C:/Users/robus/Desktop/analizadorLexico(implementacion JFLex)/alex/input.txt"));
+        Reader input = new InputStreamReader(new FileInputStream("C:/Users/robus/Desktop/PL/Procesadores-de-Lenguaje/jflexTiny/input.txt"));
         AnalizadorLexicoTiny al = new AnalizadorLexicoTiny(input);
         UnidadLexica unidad;
         do {
