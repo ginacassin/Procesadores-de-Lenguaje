@@ -1,3 +1,4 @@
+package alex;
 
 import java.io.FileInputStream;
 import java.io.Reader;
@@ -5,6 +6,12 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 
 public class AnalizadorLexicoTiny {
+    public static class ECaracterInesperado extends RuntimeException {
+        public ECaracterInesperado(String msg) {
+            super(msg);
+        }
+    }; 
+
     private Reader input;
     private StringBuffer lex;
     private int sigCar;
@@ -21,9 +28,6 @@ public class AnalizadorLexicoTiny {
         REC_DIV, REC_LAP, REC_LCIE, REC_PAP, REC_PCIE, REC_ID,
         REC_0, REC_MENOS, REC_ENT, REC_MAS, REC_IDEC1, REC_IDEC2, REC_0DEC,
         REC_EEXP, REC_EXP_MAS, REC_EXP_MENOS, REC_EXP, REC_EXP0
-
-        // REC_POR, REC_DIV, REC_PAP, REC_PCIERR, REC_COMA, REC_IGUAL,
-        // REC_MAS, REC_MENOS, REC_ID, REC_ENT, REC_0, REC_IDEC, REC_DEC, REC_COM, REC_EOF
     }
 
     private Estado estado;
@@ -45,7 +49,7 @@ public class AnalizadorLexicoTiny {
             switch(estado) { // Los estados finales no devuelven error. Los no-finales, sí pueden devolver error.
                 case INICIO:
                     if (hayAmpersand()) transita(Estado.REC_FIN_DEC1);
-                    else if (hayAlmohadilla()) transita(Estado.REC_COM1);
+                    else if (hayAlmohadilla()) transitaIgnorando(Estado.REC_COM1);
                     else if (hayPYComa()) transita(Estado.REC_SEP);
                     else if (hayArroba()) transita(Estado.REC_EVAL);
                     else if (hayEOF()) transita(Estado.REC_EOF);
@@ -73,12 +77,12 @@ public class AnalizadorLexicoTiny {
                     break;
                 case REC_FIN_DEC2: return unidadFinDeclaraciones();
                 case REC_COM1:
-                    if (hayAlmohadilla()) transita(Estado.REC_COM2);
+                    if (hayAlmohadilla()) transitaIgnorando(Estado.REC_COM2);
                     else error();
                     break;
                 case REC_COM2:
                     if (hayEOF()) transita(Estado.REC_EOF);
-                    if (hayN()) transitaIgnorando(Estado.INICIO);
+                    else if (hayN()) transitaIgnorando(Estado.INICIO);
                     else transitaIgnorando(Estado.REC_COM2);
                     break;
                 case REC_EOF: return unidadEof();
@@ -319,18 +323,35 @@ public class AnalizadorLexicoTiny {
         return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,ClaseLexica.COMP_IGUALDAD);
     }
     private void error() {
-        System.err.println("("+filaActual+','+columnaActual+"):Caracter inesperado");
-        System.exit(1);
+        int curCar = sigCar;
+        try {
+            sigCar();
+        }
+        catch(IOException e) {}
+        throw new ECaracterInesperado("("+filaActual+','+columnaActual+"):Caracter inexperado:"+(char)curCar); 
+    }
+
+    private static void imprime(UnidadLexica unidad) {
+        switch(unidad.clase()) {
+            case IDEN: case ENT: case REAL: System.out.println(unidad.lexema()); break;
+                      default: System.out.println(unidad.clase().getImage());
+        }
     }
 
     public static void main(String arg[]) throws IOException {
         Reader input = new InputStreamReader(new FileInputStream("input.txt"));
         AnalizadorLexicoTiny al = new AnalizadorLexicoTiny(input);
-        UnidadLexica unidad;
+        UnidadLexica unidad = null;
         do {
-            unidad = al.sigToken();
-            System.out.println(unidad);
+            try {
+                unidad = al.sigToken();
+                // System.out.println(unidad);
+                imprime(unidad);
+            }
+            catch (ECaracterInesperado e) {
+                System.out.println("ERROR");
+            }
         }
-        while (unidad.clase() != ClaseLexica.EOF);
+        while (unidad == null || unidad.clase() != ClaseLexica.EOF);
     } 
 }
