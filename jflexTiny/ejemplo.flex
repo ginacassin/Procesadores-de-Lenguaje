@@ -7,6 +7,7 @@ package alex;
 %class AnalizadorLexicoTiny
 %type  UnidadLexica
 %unicode
+%public
 
 //codigo que se incluye en la clase generada
 %{
@@ -49,7 +50,7 @@ mayor = >
 menorIgual = <\=
 mayorIgual = >\=
 igual = \=\=
-noIgual = !\=
+noIgual = \!\=
 and = (a|A)(n|N)(d|D)
 or = (o|O)(r|R)
 not = (n|N)(o|O)(t|T)
@@ -78,9 +79,11 @@ call = (c|C)(a|A)(l|L)(l|L)
 eval = @
 punto = \.
 coma = \,
+puntoyComa = \;
 identificador = ({letra}|_)({letra}|{digito}|_)*
-literalEntero = (\+|\-)?{parteEntera}
 literalReal = {literalEntero}((\.{parteDecimal})((e|E){literalEntero}))|(\.{parteDecimal})|((e|E){literalEntero})
+literalEntero = (\+|\-)?{parteEntera}
+literalCadena = \"\[\^\"\]\"
 //definicion de cadenas ignorables
 separador = [ \t\r\b\n]
 comentario = ##([^\n,EOF])*
@@ -134,7 +137,9 @@ comentario = ##([^\n,EOF])*
 {eval}                    {return ops.unidadEval();}
 {punto}                   {return ops.unidadPunto();}
 {coma}                    {return ops.unidadComa();}
+{puntoyComa}              {return ops.unidadPuntoyComa();}
 {identificador}           {return ops.unidadId();}
 {literalEntero}           {return ops.unidadEnt();}
 {literalReal}             {return ops.unidadReal();}
+{literalCadena}           {return ops.unidadCadena();}
 [^]                       {ops.error();}

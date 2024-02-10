@@ -198,6 +198,10 @@ public class ALexOperations {
         return new UnidadLexicaUnivaluada(alex.fila(), alex.columna(), ClaseLexica.COMA);
     }
 
+    public UnidadLexica unidadPuntoyComa() {
+        return new UnidadLexicaUnivaluada(alex.fila(), alex.columna(), ClaseLexica.PUNTOCOMA);
+    }
+
     public UnidadLexica unidadId() {
         return new UnidadLexicaMultivaluada(alex.fila(), alex.columna(), ClaseLexica.IDEN, alex.lexema());
     }
@@ -210,4 +214,7 @@ public class ALexOperations {
         return new UnidadLexicaMultivaluada(alex.fila(), alex.columna(), ClaseLexica.LITREAL, alex.lexema());
     }
 
+    public UnidadLexica unidadCadena() {
+        return new UnidadLexicaMultivaluada(alex.fila(), alex.columna(), ClaseLexica.LITCADENA, alex.lexema());
+    }
 }
