@@ -86,7 +86,7 @@ literalReal = {literalEntero}((\.{parteDecimal})((e|E){literalEntero}))|(\.{part
 literalCadena = \"\[\^\"\]\"
 //definicion de cadenas ignorables
 separador = [ \t\r\b\n]
-comentario = ##([^\n,EOF])*
+comentario = ##([^\n])*
 %%
 //descripcion del programa de procesamiento
 {separador}               {}
