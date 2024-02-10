@@ -28,8 +28,8 @@ package alex;
 //EXPRESIONES REGULARES
 //definiciones auxiliares
 letra  = ([A-Z]|[a-z])
-digitoSinCero = [1-9]
 digito = [0-9]
+digitoSinCero = [1-9]
 parteEntera = ({digitoSinCero}{digito}*)|0
 parteDecimal = ({digito}*{digitoSinCero})|0
 //definiciones lexicas
@@ -64,11 +64,11 @@ tipoReal = (r|R)(e|E)(a|A)(l|L)
 tipoBooleano = (b|B)(o|O)(o|O)(l|L)
 tipoString = (s|S)(t|T)(r|R)(i|I)(n|N)(g|G)
 null = (n|N)(u|U)(l|L)(l|L)
-procedimiento = (p|P)(r|R)(o|O)(c|C)
+proc = (p|P)(r|R)(o|O)(c|C)
 if = (i|I)(f|F)
 else = (e|E)(l|L)(s|S)(e|E)
 while = (w|W)(h|H)(i|I)(l|L)(e|E)
-estructura = (s|S)(t|T)(r|R)(u|U)(c|C)(t|T)
+struct = (s|S)(t|T)(r|R)(u|U)(c|C)(t|T)
 new = (n|N)(e|E)(w|W)
 delete = (d|D)(e|E)(l|L)(e|E)(t|T)(e|E)
 read = (r|R)(e|E)(a|A)(d|D)
@@ -81,8 +81,8 @@ punto = \.
 coma = \,
 puntoyComa = \;
 identificador = ({letra}|_)({letra}|{digito}|_)*
-literalReal = {literalEntero}((\.{parteDecimal})((e|E){literalEntero}))|(\.{parteDecimal})|((e|E){literalEntero})
 literalEntero = (\+|\-)?{parteEntera}
+literalReal = {literalEntero}((\.{parteDecimal})((e|E){literalEntero}))|(\.{parteDecimal})|((e|E){literalEntero})
 literalCadena = \"\[\^\"\]\"
 //definicion de cadenas ignorables
 separador = [ \t\r\b\n]
@@ -95,8 +95,8 @@ comentario = ##([^\n,EOF])*
 {resta}                   {return ops.unidadResta();}
 {mul}                     {return ops.unidadMul();}
 {div}                     {return ops.unidadDiv();}
-{parentesisAbrir}         {return ops.unidadPAp();}
-{parentesisCerrar}        {return ops.unidadPCierre();}
+{parentesisAbrir}         {return ops.unidadParentesisAbrir();}
+{parentesisCerrar}        {return ops.unidadParentesisCerrar();}
 {abrirBloque}             {return ops.unidadAbrirBloque();}
 {cerrarBloque}            {return ops.unidadCerrarBloque();}
 {tamanoAbrir}             {return ops.unidadTamanoAbrir();}
@@ -122,11 +122,11 @@ comentario = ##([^\n,EOF])*
 {tipoBooleano}            {return ops.unidadTipoBooleano();}
 {tipoString}              {return ops.unidadTipoString();}
 {null}                    {return ops.unidadNull();}
-{procedimiento}           {return ops.unidadProcedimiento();}
+{proc}                    {return ops.unidadProc();}
 {if}                      {return ops.unidadIf();}
 {else}                    {return ops.unidadtElse();}
 {while}                   {return ops.unidadWhile();}
-{estructura}              {return ops.unidadEstructura();}
+{struct}                  {return ops.unidadStruct();}
 {new}                     {return ops.unidadNew();}
 {delete}                  {return ops.unidadDelete();}
 {read}                    {return ops.unidadRead();}
@@ -137,9 +137,9 @@ comentario = ##([^\n,EOF])*
 {eval}                    {return ops.unidadEval();}
 {punto}                   {return ops.unidadPunto();}
 {coma}                    {return ops.unidadComa();}
-{puntoyComa}              {return ops.unidadPuntoyComa();}
-{identificador}           {return ops.unidadId();}
-{literalEntero}           {return ops.unidadEnt();}
-{literalReal}             {return ops.unidadReal();}
-{literalCadena}           {return ops.unidadCadena();}
+{puntoYComa}              {return ops.unidadPuntoYComa();}
+{identificador}           {return ops.unidadIdentificador();}
+{literalEntero}           {return ops.unidadLiteralEntero();}
+{literalReal}             {return ops.unidadLiteralReal();}
+{literalCadena}           {return ops.unidadLiteralCadena();}
 [^]                       {ops.error();}

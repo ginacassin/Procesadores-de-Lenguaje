@@ -8,12 +8,18 @@ import java.io.Reader;
 
 public class Main {
     public static void main(String[] args) throws FileNotFoundException, IOException {
-        Reader input = new InputStreamReader(new FileInputStream("C:/Users/robus/Desktop/PL/Procesadores-de-Lenguaje/jflexTiny/input.txt"));
+        Reader input = new InputStreamReader(new FileInputStream(new FileInputStream(args[0])));
         AnalizadorLexicoTiny al = new AnalizadorLexicoTiny(input);
         UnidadLexica unidad;
         do {
-            unidad = al.yylex();
-            System.out.println(unidad);
+            try {
+                unidad = al.yylex();
+                System.out.println(unidad);
+            }
+            catch(ECaracterInesperado e) {
+                System.out.println(e.getMessage());
+                System.exit(1);
+            }
         }
         while (unidad.clase() != ClaseLexica.EOF);
     }
