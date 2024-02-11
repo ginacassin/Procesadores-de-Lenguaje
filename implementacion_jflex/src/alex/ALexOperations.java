@@ -124,11 +124,11 @@ public class ALexOperations {
     }
 
     public UnidadLexica unidadTipoEntero() {
-        return new UnidadLexicaUnivaluada(alex.fila(), alex.columna(), ClaseLexica.ENTERO);
+        return new UnidadLexicaMultivaluada(alex.fila(), alex.columna(), ClaseLexica.ENTERO, alex.lexema());
     }
 
     public UnidadLexica unidadTipoReal() {
-        return new UnidadLexicaUnivaluada(alex.fila(), alex.columna(), ClaseLexica.REAL);
+        return new UnidadLexicaMultivaluada(alex.fila(), alex.columna(), ClaseLexica.REAL, alex.lexema());
     }
 
     public UnidadLexica unidadTipoBooleano() {
