@@ -81,8 +81,8 @@ punto = \.
 coma = \,
 puntoYComa = \;
 identificador = ({letra}|_)({letra}|{digito}|_)*
-literalReal = {literalEntero}((\.{parteDecimal})((e|E){literalEntero}))|(\.{parteDecimal})|((e|E){literalEntero})
 literalEntero = (\+|\-)?{parteEntera}
+literalReal = (\+|\-)?{parteEntera}((\.{parteDecimal})((e|E)(\+|\-)?{parteEntera}))|(\.{parteDecimal})|((e|E)(\+|\-)?{parteEntera})
 literalCadena = \"[^\"]*\"
 //definicion de cadenas ignorables
 separador = [ \t\r\b\n]
