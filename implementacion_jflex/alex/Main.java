@@ -16,11 +16,11 @@ public class Main {
                 unidad = al.yylex();
                 System.out.println(unidad);
             }
-            catch(ECaracterInesperado e) {
+            catch (ECaracterInesperado e) {
                 System.out.println(e.getMessage());
                 System.exit(1);
             }
         }
-        while (unidad.clase() != ClaseLexica.EOF);
+        while (unidad == null || unidad.clase() != ClaseLexica.EOF);
     }
 }
