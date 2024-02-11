@@ -82,7 +82,7 @@ coma = \,
 puntoYComa = \;
 identificador = ({letra}|_)({letra}|{digito}|_)*
 literalEntero = (\+|\-)?{parteEntera}
-literalReal = (\+|\-)?{parteEntera}((\.{parteDecimal})((e|E)(\+|\-)?{parteEntera}))|(\.{parteDecimal})|((e|E)(\+|\-)?{parteEntera})
+literalReal = (\+|\-)?{parteEntera}(\.{parteDecimal})?((e|E)(\+|\-)?{parteEntera})?
 literalCadena = \"[^\"]*\"
 //definicion de cadenas ignorables
 separador = [ \t\r\b\n]
@@ -124,7 +124,7 @@ comentario = ##([^\n])*
 {null}                    {return ops.unidadNull();}
 {proc}                    {return ops.unidadProc();}
 {if}                      {return ops.unidadIf();}
-{else}                    {return ops.unidadtElse();}
+{else}                    {return ops.unidadElse();}
 {while}                   {return ops.unidadWhile();}
 {struct}                  {return ops.unidadStruct();}
 {new}                     {return ops.unidadNew();}
