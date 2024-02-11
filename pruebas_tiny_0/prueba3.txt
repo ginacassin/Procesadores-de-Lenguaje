@@ -1,0 +1,11 @@
+## Verifiquemos que los identificadores se leen correctamente
+ejemplo
+ejemplo1
+eJemPLO2
+EJEMPLO3
+_EjempLo_4_
+
+## Estos no deberian ser un unico identificador
+ejem[plo5
+ejempl*o6
+_ejempl&&o7

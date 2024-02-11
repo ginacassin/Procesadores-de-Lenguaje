@@ -1,0 +1,29 @@
+## Todas las palabras reservadas identificadas correctamente
+bool
+inT
+rEAl
+and
+Or
+not
+TRUE
+falsE
+
+## Deberian reconocerse todos los operadores y simbolos
+&&
+;
+@
+!=
+>
+>=
+<
+<=
+=
+==
+*
+/
+{
+}
+(
+)
+-
++
