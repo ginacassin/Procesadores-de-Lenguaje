@@ -1,19 +1,17 @@
-
+import alex.ALexOperations.ECaracterInesperado;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-
 import alex.AnalizadorLexicoTiny;
 import alex.ClaseLexica;
 import alex.UnidadLexica;
-import alex.AnalizadorLexicoTiny.ECaracterInesperado;
 
 public class DomJudge {
     private static void imprime(UnidadLexica unidad) {
         switch(unidad.clase()) {
-            case IDEN: case ENT: case REAL: System.out.println(unidad.lexema()); break;
-                      default: System.out.println(unidad.clase().getImage());
+            case ID: case ENTERO: case REAL: System.out.println(unidad.lexema()); break;
+            default: System.out.println(unidad.clase().getImage());
         }
     }
 
@@ -23,7 +21,7 @@ public class DomJudge {
         UnidadLexica unidad = null;
         do {
             try {
-                unidad = al.sigToken();
+                unidad = al.yylex();
                 imprime(unidad);
             }
             catch(ECaracterInesperado e) {
