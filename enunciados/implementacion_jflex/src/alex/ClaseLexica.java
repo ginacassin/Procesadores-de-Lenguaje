@@ -49,7 +49,7 @@ public enum ClaseLexica {
     PUNTO("."),
     COMA(","),
     PUNTOCOMA(";"),
-    ID,
+    IDEN,
     LITENT,
     LITREAL,
     LITCADENA;
