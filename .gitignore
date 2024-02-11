@@ -2,6 +2,5 @@
 misc.xml
 modules.xml
 vcs.xml
-jflexTiny.iml
 \out
-implementacion_jflex/implementacion_jflex.iml
+*.iml
