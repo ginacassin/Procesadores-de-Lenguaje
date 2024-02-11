@@ -8,7 +8,7 @@ import java.io.Reader;
 
 public class Main {
     public static void main(String[] args) throws FileNotFoundException, IOException {
-        Reader input = new InputStreamReader(new FileInputStream(new FileInputStream(args[0])));
+        Reader input = new InputStreamReader(new FileInputStream("implementacion_jflex/src/alex/input.txt"));
         AnalizadorLexicoTiny al = new AnalizadorLexicoTiny(input);
         UnidadLexica unidad = null;
         do {
@@ -16,7 +16,7 @@ public class Main {
                 unidad = al.yylex();
                 System.out.println(unidad);
             }
-            catch (ECaracterInesperado e) {
+            catch (ALexOperations.ECaracterInesperado e) {
                 System.out.println(e.getMessage());
                 System.exit(1);
             }
