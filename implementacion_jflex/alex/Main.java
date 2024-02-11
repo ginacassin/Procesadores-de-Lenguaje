@@ -10,7 +10,7 @@ public class Main {
     public static void main(String[] args) throws FileNotFoundException, IOException {
         Reader input = new InputStreamReader(new FileInputStream(new FileInputStream(args[0])));
         AnalizadorLexicoTiny al = new AnalizadorLexicoTiny(input);
-        UnidadLexica unidad;
+        UnidadLexica unidad = null;
         do {
             try {
                 unidad = al.yylex();
