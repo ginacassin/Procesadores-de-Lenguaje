@@ -8,7 +8,8 @@ import java.io.Reader;
 
 public class Main {
     public static void main(String[] args) throws FileNotFoundException, IOException {
-        Reader input = new InputStreamReader(new FileInputStream("implementacion_jflex/src/alex/input.txt"));
+        // test argument: implementacion_jflex/src/alex/input.txt
+        Reader input = new InputStreamReader(new FileInputStream((args[0])));
         AnalizadorLexicoTiny al = new AnalizadorLexicoTiny(input);
         UnidadLexica unidad = null;
         do {
