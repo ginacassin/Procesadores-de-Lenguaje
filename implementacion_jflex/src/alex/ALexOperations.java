@@ -208,7 +208,7 @@ public class ALexOperations {
     }
 
     public UnidadLexica unidadIdentificador() {
-        return new UnidadLexicaMultivaluada(alex.fila(), alex.columna(), ClaseLexica.ID, alex.lexema());
+        return new UnidadLexicaMultivaluada(alex.fila(), alex.columna(), ClaseLexica.IDEN, alex.lexema());
     }
 
     public UnidadLexica unidadLiteralEntero() {

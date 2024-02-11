@@ -82,7 +82,7 @@ coma = \,
 puntoYComa = \;
 identificador = ({letra}|_)({letra}|{digito}|_)*
 literalEntero = (\+|\-)?{parteEntera}
-literalReal = (\+|\-)?{parteEntera}(\.{parteDecimal})?((e|E)(\+|\-)?{parteEntera})?
+literalReal = (\+|\-)?{parteEntera}((\.{parteDecimal})|((e|E)(\+|\-)?{parteEntera})|((\.{parteDecimal})((e|E)(\+|\-)?{parteEntera})))
 literalCadena = \"[^\"]*\"
 //definicion de cadenas ignorables
 separador = [ \t\r\b\n]
