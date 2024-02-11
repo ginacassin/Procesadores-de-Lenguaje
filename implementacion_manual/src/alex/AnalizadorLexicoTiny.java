@@ -210,7 +210,7 @@ public class AnalizadorLexicoTiny {
     }
    
     private boolean hayLetraOGuionBajo() {return sigCar >= 'a' && sigCar <= 'z'
-                                                || sigCar >= 'A' && sigCar <= 'z'
+                                                || sigCar >= 'A' && sigCar <= 'Z'
                                                 || sigCar == '_';}
     private boolean hayDigitoPos() {return sigCar >= '1' && sigCar <= '9';}
     private boolean hayCero() {return sigCar == '0';}
