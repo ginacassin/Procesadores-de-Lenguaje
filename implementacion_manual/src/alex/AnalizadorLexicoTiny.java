@@ -27,7 +27,7 @@ public class AnalizadorLexicoTiny {
         REC_MENOR, REC_MENOR_IGUAL, REC_IGUAL, REC_COMP_IGUAL, REC_MUL,
         REC_DIV, REC_LAP, REC_LCIE, REC_PAP, REC_PCIE, REC_ID,
         REC_0, REC_MENOS, REC_ENT, REC_MAS, REC_IDEC1, REC_IDEC2, REC_0DEC,
-        REC_EEXP, REC_EXP_MAS, REC_EXP_MENOS, REC_EXP, REC_EXP0
+        REC_EEXP, REC_EXP_SIGNO, REC_EXP, REC_EXP0
     }
 
     private Estado estado;
@@ -155,18 +155,13 @@ public class AnalizadorLexicoTiny {
                     else error();
                     break;
                 case REC_EEXP:
-                    if (hayResta()) transita(Estado.REC_EXP_MENOS);
-                    else if (haySuma()) transita(Estado.REC_EXP_MAS);
+                    if (hayResta()) transita(Estado.REC_EXP_SIGNO);
+                    else if (haySuma()) transita(Estado.REC_EXP_SIGNO);
                     else if (hayCero()) transita(Estado.REC_EXP0);
                     else if (hayDigitoPos()) transita(Estado.REC_EXP);
                     else error();
                     break;
-                case REC_EXP_MAS:
-                    if (hayCero()) transita(Estado.REC_EXP0);
-                    else if (hayDigitoPos()) transita(Estado.REC_EXP);
-                    else error();
-                    break;
-                case REC_EXP_MENOS:
+                case REC_EXP_SIGNO:
                     if (hayCero()) transita(Estado.REC_EXP0);
                     else if (hayDigitoPos()) transita(Estado.REC_EXP);
                     else error();
@@ -339,19 +334,21 @@ public class AnalizadorLexicoTiny {
     }
 
     public static void main(String arg[]) throws IOException {
-        Reader input = new InputStreamReader(new FileInputStream("alex/input.txt"));
+        Reader input = new InputStreamReader(new FileInputStream("./input.txt"));
         AnalizadorLexicoTiny al = new AnalizadorLexicoTiny(input);
         UnidadLexica unidad = null;
+        boolean error;
         do {
+            error = false;
             try {
                 unidad = al.sigToken();
-                // System.out.println(unidad);
                 imprime(unidad);
             }
-            catch (ECaracterInesperado e) {
+            catch(ECaracterInesperado e) {
                 System.out.println("ERROR");
+                error = true;
             }
         }
-        while (unidad == null || unidad.clase() != ClaseLexica.EOF);
+        while (error || unidad.clase() != ClaseLexica.EOF);
     } 
 }
