@@ -15,7 +15,7 @@ public class DomJudge {
     }
 
     public static void main(String[] args) throws FileNotFoundException, IOException {
-        Reader input  = new InputStreamReader(new FileInputStream("implementacion_jflex/src/alex/input.txt"));
+        Reader input  = new InputStreamReader(System.in);
         AnalizadorLexicoTiny al = new AnalizadorLexicoTiny(input);
         UnidadLexica unidad = null;
         do {
