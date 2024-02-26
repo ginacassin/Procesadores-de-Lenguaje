@@ -1,0 +1,542 @@
+% Preamble
+\documentclass[11pt]{article}
+
+% Packages
+\usepackage{amsmath}
+\usepackage{titling}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{graphicx}
+\graphicspath{ {/} }
+
+% Titles
+\title{Memoria: Procesadores de Lenguaje - Lenguaje Tiny}
+\author{Burgos Sosa, Rodrigo \and Cassin, Gina Andrea \and Estebán Velasco, Luis \and Rabbia, Santiago Elias}
+\date{Curso 2024}
+
+% Document
+\begin{document}
+\begin{titlepage}
+    \centering
+    {\Huge Memoria: Procesadores de Lenguaje - Lenguaje Tiny \par}
+    \vspace{1cm}
+    {\Large Fase 2: Análisis sintáctico \par}
+    \vspace{2cm}
+    {\Large Grupo G03: \par}
+    {\Large Burgos Sosa Rodrigo, Cassin Gina Andrea, \par}
+    {\Large Estebán Velasco Luis, Rabbia Santiago Elias \par}
+    \vspace{2cm}
+    {\Large Curso 2024 \par}
+\end{titlepage}
+\thispagestyle{empty}
+
+    \newpage
+
+    \section{Introducción}
+        En el siguiente documento se expondrá una memoria sobre el desarrollo de analizadores sintácticos aplicado sobre dos lenguajes de programación, Tiny y Tiny(0) - un subconjunto de Tiny.
+        Se presentará una especificación sintáctica de ambos lenguajes, con acondicionamiento de la gramática para permitir la implementación de un analizador
+        sintáctico descendente predictivo recursivo, y se proporcionarán los directores de cada regla de la gramática acondicionada para solamente Tiny(0).
+
+    \section{Análisis sintáctico}
+        Es un componente central de un procesador de lenguaje, ya que dicha estructura gramatical será la base para articular los subsecuentes
+        procesamientos del lenguaje: procesamiento dirigido por la sintaxis. Esto es lo que se especificará a continuación:
+    
+        \subsection{Tiny(0)}
+            \subsubsection{Especificación sintáctica (gramática)}
+            \begin{itemize}
+                \item programa $\rightarrow$ bloque
+                \item bloque $\rightarrow$ \{ declaraciones instrucciones \}
+            \end{itemize}
+            \
+            \begin{itemize}
+                \item declaraciones $\rightarrow$ declaracionesAux \&\&
+                \item declaraciones $\rightarrow$ $\varepsilon$
+                \item declaracionesAux $\rightarrow$ declaracionesAux ; declaracionVar
+                \item declaracionesAux $\rightarrow$ declaracionVar
+                \item declaracionVar $\rightarrow$ tipo identificador
+            \end{itemize}
+            \ 
+            \begin{itemize}
+                \item tipo $\rightarrow$ int
+                \item tipo $\rightarrow$ real
+                \item tipo $\rightarrow$ bool
+            \end{itemize}
+            \ 
+            \begin{itemize}
+                \item instrucciones $\rightarrow$ instruccionesAux
+                \item instrucciones $\rightarrow$ $\varepsilon$
+                \item instruccionesAux $\rightarrow$ instruccionesAux ; instruccion
+                \item instruccionesAux $\rightarrow$ instruccion
+                \item instruccion $\rightarrow$ \verb|@| expr 
+            \end{itemize}
+            
+            Las siguientes expresiones se construyen de acuerdo a las siguientes prioridades (de menor a mayor prioridad):
+            \begin{enumerate}
+                \item Operador de asignación, es binario e infijo. 
+                \item Operadores relacionales, son binarios e infijos.
+                \item +, - (binario)
+                \item and, or
+                \item $^{\ast}$, / son binarios e infijos.
+                \item - (unario), not son binarios y prefijos.
+            \end{enumerate}
+            \
+            \begin{itemize}
+                \item expr $\rightarrow$ e0
+                \item e0 $\rightarrow$ e1 = e0 \textit{(asocia por derecha)}
+                \item e0 $\rightarrow$ e1
+                \item e1 $\rightarrow$ e1 op1 e2 \textit{(asocia por izquierda)}
+                \item e1 $\rightarrow$ e2
+                \item e2 $\rightarrow$ e2 + e3 \textit{(asocia por izquierda)}
+                \item e2 $\rightarrow$ e3 - e3 \textit{(no asocia)}
+                \item e2 $\rightarrow$ e3
+                \item e3 $\rightarrow$ e4 and e3 \textit{(asocia por derecha)}
+                \item e3 $\rightarrow$ e4 or e4 \textit{(no asocia)}
+                \item e3 $\rightarrow$ e4
+                \item e4 $\rightarrow$ e4 op4 e5 \textit{(asocia por izquierda)}
+                \item e4 $\rightarrow$ e5
+                \item e5 $\rightarrow$ op5 e5 \textit{(prefijo)}
+                \item e5 $\rightarrow$ e6
+                \item e6 $\rightarrow$ ( e0 )
+                \item e6 $\rightarrow$ exprBase
+                \item exprBase $\rightarrow$ literalEntero
+                \item exprBase $\rightarrow$ literalReal
+                \item exprBase $\rightarrow$ true
+                \item exprBase $\rightarrow$ false
+                \item exprBase $\rightarrow$ identificador
+                \item exprBase $\rightarrow$ null
+                \item op1 $\rightarrow$ $<$
+                \item op1 $\rightarrow$ $>$
+                \item op1 $\rightarrow$ $<=$
+                \item op1 $\rightarrow$ $>=$
+                \item op1 $\rightarrow$ $==$
+                \item op1 $\rightarrow$ $!=$
+                \item op4 $\rightarrow$ $^{\ast}$
+                \item op4 $\rightarrow$ $/$
+                \item op5 $\rightarrow$ $-$
+                \item op5 $\rightarrow$ not
+            \end{itemize}
+            \subsubsection{Acondicionamiento de la gramática (descendente predictivo recursivo)}
+            Por notación, la eliminación de recursión por izquierda será denotada por R$i$ y la factorización por F$i$.  
+            \begin{itemize}
+                \item programa $\rightarrow$ bloque
+                \item bloque $\rightarrow$ \{ declaraciones instrucciones \}
+            \end{itemize}
+            \
+            \begin{itemize}
+                \item declaraciones $\rightarrow$ declaracionesAux \&\&
+                \item declaraciones $\rightarrow$ $\varepsilon$
+                \item declaracionesAux $\rightarrow$ declaracionVar R1
+                \item R1 $\rightarrow$ ; declaracionVar R1
+                \item R1 $\rightarrow$ $\varepsilon$
+                \item declaracionVar $\rightarrow$ tipo identificador
+            \end{itemize}
+            \ 
+            \begin{itemize}
+                \item tipo $\rightarrow$ int
+                \item tipo $\rightarrow$ real
+                \item tipo $\rightarrow$ bool
+            \end{itemize}
+            \ 
+            \begin{itemize}
+                \item instrucciones $\rightarrow$ instruccionesAux
+                \item instrucciones $\rightarrow$ $\varepsilon$
+                \item instruccionesAux $\rightarrow$ instruccion R2
+                \item R2 $\rightarrow$ ; instruccion R2
+                \item R2 $\rightarrow$ $\varepsilon$ 
+                \item instruccion $\rightarrow$ \verb|@| expr 
+            \end{itemize}
+            \ 
+            \begin{itemize}
+                \item expr $\rightarrow$ e0
+                \item e0 $\rightarrow$ e1 F1
+                \item F1 $\rightarrow$ = e0
+                \item F1 $\rightarrow$ $\varepsilon$
+                \item e1 $\rightarrow$ e2 R3
+                \item R3 $\rightarrow$ op1 e2 R3
+                \item R3 $\rightarrow$ $\varepsilon$
+                \item e2 $\rightarrow$ e3 F2 R4
+                \item R4 $\rightarrow$ + e3 R4
+                \item R4 $\rightarrow$ $\varepsilon$
+                \item F2 $\rightarrow$ - e3
+                \item F2 $\rightarrow$ $\varepsilon$
+                \item e3 $\rightarrow$ e4 F3
+                \item F3 $\rightarrow$ and e3
+                \item F3 $\rightarrow$ or e4
+                \item F3 $\rightarrow$ $\varepsilon$
+                \item e4 $\rightarrow$ e5 R5
+                \item R5 $\rightarrow$ op4 e5 R5
+                \item R5 $\rightarrow$ $\varepsilon$
+                \item e5 $\rightarrow$ op5 e5
+                \item e5 $\rightarrow$ e6
+                \item e6 $\rightarrow$ ( e0 )
+                \item e6 $\rightarrow$ exprBase
+                \item exprBase $\rightarrow$ literalEntero
+                \item exprBase $\rightarrow$ literalReal
+                \item exprBase $\rightarrow$ true
+                \item exprBase $\rightarrow$ false
+                \item exprBase $\rightarrow$ identificador
+                \item exprBase $\rightarrow$ null
+                \item op1 $\rightarrow$ $<$
+                \item op1 $\rightarrow$ $>$
+                \item op1 $\rightarrow$ $<=$
+                \item op1 $\rightarrow$ $>=$
+                \item op1 $\rightarrow$ $==$
+                \item op1 $\rightarrow$ $!=$
+                \item op4 $\rightarrow$ $^{\ast}$
+                \item op4 $\rightarrow$ $/$
+                \item op5 $\rightarrow$ $-$
+                \item op5 $\rightarrow$ not
+            \end{itemize}
+            \subsubsection{Directores de cada regla de la gramática condicionada}
+            \begin{longtable}{|p{6cm}|p{4cm}|p{3cm}|}
+                \hline
+                \textbf{REGLA} & \textbf{DIRECTORES} & \textbf{ANULABLE} \\
+                \hline
+                programa $\rightarrow$ bloque & \{ & no \\
+                \hline
+                bloque $\rightarrow$ \{ declaraciones instrucciones \} & \{ & no \\
+                \hline
+                declaraciones $\rightarrow$ declaracionesAux \&\& & tipo & no \\
+                \hline
+                declaraciones $\rightarrow$ $\varepsilon$ & & si \\
+                \hline
+                declaracionesAux $\rightarrow$ declaracionVar R1 & tipo & no \\
+                \hline
+                R1 $\rightarrow$ ; declaracionVar & tipo & no \\
+                \hline
+                R1 $\rightarrow$ $\varepsilon$ &  & si \\
+                \hline
+                declaracionVar  $\rightarrow$ tipo identificador & tipo & no \\
+                \hline
+                tipo $\rightarrow$ int & int & no \\
+                \hline
+                tipo $\rightarrow$ real & real & no \\
+                \hline
+                tipo $\rightarrow$ bool & bool & no \\
+                \hline
+                instrucciones $\rightarrow$ instruccionesAux & \verb|@| & no \\
+                \hline
+                instrucciones $\rightarrow$ $\varepsilon$ & & si \\
+                \hline
+                instruccionesAux $\rightarrow$ instruccion R2 & \verb|@| & no \\
+                \hline
+                R2 $\rightarrow$ ; instruccion R2 & \verb|@| & no \\
+                \hline
+                R2 $\rightarrow$ $\varepsilon$ &  & si \\
+                \hline
+                instruccion $\rightarrow$ \verb|@| expr & \verb|@| & no \\
+                \hline
+                expr $\rightarrow$ e0 & ( - not literalEntero literalReal true false identificador null & no \\
+                \hline
+                e0 $\rightarrow$ e1 F1 & ( - not literalEntero literalReal true false identificador null & no \\
+                \hline
+                F1 $\rightarrow$ = e0 & = & no \\
+                \hline
+                F1 $\rightarrow$ $\varepsilon$ &  & si \\
+                \hline
+                e1 $\rightarrow$ e2 R3 & ( - not literalEntero literalReal true false identificador null & no \\
+                \hline
+                R3 $\rightarrow$ op1 e2 R3 & $< \ \ > \ \ <= \ \ >= \ \ == \ \  !=$ & no \\
+                \hline
+                R3 $\rightarrow$ $\varepsilon$ &  & si \\
+                \hline
+                e2 $\rightarrow$ e3 F2 R4 & ( - not literalEntero literalReal true false identificador null & no \\
+                \hline
+                R4 $\rightarrow$ + e3 R4 & + & no \\
+                \hline
+                R4 $\rightarrow$ $\varepsilon$ &  & si \\
+                \hline
+                F2 $\rightarrow$ e3 & - & no \\
+                \hline
+                F2 $\rightarrow$ $\varepsilon$ &  & si \\
+                \hline
+                e3 $\rightarrow$ e4 F3 & ( - not literalEntero literalReal true false identificador null & no \\
+                \hline
+                F3 $\rightarrow$ and e3 & and & no \\
+                \hline
+                F3 $\rightarrow$ or e4 & or & no \\
+                \hline
+                F3 $\rightarrow$ $\varepsilon$ &  & si \\
+                \hline
+                e4 $\rightarrow$ e5 R5 & ( - not literalEntero literalReal true false identificador null & no \\
+                \hline
+                R5 $\rightarrow$ op4 e5 R5 & $^{\ast}$ / & no \\
+                \hline
+                R5 $\rightarrow$ $\varepsilon$ &  & si \\
+                \hline
+                e5 $\rightarrow$ op5 e5 & - not & no \\
+                \hline
+                e5 $\rightarrow$ e6 & ( - not literalEntero literalReal true false identificador null & no \\
+                \hline
+                e6 $\rightarrow$ ( e0 ) & ( & no \\
+                \hline
+                e6 $\rightarrow$ exprBase & ( - not literalEntero literalReal true false identificador null & no \\
+                \hline
+                exprBase $\rightarrow$ literalEntero & literalEntero & no \\
+                \hline
+                exprBase $\rightarrow$ literalReal & literalEntero & no \\
+                \hline
+                exprBase $\rightarrow$ true & true & no \\
+                \hline
+                exprBase $\rightarrow$ false & false & no \\
+                \hline
+                exprBase $\rightarrow$ identificador & identificador & no \\
+                \hline
+                exprBase $\rightarrow$ null & null & no \\
+                \hline
+                op1 $\rightarrow$ $<$ & $<$ & no \\
+                \hline
+                op1 $\rightarrow$ $>$ & $>$ & no \\
+                \hline
+                op1 $\rightarrow$ $<=$ & $<=$ & no \\
+                \hline
+                op1 $\rightarrow$ $>=$ & $>=$ & no \\
+                \hline
+                op1 $\rightarrow$ $==$ & $==$ & no \\
+                \hline
+                op1 $\rightarrow$ $!=$ & $!=$ & no \\
+                \hline
+                op1 $\rightarrow$ $^{\ast}$ & $^{\ast}$ & no \\
+                \hline
+                op1 $\rightarrow$ $/$ & $/$ & no \\
+                \hline
+                op1 $\rightarrow$ - & - & no \\
+                \hline
+                op1 $\rightarrow$ not & not & no \\
+                \hline
+            \end{longtable}
+        \subsection{Tiny}
+        \subsubsection{Especificación sintáctica (gramática)}
+        \begin{itemize}
+            \item programa $\rightarrow$ bloque
+            \item bloque $\rightarrow$ \{ declaraciones instrucciones \}
+        \end{itemize}
+        \
+        \begin{itemize}
+            \item declaraciones $\rightarrow$ declaracionesAux \&\&
+            \item declaraciones $\rightarrow \varepsilon$
+            \item declaracionesAux $\rightarrow$ declaracionesAux ; declaracion
+            \item declaracionesAux $\rightarrow$ declaracion
+            \item declaracion $\rightarrow$ declaracionVar
+            \item declaracion $\rightarrow$ declaracionTipo
+            \item declaracion $\rightarrow$ declaracionProc
+            \item declaracionVar $\rightarrow$ tipo0 identificador
+            \item declaracionTipo $\rightarrow$ type tipo0 identificador
+            \item declaracionProc $\rightarrow$ proc identificador paramsFormales bloque
+            \item paramsFormales $\rightarrow$ ( paramsFormalesAux )
+            \item paramsFormalesAux $\rightarrow$ paramsFormalesAux , param
+            \item paramsFormalesAux $\rightarrow$ param
+            \item param $\rightarrow$ tipo referencia identificador
+            \item referencia $\rightarrow$ \&
+            \item referencia $\rightarrow \varepsilon$
+        \end{itemize}
+        \
+        \begin{itemize}
+            \item tipo0 $\rightarrow$ tipo0 [ literalEntero ]
+            \item tipo0 $\rightarrow$ tipo1
+            \item tipo1 $\rightarrow$ \^{} tipo1
+            \item tipo1 $\rightarrow$ tipo2
+            \item tipo2 $\rightarrow$ struct \{ listaCampos \}
+            \item listaCampos $\rightarrow$ listaCampos , campo
+            \item listaCampos $\rightarrow$ campo
+            \item campo $\rightarrow$ tipo0 identificador
+            \item tipo2 $\rightarrow$ int
+            \item tipo2 $\rightarrow$ real
+            \item tipo2 $\rightarrow$ bool
+            \item tipo2 $\rightarrow$ string
+            \item tipo2 $\rightarrow$ identificador
+        \end{itemize}
+        \
+        \begin{itemize}
+            \item instrucciones $\rightarrow$ instruccionesAux
+            \item instrucciones $\rightarrow \varepsilon$
+            \item instruccionesAux $\rightarrow$ instruccionesAux ; instruccion 
+            \item instruccionesAux $\rightarrow$ instruccion 
+            \item instruccion  $\rightarrow$ @ expr
+            \item instruccion  $\rightarrow$ if expr bloque
+            \item instruccion  $\rightarrow$ if expr bloque else bloque
+            \item instruccion  $\rightarrow$ while expr bloque
+            \item instruccion  $\rightarrow$ read expr
+            \item instruccion  $\rightarrow$ write expr
+            \item instruccion  $\rightarrow$ nl
+            \item instruccion  $\rightarrow$ new expr
+            \item instruccion  $\rightarrow$ delete expr
+            \item instruccion  $\rightarrow$ call identificador paramsReales
+            \item paramsReales $\rightarrow$ ( paramsRealesAux )
+            \item paramsReales $\rightarrow$ ( )
+            \item paramsRealesAux $\rightarrow$ paramsRealesAux , expr
+            \item paramsRealesAux $\rightarrow$ expr
+        \end{itemize}
+        Las siguientes expresiones se construyen de acuerdo a las siguientes prioridades (de menor a mayor prioridad):
+        \begin{enumerate}
+            \item Operador de asignación, es binario e infijo. 
+            \item Operadores relacionales, son binarios e infijos.
+            \item +, - (binario)
+            \item and, or
+            \item $^{\ast}$, /, \% son binarios e infijos.
+            \item - (unario), not son binarios y prefijos.
+            \item Operadores de indexación, de acceso a registro y de indirección. Unarios posfijos, asociativos.
+        \end{enumerate}
+        \begin{itemize}
+            \item expr $\rightarrow$ e0
+            \item e0 $\rightarrow$ e1 = e0
+            \item e0 $\rightarrow$ e1
+            \item e1 $\rightarrow$ e1 op1 e2
+            \item e1 $\rightarrow$ e2
+            \item e2 $\rightarrow$ e2 + e3
+            \item e2 $\rightarrow$ e3 - e3
+            \item e2 $\rightarrow$ e3
+            \item e3 $\rightarrow$ e4 and e3
+            \item e3 $\rightarrow$ e4 or e4
+            \item e3 $\rightarrow$ e4
+            \item e4 $\rightarrow$ e4 op4 e5
+            \item e4 $\rightarrow$ e5
+            \item e5 $\rightarrow$ op5 e5
+            \item e5 $\rightarrow$ e6
+            \item e6 $\rightarrow$ e6 op6
+            \item e6 $\rightarrow$ e7
+            \item e7 $\rightarrow$ ( e0 )
+            \item e7 $\rightarrow$ exprBase
+            \item exprBase $\rightarrow$ literalEntero
+            \item exprBase $\rightarrow$ literalReal
+            \item exprBase $\rightarrow$ true
+            \item exprBase $\rightarrow$ false
+            \item exprBase $\rightarrow$ literalCadena
+            \item exprBase $\rightarrow$ identificador
+            \item exprBase $\rightarrow$ null
+            \item op1 $\rightarrow$ $<$
+            \item op1 $\rightarrow$ $>$
+            \item op1 $\rightarrow$ $<=$
+            \item op1 $\rightarrow$ $>=$
+            \item op1 $\rightarrow$ ==
+            \item op1 $\rightarrow$ !=
+            \item op4 $\rightarrow$ *
+            \item op4 $\rightarrow$ /
+            \item op4 $\rightarrow$ \%
+            \item op5 $\rightarrow$ -
+            \item op5 $\rightarrow$ not
+            \item op6 $\rightarrow$ [ expr ]
+            \item op6 $\rightarrow$ . identificador
+            \item op6 $\rightarrow$ \^{}
+        \end{itemize}
+        \subsubsection{Acondicionamiento de la gramática (descendente predictivo recursivo)}
+            Por notación, la eliminación de recursión por izquierda será denotada por R$i$ y la factorización por F$i$.  
+        \begin{itemize}
+            \item programa $\rightarrow$ bloque
+            \item bloque $\rightarrow$ \{ declaraciones instrucciones \}
+        \end{itemize}
+        \
+        \begin{itemize}
+            \item declaraciones $\rightarrow$ declaracionesAux \&\&
+            \item declaraciones $\rightarrow \varepsilon$
+            \item declaracionesAux $\rightarrow$ declaracion R1
+            \item R1 $\rightarrow$ ; declaracion R1
+            \item R1 $\rightarrow \varepsilon$
+            \item declaracion $\rightarrow$ declaracionVar
+            \item declaracion $\rightarrow$ declaracionTipo
+            \item declaracion $\rightarrow$ declaracionProc
+            \item declaracionVar $\rightarrow$ tipo0 identificador
+            \item declaracionTipo $\rightarrow$ type tipo0 identificador
+            \item declaracionProc $\rightarrow$ proc identificador paramsFormales bloque
+            \item paramsFormales $\rightarrow$ ( paramsFormalesAux )
+            \item paramsFormalesAux $\rightarrow$ param R2
+            \item R2 $\rightarrow$ , param R2
+            \item R2 $\rightarrow \varepsilon$
+            \item param $\rightarrow$ tipo0 referencia identificador
+            \item referencia $\rightarrow$ \&
+            \item referencia $\rightarrow \varepsilon$
+        \end{itemize}
+        \
+        \begin{itemize}
+            \item tipo0 $\rightarrow$ tipo1 R3
+            \item R3 $\rightarrow$ [ literalEntero ]
+            \item R3 $\rightarrow \varepsilon$
+            \item tipo1 $\rightarrow$ \^{} tipo1
+            \item tipo1 $\rightarrow$ tipo2
+            \item tipo2 $\rightarrow$ struct \{ listaCampos \}
+            \item listaCampos $\rightarrow$ campo R4
+            \item R4 $\rightarrow$ , campo R4
+            \item R4 $\rightarrow \varepsilon$
+            \item campo $\rightarrow$ tipo0 identificador
+            \item tipo2 $\rightarrow$ int
+            \item tipo2 $\rightarrow$ real
+            \item tipo2 $\rightarrow$ bool
+            \item tipo2 $\rightarrow$ string
+            \item tipo2 $\rightarrow$ identificador
+        \end{itemize}
+        \
+        \begin{itemize}
+            \item instrucciones $\rightarrow$ instruccionesAux
+            \item instrucciones $\rightarrow \varepsilon$
+            \item instruccionesAux $\rightarrow$ instruccion R5
+            \item R5 $\rightarrow$ ; instruccion R5
+            \item R5 $\rightarrow \varepsilon$
+            \item instruccion $\rightarrow$ @ expr
+            \item instruccion $\rightarrow$ if expr bloque F1
+            \item F1 $\rightarrow$ else bloque
+            \item F1 $\rightarrow \varepsilon$
+            \item instruccion $\rightarrow$ while expr bloque
+            \item instruccion $\rightarrow$ read expr
+            \item instruccion $\rightarrow$ write expr 
+            \item instruccion $\rightarrow$ nl
+            \item instruccion $\rightarrow$ new expr
+            \item instruccion $\rightarrow$ delete expr
+            \item instruccion $\rightarrow$ call identificador paramsReales
+            \item paramsReales $\rightarrow$ ( F2
+            \item F2 $\rightarrow$ paramsRealesAux )
+            \item F2 $\rightarrow$ )
+            \item paramsRealesAux $\rightarrow$ expr R6
+            \item R6 $\rightarrow$ , expr R6
+            \item R6 $\rightarrow \varepsilon$
+        \end{itemize}
+        \
+        \begin{itemize}
+            \item expr $\rightarrow$ e0
+            \item e0 $\rightarrow$ e1 F3
+            \item F3 $\rightarrow$ = e0
+            \item F3 $\rightarrow \varepsilon$
+            \item e1 $\rightarrow$ e2 R7
+            \item R7 $\rightarrow$ op1 e2 R7
+            \item R7 $\rightarrow \varepsilon$
+            \item e2 $\rightarrow$ e3 F4 R8
+            \item R8 $\rightarrow$ + e3 R8
+            \item R8 $\rightarrow \varepsilon$
+            \item F4 $\rightarrow$ - e3
+            \item F4 $\rightarrow \varepsilon$
+            \item e3 $\rightarrow$ e4 F5
+            \item F5 $\rightarrow$ and e3
+            \item F5 $\rightarrow$ or e4
+            \item F5 $\rightarrow \varepsilon$
+            \item e4 $\rightarrow$ e5 R9
+            \item R9 $\rightarrow$ op4 e5 R9
+            \item R9 $\rightarrow \varepsilon$
+            \item e5 $\rightarrow$ op5 e5
+            \item e5 $\rightarrow$ e6
+            \item e6 $\rightarrow$ e7 R10
+            \item R10 $\rightarrow$ op6 R10
+            \item R10 $\rightarrow \varepsilon$
+            \item e7 $\rightarrow$ ( e0 )
+            \item e7 $\rightarrow$ exprBase
+            \item exprBase $\rightarrow$ literalEntero
+            \item exprBase $\rightarrow$ literalReal
+            \item exprBase $\rightarrow$ true
+            \item exprBase $\rightarrow$ false
+            \item exprBase $\rightarrow$ literalCadena
+            \item exprBase $\rightarrow$ identificador
+            \item exprBase $\rightarrow$ null
+            \item op1 $\rightarrow$ $<$
+            \item op1 $\rightarrow$ $>$
+            \item op1 $\rightarrow$ $<=$
+            \item op1 $\rightarrow$ $>=$
+            \item op1 $\rightarrow$ ==
+            \item op1 $\rightarrow$ !=
+            \item op4 $\rightarrow$ *
+            \item op4 $\rightarrow$ /
+            \item op4 $\rightarrow$ \%
+            \item op5 $\rightarrow$ -
+            \item op5 $\rightarrow$ not
+            \item op6 $\rightarrow$ [ expr ]
+            \item op6 $\rightarrow$ . identificador
+            \item op6 $\rightarrow$ \^{}
+        \end{itemize}
+\end{document}
