@@ -18,7 +18,7 @@ PARSER_END(AnalizadorSintacticoTiny)
   TOKEN:{<#digitoSinCero:["1"-"9"]>}
   TOKEN:{<#digito:<digitoSinCero>|"0">}
   TOKEN:{<#parteEntera:<digitoSinCero> (<digito>)* |"0">}
-  TOKEN:{<#parteDecimal: (<digito>)* <digitoPositivo> | "0">}
+  TOKEN:{<#parteDecimal: (<digito>)* <digitoSinCero> | "0">}
 
   // Reglas de cadenas ignorables
     SKIP:{<["\t"," ","\r","\b","\n"]>}
@@ -57,66 +57,60 @@ PARSER_END(AnalizadorSintacticoTiny)
   void programa()   : {} {bloque()}      //incluir eof ?
   void bloque()   : {} {declaraciones() instrucciones()}
 
-  void declaraciones()   : {} {}
-  void declaracionesAux()   : {} {}
-  void declaracion()   : {} {}
-  void declaracionVar()   : {} {}
-  void declaracionTipo()   : {} {}
-  void declaracionProc()   : {} {}
-  void paramsFormales()   : {} {}
-  void paramsFormalesAux()   : {} {}
-  void paramsFormalesLista()   : {} {}
-  void param()   : {} {}
-  void referencia()   : {} {}
+  void declaraciones()   : {} {declaracionesAux() "&&" | {}}
+  void declaracionesAux()   : {} {declaracion() recDeclaracion()}
+  void recDeclaracion()   : {} {";" declaracion() recDeclaracion() | {}}
+  void declaracion()   : {} {declaracionVar() | declaracionTipo() | declaracionProc()}
+  void declaracionVar()   : {} {tipo0() <iden>}
+  void declaracionTipo()   : {} {<type> tipo0() <iden>}
+  void declaracionProc()   : {} {<proc> <iden> paramsFormales() bloque()}
+  void paramsFormales()   : {} {"(" paramsFormalesAux() ")"}
+  void paramsFormalesAux()   : {} {paramsFormalesLista() | {}}
+  void paramsFormalesLista()   : {} {param() recParamFormal()}
+  void recParamFormal()   : {} {"," param() recParamFormal() | {}}
+  void param()   : {} {tipo0() referencia() <iden>}
+  void referencia()   : {} {"&" | {}}
 
-  void tipo0()   : {} {}
-  void tipo1()   : {} {}
-  void tipo2()   : {} {}
-  void listaCampos()   : {} {}
-  void campo()   : {} {}
+  void tipo0()   : {} {tipo1() recArray()}
+  void recArray()   : {} {"[" <literalEntero> "]" recArray() | {}}
+  void tipo1()   : {} {"^" tipo1() | tipo2()}
+  void tipo2()   : {} {<struct> "{" listaCampos() "}" | <int> | <real> | <bool> | <string> | <iden>}
+  void listaCampos()   : {} {campo() recCampo()}
+  void recCampo()   : {} {"," campo() recCampo() | {}}
+  void campo()   : {} {tipo0() <iden>}
 
-  void intrucciones()   : {} {}
-  void instruccionesAux()   : {} {}
-  void instruccion()   : {} {}
-  void paramsReales()   : {} {}
-  void paramsRealesAux()   : {} {}
-  void paramsRealesLista()   : {} {}
+  void instrucciones()   : {} {instruccionesAux() | {}}
+  void instruccionesAux()   : {} {instruccion() recInstruccion()}
+  void recInstruccion()   : {} {";" instruccion() recInstruccion() | {}}
+  void instruccion()   : {} {"@" expr() | <if> expr() bloque() factorIf() | <while> expr() bloque() | <read> expr() | <write> expr() | <nl> | <new> expr() | <delete> expr() | <call> <iden> paramsReales()}
+  void factorIf()   : {} {<else> bloque() | {}}
+  void paramsReales()   : {} {"(" paramsRealesAux() ")"}
+  void paramsRealesAux()   : {} {paramsRealesLista() | {}}
+  void paramsRealesLista()   : {} {expr() recParamReal()}
+  void recParamReal()   : {} {expr() recParamReal() | {}}
 
-  void expr()   : {} {}
-  void e0()   : {} {}
-  void e1()   : {} {}
-  void e2()   : {} {}
-  void e3()   : {} {}
-  void e4()   : {} {}
-  void e5()   : {} {}
-  void e6()   : {} {}
-  void e7()   : {} {}
-  void exprBase()   : {} {}
-  void op1()   : {} {}
-  void op2()   : {} {}
-  void op3()   : {} {}
-  void op4()   : {} {}
-  void op5()   : {} {}
-  void op6()   : {} {}
+  void expr()   : {} {e0()}
+  void e0()   : {} {e1() factorE1()}
+  void factorE1()   : {} {e0() factorE1() | {}}
+  void e1()   : {} {e2() recOp1()}
+  void recOp1()   : {} {op1() e2() recOp1() | {}}
+  void e2()   : {} {e3() factorE3() recSuma()}
+  void recSuma()   : {} {"+" e3() recSuma() | {}}
+  void factorE3()   : {} {"-" e3() | {}}
+  void e3()   : {} {e4() factorE4()}
+  void factorE4()   : {} {<and> e3() | <or> e4() | {}}
+  void e4()   : {} {e5() recOp4()}
+  void recOp4()   : {} {op4() e5() recOp4() | {}}
+  void e5()   : {} {op5() e5() | e6()}
+  void e6()   : {} {e6Aux() recOp6()}
+  void recOp6()   : {} {op6() recOp6() | {}}
+  void e6Aux()   : {} {"(" e0() ")" | <literalEntero> | <literalReal> | <true> | <false> | <literalCadena> | <iden> | <null>}
+  void op1()   : {} {"<" | ">" | "<=" | ">=" | "==" | "!="}
+  void op4()   : {} {"*" | "/" | "%"}
+  void op5()   : {} {"-" | <not>}
+  void op6()   : {} {"[" expr() "]" | "." <iden> | "^"}
 
 
-
-
-
-  void analiza()   : {} {programa() <EOF> }
-  void programa()  : {} {expresion() declaraciones()}
-  void expresion() : {} {<evalua> e0()}
-  void declaraciones() : {} {<donde> lista_declaraciones() | {}}
-  void lista_declaraciones() : {} {declaracion() rlista_decs()}
-  void rlista_decs() : {} {"," declaracion() rlista_decs() | {}}
-  void declaracion() : {} {<iden> "=" e0()}
-  void e0() : {} {e1() re0()}
-  void re0() : {} {op0() e1() re0() | {}}
-  void e1() : {} {e2() re1()}
-  void re1() : {} {op1() e2() re1() | {}}
-  void e2() : {} {<iden> | <lit_ent> |  <lit_real> | "(" e0() ")"}
-  void op0()  : {} {"+" | "-"}
-  void op1()  : {} {"*" | "/"}
 
 
 
