@@ -21,26 +21,26 @@ PARSER_END(AnalizadorSintacticoTiny)
   TOKEN:{<#parteDecimal: (<digito>)* <digitoSinCero> | "0">}
 
   // Reglas de cadenas ignorables
-    SKIP:{<["\t"," ","\r","\b","\n"]>}
-    SKIP:{<"##"(~["\n",<EOF>])*>}
+  SKIP:{<["\t"," ","\r","\b","\n"]>}
+  SKIP:{<"##"(~["\n"])*>} // tengo que poner el <EOF> ?
 
   // Reglas de token
   TOKEN: {<and:("a"|"A")("n"|"N")("d"|"D")>}
   TOKEN: {<or:("o"|"O")("r"|"R")>}
   TOKEN: {<not:("n"|"N")("o"|"O")("t"|"T")>}
-  TOKEN: {<true:("t"|"T")("r"|"R")("u"|"U")("e"|"E")>}
-  TOKEN: {<false:("f"|"F")("a"|"A")("l"|"L")("s"|"S")("e"|"E")>}
-  TOKEN: {<int:("i"|"I")("n"|"N")("t"|"T")>}
+  TOKEN: {<TRUE:("t"|"T")("r"|"R")("u"|"U")("e"|"E")>}
+  TOKEN: {<FALSE:("f"|"F")("a"|"A")("l"|"L")("s"|"S")("e"|"E")>}
+  TOKEN: {<INT:("i"|"I")("n"|"N")("t"|"T")>}
   TOKEN: {<real:("r"|"R")("e"|"E")("a"|"A")("l"|"L")>}
   TOKEN: {<bool:("b"|"B")("o"|"O")("o"|"O")("l"|"L")>}
   TOKEN: {<string:("s"|"S")("t"|"T")("r"|"R")("i"|"I")("n"|"N")("g"|"G")>}
-  TOKEN: {<null:("n"|"N")("u"|"U")("l"|"L")("l"|"L")>}  //esto habia que quitarlo?
+  TOKEN: {<NULL:("n"|"N")("u"|"U")("l"|"L")("l"|"L")>}
   TOKEN: {<proc:("p"|"P")("r"|"R")("o"|"O")("c"|"C")>}
-  TOKEN: {<if:("i"|"I")("f"|"F")>}
-  TOKEN: {<else:("e"|"E")("l"|"L")("s"|"S")("e"|"E")>}
-  TOKEN: {<while:("w"|"W")("h"|"H")("i"|"I")("l"|"L")("e"|"E")>}
+  TOKEN: {<IF:("i"|"I")("f"|"F")>}
+  TOKEN: {<ELSE:("e"|"E")("l"|"L")("s"|"S")("e"|"E")>}
+  TOKEN: {<WHILE:("w"|"W")("h"|"H")("i"|"I")("l"|"L")("e"|"E")>}
   TOKEN: {<struct:("s"|"S")("t"|"T")("r"|"R")("u"|"U")("c"|"C")("t"|"T")>}
-  TOKEN: {<new:("n"|"N")("e"|"E")("w"|"W")>}
+  TOKEN: {<NEW:("n"|"N")("e"|"E")("w"|"W")>}
   TOKEN: {<delete:("d"|"D")("e"|"E")("l"|"L")("e"|"E")("t"|"T")("e"|"E")>}
   TOKEN: {<read:("r"|"R")("e"|"E")("a"|"A")("d"|"D")>}
   TOKEN: {<write:("w"|"W")("r"|"R")("i"|"I")("t"|"T")("e"|"E")>}
@@ -74,7 +74,7 @@ PARSER_END(AnalizadorSintacticoTiny)
   void tipo0()   : {} {tipo1() recArray()}
   void recArray()   : {} {"[" <literalEntero> "]" recArray() | {}}
   void tipo1()   : {} {"^" tipo1() | tipo2()}
-  void tipo2()   : {} {<struct> "{" listaCampos() "}" | <int> | <real> | <bool> | <string> | <iden>}
+  void tipo2()   : {} {<struct> "{" listaCampos() "}" | <INT> | <real> | <bool> | <string> | <iden>}
   void listaCampos()   : {} {campo() recCampo()}
   void recCampo()   : {} {"," campo() recCampo() | {}}
   void campo()   : {} {tipo0() <iden>}
@@ -82,8 +82,8 @@ PARSER_END(AnalizadorSintacticoTiny)
   void instrucciones()   : {} {instruccionesAux() | {}}
   void instruccionesAux()   : {} {instruccion() recInstruccion()}
   void recInstruccion()   : {} {";" instruccion() recInstruccion() | {}}
-  void instruccion()   : {} {"@" expr() | <if> expr() bloque() factorIf() | <while> expr() bloque() | <read> expr() | <write> expr() | <nl> | <new> expr() | <delete> expr() | <call> <iden> paramsReales()}
-  void factorIf()   : {} {<else> bloque() | {}}
+  void instruccion()   : {} {"@" expr() | <IF> expr() bloque() factorIf() | <WHILE> expr() bloque() | <read> expr() | <write> expr() | <nl> | <NEW> expr() | <delete> expr() | <call> <iden> paramsReales()}
+  void factorIf()   : {} {<ELSE> bloque() | {}}
   void paramsReales()   : {} {"(" paramsRealesAux() ")"}
   void paramsRealesAux()   : {} {paramsRealesLista() | {}}
   void paramsRealesLista()   : {} {expr() recParamReal()}
@@ -104,7 +104,7 @@ PARSER_END(AnalizadorSintacticoTiny)
   void e5()   : {} {op5() e5() | e6()}
   void e6()   : {} {e6Aux() recOp6()}
   void recOp6()   : {} {op6() recOp6() | {}}
-  void e6Aux()   : {} {"(" e0() ")" | <literalEntero> | <literalReal> | <true> | <false> | <literalCadena> | <iden> | <null>}
+  void e6Aux()   : {} {"(" e0() ")" | <literalEntero> | <literalReal> | <TRUE> | <FALSE> | <literalCadena> | <iden> | <NULL>}
   void op1()   : {} {"<" | ">" | "<=" | ">=" | "==" | "!="}
   void op4()   : {} {"*" | "/" | "%"}
   void op5()   : {} {"-" | <not>}

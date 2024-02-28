@@ -3,7 +3,7 @@ package asint;
 import java.io.Reader;
 
 
-public class AnalizadorSintacticoTinyDJ extends AnalizadorSintacticoTiny {
+public class AnalizadorSintacticoTinyDJ extends asint.AnalizadorSintacticoTiny {
     public AnalizadorSintacticoTinyDJ(Reader r) {
         super(r);
         disable_tracing();
