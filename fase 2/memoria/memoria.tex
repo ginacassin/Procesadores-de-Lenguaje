@@ -97,13 +97,11 @@
                 \item e5 $\rightarrow$ op5 e5 \textit{(prefijo)}
                 \item e5 $\rightarrow$ e6
                 \item e6 $\rightarrow$ ( e0 )
-                \item e6 $\rightarrow$ exprBase
-                \item exprBase $\rightarrow$ literalEntero
-                \item exprBase $\rightarrow$ literalReal
-                \item exprBase $\rightarrow$ true
-                \item exprBase $\rightarrow$ false
-                \item exprBase $\rightarrow$ identificador
-                \item exprBase $\rightarrow$ null
+                \item e6 $\rightarrow$ literalEntero
+                \item e6 $\rightarrow$ literalReal
+                \item e6 $\rightarrow$ true
+                \item e6 $\rightarrow$ false
+                \item e6 $\rightarrow$ identificador
                 \item op1 $\rightarrow$ $<$
                 \item op1 $\rightarrow$ $>$
                 \item op1 $\rightarrow$ $<=$
@@ -116,7 +114,7 @@
                 \item op5 $\rightarrow$ not
             \end{itemize}
             \subsubsection{Acondicionamiento de la gramática (descendente predictivo recursivo)}
-            Por notación, la eliminación de recursión por izquierda será denotada por R$i$ y la factorización por F$i$.  
+            Por notación, la eliminación de recursión por izquierda será denotada comenzando el nombre por $rec$ y la factorización por $fac$.  
             \begin{itemize}
                 \item programa $\rightarrow$ bloque
                 \item bloque $\rightarrow$ \{ declaraciones instrucciones \}
@@ -125,9 +123,9 @@
             \begin{itemize}
                 \item declaraciones $\rightarrow$ declaracionesAux \&\&
                 \item declaraciones $\rightarrow$ $\varepsilon$
-                \item declaracionesAux $\rightarrow$ declaracionVar R1
-                \item R1 $\rightarrow$ ; declaracionVar R1
-                \item R1 $\rightarrow$ $\varepsilon$
+                \item declaracionesAux $\rightarrow$ declaracionVar recDeclaracionesAux
+                \item recDeclaracionesAux $\rightarrow$ ; declaracionVar recDeclaracionesAux
+                \item recDeclaracionesAux $\rightarrow$ $\varepsilon$
                 \item declaracionVar $\rightarrow$ tipo identificador
             \end{itemize}
             \ 
@@ -140,42 +138,40 @@
             \begin{itemize}
                 \item instrucciones $\rightarrow$ instruccionesAux
                 \item instrucciones $\rightarrow$ $\varepsilon$
-                \item instruccionesAux $\rightarrow$ instruccion R2
-                \item R2 $\rightarrow$ ; instruccion R2
-                \item R2 $\rightarrow$ $\varepsilon$ 
+                \item instruccionesAux $\rightarrow$ instruccion recInstruccionesAux 
+                \item recInstruccionesAux  $\rightarrow$ ; instruccion recInstruccionesAux 
+                \item recInstruccionesAux  $\rightarrow$ $\varepsilon$ 
                 \item instruccion $\rightarrow$ \verb|@| expr 
             \end{itemize}
             \ 
             \begin{itemize}
                 \item expr $\rightarrow$ e0
-                \item e0 $\rightarrow$ e1 F1
-                \item F1 $\rightarrow$ = e0
-                \item F1 $\rightarrow$ $\varepsilon$
-                \item e1 $\rightarrow$ e2 R3
-                \item R3 $\rightarrow$ op1 e2 R3
-                \item R3 $\rightarrow$ $\varepsilon$
-                \item e2 $\rightarrow$ e3 F2 R4
-                \item R4 $\rightarrow$ + e3 R4
-                \item R4 $\rightarrow$ $\varepsilon$
-                \item F2 $\rightarrow$ - e3
-                \item F2 $\rightarrow$ $\varepsilon$
-                \item e3 $\rightarrow$ e4 F3
-                \item F3 $\rightarrow$ and e3
-                \item F3 $\rightarrow$ or e4
-                \item F3 $\rightarrow$ $\varepsilon$
-                \item e4 $\rightarrow$ e5 R5
-                \item R5 $\rightarrow$ op4 e5 R5
-                \item R5 $\rightarrow$ $\varepsilon$
+                \item e0 $\rightarrow$ e1 facE0
+                \item facE0 $\rightarrow$ = e0
+                \item facE0 $\rightarrow$ $\varepsilon$
+                \item e1 $\rightarrow$ e2 recE1
+                \item recE1 $\rightarrow$ op1 e2 recE1
+                \item recE1 $\rightarrow$ $\varepsilon$
+                \item e2 $\rightarrow$ e3 facE2 recE2
+                \item recE2 $\rightarrow$ + e3 recE2
+                \item recE2 $\rightarrow$ $\varepsilon$
+                \item facE2  $\rightarrow$ - e3
+                \item facE2  $\rightarrow$ $\varepsilon$
+                \item e3 $\rightarrow$ e4 facE3
+                \item facE3 $\rightarrow$ and e3
+                \item facE3 $\rightarrow$ or e4
+                \item facE3 $\rightarrow$ $\varepsilon$
+                \item e4 $\rightarrow$ e5 recE4
+                \item recE4 $\rightarrow$ op4 e5 recE4
+                \item recE4 $\rightarrow$ $\varepsilon$
                 \item e5 $\rightarrow$ op5 e5
                 \item e5 $\rightarrow$ e6
                 \item e6 $\rightarrow$ ( e0 )
-                \item e6 $\rightarrow$ exprBase
-                \item exprBase $\rightarrow$ literalEntero
-                \item exprBase $\rightarrow$ literalReal
-                \item exprBase $\rightarrow$ true
-                \item exprBase $\rightarrow$ false
-                \item exprBase $\rightarrow$ identificador
-                \item exprBase $\rightarrow$ null
+                \item e6 $\rightarrow$ literalEntero
+                \item e6 $\rightarrow$ literalReal
+                \item e6 $\rightarrow$ true
+                \item e6 $\rightarrow$ false
+                \item e6 $\rightarrow$ identificador
                 \item op1 $\rightarrow$ $<$
                 \item op1 $\rightarrow$ $>$
                 \item op1 $\rightarrow$ $<=$
@@ -200,11 +196,11 @@
                 \hline
                 declaraciones $\rightarrow$ $\varepsilon$ & & si \\
                 \hline
-                declaracionesAux $\rightarrow$ declaracionVar R1 & tipo & no \\
+                declaracionesAux $\rightarrow$ declaracionVar recDeclaracionesAux & tipo & no \\
                 \hline
-                R1 $\rightarrow$ ; declaracionVar & tipo & no \\
+                recDeclaracionesAux $\rightarrow$ ; declaracionVar & tipo & no \\
                 \hline
-                R1 $\rightarrow$ $\varepsilon$ &  & si \\
+                recDeclaracionesAux $\rightarrow$ $\varepsilon$ &  & si \\
                 \hline
                 declaracionVar  $\rightarrow$ tipo identificador & tipo & no \\
                 \hline
@@ -218,71 +214,67 @@
                 \hline
                 instrucciones $\rightarrow$ $\varepsilon$ & & si \\
                 \hline
-                instruccionesAux $\rightarrow$ instruccion R2 & \verb|@| & no \\
+                instruccionesAux $\rightarrow$ instruccion recInstruccionesAux & \verb|@| & no \\
                 \hline
-                R2 $\rightarrow$ ; instruccion R2 & \verb|@| & no \\
+                recInstruccionesAux $\rightarrow$ ; instruccion recInstruccionesAux & ; & no \\
                 \hline
-                R2 $\rightarrow$ $\varepsilon$ &  & si \\
+                recInstruccionesAux $\rightarrow$ $\varepsilon$ &  & si \\
                 \hline
                 instruccion $\rightarrow$ \verb|@| expr & \verb|@| & no \\
                 \hline
-                expr $\rightarrow$ e0 & ( - not literalEntero literalReal true false identificador null & no \\
+                expr $\rightarrow$ e0 & ( - not literalEntero literalReal true false identificador & no \\
                 \hline
-                e0 $\rightarrow$ e1 F1 & ( - not literalEntero literalReal true false identificador null & no \\
+                e0 $\rightarrow$ e1 facE0 & ( - not literalEntero literalReal true false identificador & no \\
                 \hline
-                F1 $\rightarrow$ = e0 & = & no \\
+                facE0 $\rightarrow$ = e0 & = & no \\
                 \hline
-                F1 $\rightarrow$ $\varepsilon$ &  & si \\
+                facE0 $\rightarrow$ $\varepsilon$ &  & si \\
                 \hline
-                e1 $\rightarrow$ e2 R3 & ( - not literalEntero literalReal true false identificador null & no \\
+                e1 $\rightarrow$ e2 recE1 & ( - not literalEntero literalReal true false identificador & no \\
                 \hline
-                R3 $\rightarrow$ op1 e2 R3 & $< \ \ > \ \ <= \ \ >= \ \ == \ \  !=$ & no \\
+                recE1 $\rightarrow$ op1 e2 recE1 & $< \ \ > \ \ <= \ \ >= \ \ == \ \  !=$ & no \\
                 \hline
-                R3 $\rightarrow$ $\varepsilon$ &  & si \\
+                recE1 $\rightarrow$ $\varepsilon$ &  & si \\
                 \hline
-                e2 $\rightarrow$ e3 F2 R4 & ( - not literalEntero literalReal true false identificador null & no \\
+                e2 $\rightarrow$ e3 facE2 recE2 & ( - not literalEntero literalReal true false identificador & no \\
                 \hline
-                R4 $\rightarrow$ + e3 R4 & + & no \\
+                recE2 $\rightarrow$ + e3 recE2 & + & no \\
                 \hline
-                R4 $\rightarrow$ $\varepsilon$ &  & si \\
+                recE2 $\rightarrow$ $\varepsilon$ &  & si \\
                 \hline
-                F2 $\rightarrow$ e3 & - & no \\
+                facE2  $\rightarrow$ e3 & - & no \\
                 \hline
-                F2 $\rightarrow$ $\varepsilon$ &  & si \\
+                facE2  $\rightarrow$ $\varepsilon$ &  & si \\
                 \hline
-                e3 $\rightarrow$ e4 F3 & ( - not literalEntero literalReal true false identificador null & no \\
+                e3 $\rightarrow$ e4 facE3 & ( - not literalEntero literalReal true false identificador & no \\
                 \hline
-                F3 $\rightarrow$ and e3 & and & no \\
+                facE3 $\rightarrow$ and e3 & and & no \\
                 \hline
-                F3 $\rightarrow$ or e4 & or & no \\
+                facE3 $\rightarrow$ or e4 & or & no \\
                 \hline
-                F3 $\rightarrow$ $\varepsilon$ &  & si \\
+                facE3 $\rightarrow$ $\varepsilon$ &  & si \\
                 \hline
-                e4 $\rightarrow$ e5 R5 & ( - not literalEntero literalReal true false identificador null & no \\
+                e4 $\rightarrow$ e5 recE4 & ( - not literalEntero literalReal true false identificador & no \\
                 \hline
-                R5 $\rightarrow$ op4 e5 R5 & $^{\ast}$ / & no \\
+                recE4 $\rightarrow$ op4 e5 recE4 & $^{\ast}$ / & no \\
                 \hline
-                R5 $\rightarrow$ $\varepsilon$ &  & si \\
+                recE4 $\rightarrow$ $\varepsilon$ &  & si \\
                 \hline
                 e5 $\rightarrow$ op5 e5 & - not & no \\
                 \hline
-                e5 $\rightarrow$ e6 & ( - not literalEntero literalReal true false identificador null & no \\
+                e5 $\rightarrow$ e6 & ( - not literalEntero literalReal true false identificador & no \\
                 \hline
                 e6 $\rightarrow$ ( e0 ) & ( & no \\
                 \hline
-                e6 $\rightarrow$ exprBase & ( - not literalEntero literalReal true false identificador null & no \\
+                e6 $\rightarrow$ literalEntero & literalEntero & no \\
                 \hline
-                exprBase $\rightarrow$ literalEntero & literalEntero & no \\
+                e6 $\rightarrow$ literalReal & literalEntero & no \\
                 \hline
-                exprBase $\rightarrow$ literalReal & literalEntero & no \\
+                e6 $\rightarrow$ true & true & no \\
                 \hline
-                exprBase $\rightarrow$ true & true & no \\
+                e6 $\rightarrow$ false & false & no \\
                 \hline
-                exprBase $\rightarrow$ false & false & no \\
-                \hline
-                exprBase $\rightarrow$ identificador & identificador & no \\
-                \hline
-                exprBase $\rightarrow$ null & null & no \\
+                e6 $\rightarrow$ identificador & identificador & no \\
                 \hline
                 op1 $\rightarrow$ $<$ & $<$ & no \\
                 \hline
@@ -296,13 +288,13 @@
                 \hline
                 op1 $\rightarrow$ $!=$ & $!=$ & no \\
                 \hline
-                op1 $\rightarrow$ $^{\ast}$ & $^{\ast}$ & no \\
+                op4 $\rightarrow$ $^{\ast}$ & $^{\ast}$ & no \\
                 \hline
-                op1 $\rightarrow$ $/$ & $/$ & no \\
+                op4 $\rightarrow$ $/$ & $/$ & no \\
                 \hline
-                op1 $\rightarrow$ - & - & no \\
+                op5 $\rightarrow$ - & - & no \\
                 \hline
-                op1 $\rightarrow$ not & not & no \\
+                op5 $\rightarrow$ not & not & no \\
                 \hline
             \end{longtable}
         \subsection{Tiny}
@@ -324,8 +316,10 @@
             \item declaracionTipo $\rightarrow$ type tipo0 identificador
             \item declaracionProc $\rightarrow$ proc identificador paramsFormales bloque
             \item paramsFormales $\rightarrow$ ( paramsFormalesAux )
-            \item paramsFormalesAux $\rightarrow$ paramsFormalesAux , param
-            \item paramsFormalesAux $\rightarrow$ param
+            \item paramsFormalesAux $\rightarrow$ paramsFormalesLista
+            \item paramsFormalesAux $\rightarrow$ $\varepsilon$
+            \item paramsFormalesLista $\rightarrow$ paramsFormalesLista , param 
+            \item paramsFormalesLista $\rightarrow$ param
             \item param $\rightarrow$ tipo referencia identificador
             \item referencia $\rightarrow$ \&
             \item referencia $\rightarrow \varepsilon$
@@ -363,9 +357,10 @@
             \item instruccion  $\rightarrow$ delete expr
             \item instruccion  $\rightarrow$ call identificador paramsReales
             \item paramsReales $\rightarrow$ ( paramsRealesAux )
-            \item paramsReales $\rightarrow$ ( )
-            \item paramsRealesAux $\rightarrow$ paramsRealesAux , expr
-            \item paramsRealesAux $\rightarrow$ expr
+            \item paramsRealesAux $\rightarrow$ paramsRealesLista
+            \item paramsRealesAux $\rightarrow$ $\varepsilon$
+            \item paramsRealesLista $\rightarrow$ paramsRealesLista , expr 
+            \item paramsRealesLista $\rightarrow$ expr
         \end{itemize}
         Las siguientes expresiones se construyen de acuerdo a las siguientes prioridades (de menor a mayor prioridad):
         \begin{enumerate}
@@ -394,16 +389,14 @@
             \item e5 $\rightarrow$ op5 e5
             \item e5 $\rightarrow$ e6
             \item e6 $\rightarrow$ e6 op6
-            \item e6 $\rightarrow$ e7
-            \item e7 $\rightarrow$ ( e0 )
-            \item e7 $\rightarrow$ exprBase
-            \item exprBase $\rightarrow$ literalEntero
-            \item exprBase $\rightarrow$ literalReal
-            \item exprBase $\rightarrow$ true
-            \item exprBase $\rightarrow$ false
-            \item exprBase $\rightarrow$ literalCadena
-            \item exprBase $\rightarrow$ identificador
-            \item exprBase $\rightarrow$ null
+            \item e6 $\rightarrow$ ( e0 )
+            \item e6 $\rightarrow$ literalEntero
+            \item e6 $\rightarrow$ literalReal
+            \item e6 $\rightarrow$ true
+            \item e6 $\rightarrow$ false
+            \item e6 $\rightarrow$ literalCadena
+            \item e6 $\rightarrow$ identificador
+            \item e6 $\rightarrow$ null
             \item op1 $\rightarrow$ $<$
             \item op1 $\rightarrow$ $>$
             \item op1 $\rightarrow$ $<=$
@@ -420,7 +413,7 @@
             \item op6 $\rightarrow$ \^{}
         \end{itemize}
         \subsubsection{Acondicionamiento de la gramática (descendente predictivo recursivo)}
-            Por notación, la eliminación de recursión por izquierda será denotada por R$i$ y la factorización por F$i$.  
+        Por notación, la eliminación de recursión por izquierda será denotada comenzando el nombre por $rec$ y la factorización por $fac$.  
         \begin{itemize}
             \item programa $\rightarrow$ bloque
             \item bloque $\rightarrow$ \{ declaraciones instrucciones \}
@@ -429,9 +422,9 @@
         \begin{itemize}
             \item declaraciones $\rightarrow$ declaracionesAux \&\&
             \item declaraciones $\rightarrow \varepsilon$
-            \item declaracionesAux $\rightarrow$ declaracion R1
-            \item R1 $\rightarrow$ ; declaracion R1
-            \item R1 $\rightarrow \varepsilon$
+            \item declaracionesAux $\rightarrow$ declaracion recDeclaracion
+            \item recDeclaracion $\rightarrow$ ; declaracion recDeclaracion
+            \item recDeclaracion $\rightarrow \varepsilon$
             \item declaracion $\rightarrow$ declaracionVar
             \item declaracion $\rightarrow$ declaracionTipo
             \item declaracion $\rightarrow$ declaracionProc
@@ -439,24 +432,26 @@
             \item declaracionTipo $\rightarrow$ type tipo0 identificador
             \item declaracionProc $\rightarrow$ proc identificador paramsFormales bloque
             \item paramsFormales $\rightarrow$ ( paramsFormalesAux )
-            \item paramsFormalesAux $\rightarrow$ param R2
-            \item R2 $\rightarrow$ , param R2
-            \item R2 $\rightarrow \varepsilon$
+            \item paramsFormalesAux $\rightarrow$ paramsFormalesLista
+            \item paramsFormalesAux $\rightarrow$ $\varepsilon$
+            \item paramsFormalesLista $\rightarrow$ param recParamFormal
+            \item recParamFormal $\rightarrow$ , param recParamFormal
+            \item recParamFormal $\rightarrow \varepsilon$
             \item param $\rightarrow$ tipo0 referencia identificador
             \item referencia $\rightarrow$ \&
             \item referencia $\rightarrow \varepsilon$
         \end{itemize}
         \
         \begin{itemize}
-            \item tipo0 $\rightarrow$ tipo1 R3
-            \item R3 $\rightarrow$ [ literalEntero ]
-            \item R3 $\rightarrow \varepsilon$
+            \item tipo0 $\rightarrow$ tipo1 recArray
+            \item recArray $\rightarrow$ [ literalEntero ] recArray
+            \item recArray $\rightarrow \varepsilon$
             \item tipo1 $\rightarrow$ \^{} tipo1
             \item tipo1 $\rightarrow$ tipo2
             \item tipo2 $\rightarrow$ struct \{ listaCampos \}
-            \item listaCampos $\rightarrow$ campo R4
-            \item R4 $\rightarrow$ , campo R4
-            \item R4 $\rightarrow \varepsilon$
+            \item listaCampos $\rightarrow$ campo recCampo
+            \item recCampo $\rightarrow$ , campo recCampo
+            \item recCampo $\rightarrow \varepsilon$
             \item campo $\rightarrow$ tipo0 identificador
             \item tipo2 $\rightarrow$ int
             \item tipo2 $\rightarrow$ real
@@ -468,13 +463,13 @@
         \begin{itemize}
             \item instrucciones $\rightarrow$ instruccionesAux
             \item instrucciones $\rightarrow \varepsilon$
-            \item instruccionesAux $\rightarrow$ instruccion R5
-            \item R5 $\rightarrow$ ; instruccion R5
-            \item R5 $\rightarrow \varepsilon$
+            \item instruccionesAux $\rightarrow$ instruccion recInstruccion
+            \item recInstruccion $\rightarrow$ ; instruccion recInstruccion
+            \item recInstruccion $\rightarrow \varepsilon$
             \item instruccion $\rightarrow$ @ expr
-            \item instruccion $\rightarrow$ if expr bloque F1
-            \item F1 $\rightarrow$ else bloque
-            \item F1 $\rightarrow \varepsilon$
+            \item instruccion $\rightarrow$ if expr bloque facIf
+            \item facIf $\rightarrow$ else bloque
+            \item facIf $\rightarrow \varepsilon$
             \item instruccion $\rightarrow$ while expr bloque
             \item instruccion $\rightarrow$ read expr
             \item instruccion $\rightarrow$ write expr 
@@ -482,48 +477,47 @@
             \item instruccion $\rightarrow$ new expr
             \item instruccion $\rightarrow$ delete expr
             \item instruccion $\rightarrow$ call identificador paramsReales
-            \item paramsReales $\rightarrow$ ( F2
-            \item F2 $\rightarrow$ paramsRealesAux )
-            \item F2 $\rightarrow$ )
-            \item paramsRealesAux $\rightarrow$ expr R6
-            \item R6 $\rightarrow$ , expr R6
-            \item R6 $\rightarrow \varepsilon$
+            \item paramsReales $\rightarrow$ ( paramsRealesAux )
+            \item paramsRealesAux $\rightarrow$ paramsRealesLista
+            \item paramsRealesAux $\rightarrow$ $\varepsilon$
+            \item paramsRealesLista $\rightarrow$ expr recParamReal
+            \item recParamReal $\rightarrow$ , expr recParamReal
+            \item recParamReal $\rightarrow \varepsilon$
         \end{itemize}
         \
         \begin{itemize}
             \item expr $\rightarrow$ e0
-            \item e0 $\rightarrow$ e1 F3
-            \item F3 $\rightarrow$ = e0
-            \item F3 $\rightarrow \varepsilon$
-            \item e1 $\rightarrow$ e2 R7
-            \item R7 $\rightarrow$ op1 e2 R7
-            \item R7 $\rightarrow \varepsilon$
-            \item e2 $\rightarrow$ e3 F4 R8
-            \item R8 $\rightarrow$ + e3 R8
-            \item R8 $\rightarrow \varepsilon$
-            \item F4 $\rightarrow$ - e3
-            \item F4 $\rightarrow \varepsilon$
-            \item e3 $\rightarrow$ e4 F5
-            \item F5 $\rightarrow$ and e3
-            \item F5 $\rightarrow$ or e4
-            \item F5 $\rightarrow \varepsilon$
-            \item e4 $\rightarrow$ e5 R9
-            \item R9 $\rightarrow$ op4 e5 R9
-            \item R9 $\rightarrow \varepsilon$
+            \item e0 $\rightarrow$ e1 facE1
+            \item facE1 $\rightarrow$ = e0
+            \item facE1 $\rightarrow \varepsilon$
+            \item e1 $\rightarrow$ e2 recOp1
+            \item recOp1 $\rightarrow$ op1 e2 recOp1
+            \item recOp1 $\rightarrow \varepsilon$
+            \item e2 $\rightarrow$ e3 facE3  recSuma 
+            \item recSuma  $\rightarrow$ + e3 recSuma 
+            \item recSuma  $\rightarrow \varepsilon$
+            \item facE3  $\rightarrow$ - e3
+            \item facE3  $\rightarrow \varepsilon$
+            \item e3 $\rightarrow$ e4 facE4
+            \item facE4 $\rightarrow$ and e3
+            \item facE4 $\rightarrow$ or e4
+            \item facE4 $\rightarrow \varepsilon$
+            \item e4 $\rightarrow$ e5 recOp4
+            \item recOp4 $\rightarrow$ op4 e5 recOp4
+            \item recOp4 $\rightarrow \varepsilon$
             \item e5 $\rightarrow$ op5 e5
             \item e5 $\rightarrow$ e6
-            \item e6 $\rightarrow$ e7 R10
-            \item R10 $\rightarrow$ op6 R10
-            \item R10 $\rightarrow \varepsilon$
-            \item e7 $\rightarrow$ ( e0 )
-            \item e7 $\rightarrow$ exprBase
-            \item exprBase $\rightarrow$ literalEntero
-            \item exprBase $\rightarrow$ literalReal
-            \item exprBase $\rightarrow$ true
-            \item exprBase $\rightarrow$ false
-            \item exprBase $\rightarrow$ literalCadena
-            \item exprBase $\rightarrow$ identificador
-            \item exprBase $\rightarrow$ null
+            \item e6 $\rightarrow$ e6Aux recOp6
+            \item recOp6 $\rightarrow$ op6 recOp6
+            \item recOp6 $\rightarrow \varepsilon$
+            \item e6Aux  $\rightarrow$ ( e0 )
+            \item e6Aux  $\rightarrow$ literalEntero
+            \item e6Aux  $\rightarrow$ literalReal
+            \item e6Aux  $\rightarrow$ true
+            \item e6Aux  $\rightarrow$ false
+            \item e6Aux  $\rightarrow$ literalCadena
+            \item e6Aux  $\rightarrow$ identificador
+            \item e6Aux  $\rightarrow$ null
             \item op1 $\rightarrow$ $<$
             \item op1 $\rightarrow$ $>$
             \item op1 $\rightarrow$ $<=$
