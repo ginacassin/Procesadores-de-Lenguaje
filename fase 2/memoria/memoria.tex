@@ -39,7 +39,7 @@
 
     \section{Análisis sintáctico}
         Es un componente central de un procesador de lenguaje, ya que dicha estructura gramatical será la base para articular los subsecuentes
-        procesamientos del lenguaje: procesamiento dirigido por la sintaxis. Esto es lo que se especificará a continuación:
+        procesamientos del lenguaje, este es, el procesamiento dirigido por la sintaxis. Esto es lo que se especificará a continuación:
     
         \subsection{Tiny(0)}
             \subsubsection{Especificación sintáctica (gramática)}
@@ -320,7 +320,7 @@
             \item paramsFormalesAux $\rightarrow$ $\varepsilon$
             \item paramsFormalesLista $\rightarrow$ paramsFormalesLista , param 
             \item paramsFormalesLista $\rightarrow$ param
-            \item param $\rightarrow$ tipo referencia identificador
+            \item param $\rightarrow$ tipo0 referencia identificador
             \item referencia $\rightarrow$ \&
             \item referencia $\rightarrow \varepsilon$
         \end{itemize}
