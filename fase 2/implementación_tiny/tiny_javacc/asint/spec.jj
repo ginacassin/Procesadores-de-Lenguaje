@@ -22,7 +22,7 @@ PARSER_END(AnalizadorSintacticoTiny)
 
   // Reglas de cadenas ignorables
   SKIP:{<["\t"," ","\r","\b","\n"]>}
-  SKIP:{<"##"(~["\n"])*>} // tengo que poner el <EOF> ?
+  SKIP:{<"##"(~["\n"])*>}
 
   // Reglas de token
   TOKEN: {<and:("a"|"A")("n"|"N")("d"|"D")>}
@@ -50,11 +50,11 @@ PARSER_END(AnalizadorSintacticoTiny)
   TOKEN:{<iden:(<letra>|"_")(<letra>|<digito>|"_")*>}
   TOKEN:{<literalEntero:(["+","-"])?<parteEntera>>}
   TOKEN:{<literalReal:<literalEntero>(("."<parteDecimal>)|(("e"|"E")(["+","-"])?<parteEntera>)|("."<parteDecimal>("e"|"E")(["+","-"])?<parteEntera>)) >}
-  TOKEN:{<literalCadena:"\""(~["\""])*"\"">}       //revisar que esto lo acepta
+  TOKEN:{<literalCadena:"\""(~["\""])*"\"">}
 
 // ======== REGLAS SINTACTICAS ========
 
-  void programa()   : {} {bloque()}      //incluir eof ?
+  void programa()   : {} {bloque()}
   void bloque()   : {} {declaraciones() instrucciones()}
 
   void declaraciones()   : {} {declaracionesAux() "&&" | {}}
@@ -82,23 +82,23 @@ PARSER_END(AnalizadorSintacticoTiny)
   void instrucciones()   : {} {instruccionesAux() | {}}
   void instruccionesAux()   : {} {instruccion() recInstruccion()}
   void recInstruccion()   : {} {";" instruccion() recInstruccion() | {}}
-  void instruccion()   : {} {"@" expr() | <IF> expr() bloque() factorIf() | <WHILE> expr() bloque() | <read> expr() | <write> expr() | <nl> | <NEW> expr() | <delete> expr() | <call> <iden> paramsReales()}
-  void factorIf()   : {} {<ELSE> bloque() | {}}
+  void instruccion()   : {} {"@" expr() | <IF> expr() bloque() factIf() | <WHILE> expr() bloque() | <read> expr() | <write> expr() | <nl> | <NEW> expr() | <delete> expr() | <call> <iden> paramsReales()}
+  void factIf()   : {} {<ELSE> bloque() | {}}
   void paramsReales()   : {} {"(" paramsRealesAux() ")"}
   void paramsRealesAux()   : {} {paramsRealesLista() | {}}
   void paramsRealesLista()   : {} {expr() recParamReal()}
-  void recParamReal()   : {} {expr() recParamReal() | {}}
+  void recParamReal()   : {} {"," expr() recParamReal() | {}}
 
   void expr()   : {} {e0()}
-  void e0()   : {} {e1() factorE1()}
-  void factorE1()   : {} {e0() factorE1() | {}}
+  void e0()   : {} {e1() facE1()}
+  void facE1()   : {} {"=" e0() | {}}
   void e1()   : {} {e2() recOp1()}
   void recOp1()   : {} {op1() e2() recOp1() | {}}
-  void e2()   : {} {e3() factorE3() recSuma()}
+  void e2()   : {} {e3() facE3() recSuma()}
   void recSuma()   : {} {"+" e3() recSuma() | {}}
-  void factorE3()   : {} {"-" e3() | {}}
-  void e3()   : {} {e4() factorE4()}
-  void factorE4()   : {} {<and> e3() | <or> e4() | {}}
+  void facE3()   : {} {"-" e3() | {}}
+  void e3()   : {} {e4() facE4()}
+  void facE4()   : {} {<and> e3() | <or> e4() | {}}
   void e4()   : {} {e5() recOp4()}
   void recOp4()   : {} {op4() e5() recOp4() | {}}
   void e5()   : {} {op5() e5() | e6()}
