@@ -5,7 +5,7 @@ import errors.GestionErroresTiny;
 %%
 %line
 %column
-%class AnalizadorLexicoEval
+%class AnalizadorLexicoTiny
 %type  UnidadLexica
 %unicode
 %public
