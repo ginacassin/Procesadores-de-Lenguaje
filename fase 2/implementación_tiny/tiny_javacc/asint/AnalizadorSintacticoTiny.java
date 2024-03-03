@@ -643,6 +643,7 @@ public class AnalizadorSintacticoTiny implements AnalizadorSintacticoTinyConstan
       case 46:{
         jj_consume_token(46);
         e0();
+        facE1();
         break;
         }
       default:
