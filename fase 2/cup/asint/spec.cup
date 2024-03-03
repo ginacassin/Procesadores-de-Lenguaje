@@ -1,22 +1,19 @@
 package asint;
 import java_cup.runtime.*;
-import alex.AnalizadorLexicoEval;
+import alex.AnalizadorLexicoTiny;
 import alex.UnidadLexica;
-import errors.GestionErroresEval;
+import errors.GestionErroresTiny;
 
 scan with {: return getScanner().next_token(); :};
 
 parser code {:
-private GestionErroresEval errores;
-public void syntax_error(Symbol unidadLexica) {
-errores.errorSintactico((UnidadLexica)unidadLexica);
-}
+    private GestionErroresTiny errores;
+    public void syntax_error(Symbol unidadLexica) {errores.errorSintactico((UnidadLexica)unidadLexica);}
 :};
-
 init with {:
-errores = new GestionErroresEval();
-AnalizadorLexicoEval alex = (AnalizadorLexicoEval)getScanner();
-alex.fijaGestionErrores(errores);
+    errores = new GestionErroresTiny();
+    AnalizadorLexicoTiny alex = (AnalizadorLexicoTiny)getScanner();
+    alex.fijaGestionErrores(errores);
 :};
 
 terminal SUMA, RESTA, MUL, DIV, PABRIR, PCERRAR, BABRIR, BCERRAR, TABRIR, TCERRAR,
