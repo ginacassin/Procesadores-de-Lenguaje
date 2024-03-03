@@ -148,4 +148,4 @@ comentario = ##([^\n])*
 {literalEntero}           {return ops.unidadLiteralEntero();}
 {literalReal}             {return ops.unidadLiteralReal();}
 {literalCadena}           {return ops.unidadLiteralCadena();}
-[^]                       {ops.error();}
+[^]                       {errores.errorLexico(fila(),columna(),lexema());}

@@ -780,7 +780,7 @@ public class AnalizadorLexicoTiny implements java_cup.runtime.Scanner {
       else {
         switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
           case 1:
-            { ops.error();
+            { errores.errorLexico(fila(),columna(),lexema());
             }
             // fall through
           case 54: break;
