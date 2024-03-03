@@ -82,7 +82,7 @@ PARSER_END(AnalizadorSintacticoTiny)
   void instrucciones()   : {} {instruccionesAux() | {}}
   void instruccionesAux()   : {} {instruccion() recInstruccion()}
   void recInstruccion()   : {} {";" instruccion() recInstruccion() | {}}
-  void instruccion()   : {} {"@" expr() | <IF> expr() bloque() factIf() | <WHILE> expr() bloque() | <read> expr() | <write> expr() | <nl> | <NEW> expr() | <delete> expr() | <call> <iden> paramsReales()}
+  void instruccion()   : {} {"@" expr() | <IF> expr() bloque() factIf() | <WHILE> expr() bloque() | <read> expr() | <write> expr() | <nl> | <NEW> expr() | <delete> expr() | <call> <iden> paramsReales() | bloque()}
   void factIf()   : {} {<ELSE> bloque() | {}}
   void paramsReales()   : {} {"(" paramsRealesAux() ")"}
   void paramsRealesAux()   : {} {paramsRealesLista() | {}}
