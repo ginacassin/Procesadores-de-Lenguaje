@@ -82,7 +82,7 @@ PARSER_END(AnalizadorSintacticoTiny)
   void instrucciones()   : {} {instruccionesAux() | {}}
   void instruccionesAux()   : {} {instruccion() recInstruccion()}
   void recInstruccion()   : {} {";" instruccion() recInstruccion() | {}}
-  void instruccion()   : {} {"@" expr() | <IF> expr() bloque() factIf() | <WHILE> expr() bloque() | <read> expr() | <write> expr() | <nl> | <NEW> expr() | <delete> expr() | <call> <iden> paramsReales()}
+  void instruccion()   : {} {"@" expr() | <IF> expr() bloque() factIf() | <WHILE> expr() bloque() | <read> expr() | <write> expr() | <nl> | <NEW> expr() | <delete> expr() | <call> <iden> paramsReales() | bloque()}
   void factIf()   : {} {<ELSE> bloque() | {}}
   void paramsReales()   : {} {"(" paramsRealesAux() ")"}
   void paramsRealesAux()   : {} {paramsRealesLista() | {}}
@@ -91,7 +91,7 @@ PARSER_END(AnalizadorSintacticoTiny)
 
   void expr()   : {} {e0()}
   void e0()   : {} {e1() facE1()}
-  void facE1()   : {} {"=" e0() | {}}
+  void facE1()   : {} {"=" e0() facE1() | {}}
   void e1()   : {} {e2() recOp1()}
   void recOp1()   : {} {op1() e2() recOp1() | {}}
   void e2()   : {} {e3() facE3() recSuma()}
