@@ -1,5 +1,7 @@
 package alex;
 
+import errors.GestionErroresTiny;
+
 %%
 //configuracion del proceso de generacion
 %line
@@ -13,9 +15,13 @@ package alex;
 //codigo que se incluye en la clase generada
 %{
   private ALexOperations ops;
+  private GestionErroresTiny errores;
   public String lexema() {return yytext();}
   public int fila() {return yyline+1;}
   public int columna() {return yycolumn+1;}
+  public void fijaGestionErrores(GestionErroresTiny errores) {
+     this.errores = errores;
+  }
 %}
 
 %eofval{ //valor que se devuelve al llegar a final de fichero

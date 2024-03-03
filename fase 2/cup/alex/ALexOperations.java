@@ -1,7 +1,5 @@
 package alex;
 
-import asint.ClaseLexica;
-
 public class ALexOperations {
     public static class ECaracterInesperado extends RuntimeException {
         public ECaracterInesperado(String msg) {
