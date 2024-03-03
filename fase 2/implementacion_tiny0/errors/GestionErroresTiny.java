@@ -1,6 +1,5 @@
 package errors;
 
-import alex.ClaseLexica;
 import java.util.Set;
 
 public class GestionErroresTiny {

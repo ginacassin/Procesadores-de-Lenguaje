@@ -1,8 +1,8 @@
 import alex.AnalizadorLexicoTiny;
 import asint.AnalizadorSintacticoTiny;
 import asint.AnalizadorSintacticoTinyDJ;
-import errors.GestionErroresEval.ErrorLexico;
-import errors.GestionErroresEval.ErrorSintactico;
+import errors.GestionErroresTiny.ErrorLexico;
+import errors.GestionErroresTiny.ErrorSintactico;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
