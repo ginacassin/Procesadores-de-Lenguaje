@@ -1,21 +1,26 @@
 package alex;
 
+import errors.GestionErroresTiny;
+
 %%
-//configuracion del proceso de generacion
 %line
 %column
-%class AnalizadorLexicoTiny
+%class AnalizadorLexicoEval
 %type  UnidadLexica
 %unicode
 %public
 %cup
 
-//codigo que se incluye en la clase generada
 %{
   private ALexOperations ops;
+  private GestionErroresEval errores;
   public String lexema() {return yytext();}
   public int fila() {return yyline+1;}
   public int columna() {return yycolumn+1;}
+  public void fijaGestionErrores(GestionErroresTiny errores) {
+   this.errores = errores;
+  }
+
 %}
 
 %eofval{ //valor que se devuelve al llegar a final de fichero
