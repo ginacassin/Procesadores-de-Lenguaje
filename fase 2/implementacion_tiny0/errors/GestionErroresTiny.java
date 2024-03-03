@@ -1,6 +1,7 @@
 package errors;
 
 import java.util.Set;
+import alex.ClaseLexica;
 
 public class GestionErroresTiny {
 
@@ -18,7 +19,7 @@ public class GestionErroresTiny {
 
 
     public void errorLexico(int fila, int col, char car) {
-        throw new ErrorLexico("ERROR fila "+fila+","+col+": Caracter inexperado: "+car); 
+        throw new ErrorLexico("ERROR fila "+fila+","+col+": Caracter inexperado: "+car);
     }
 
     public void errorSintactico(int fila, int col, ClaseLexica encontrada, 
