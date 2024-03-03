@@ -54,8 +54,8 @@ PARSER_END(AnalizadorSintacticoTiny)
 
 // ======== REGLAS SINTACTICAS ========
 
-  void programa()   : {} {bloque()}
-  void bloque()   : {} {declaraciones() instrucciones()}
+  void programa()   : {} {bloque() <EOF>}
+  void bloque()   : {} {"{" declaraciones() instrucciones() "}"}
 
   void declaraciones()   : {} {declaracionesAux() "&&" | {}}
   void declaracionesAux()   : {} {declaracion() recDeclaracion()}
