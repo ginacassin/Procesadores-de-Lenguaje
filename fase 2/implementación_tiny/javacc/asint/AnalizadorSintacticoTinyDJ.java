@@ -1,9 +1,9 @@
-package asint;
+package javacc.asint;
 
 import java.io.Reader;
 
 
-public class AnalizadorSintacticoTinyDJ extends asint.AnalizadorSintacticoTiny {
+public class AnalizadorSintacticoTinyDJ extends javacc.asint.AnalizadorSintacticoTiny {
     public AnalizadorSintacticoTinyDJ(Reader r) {
         super(r);
         disable_tracing();
