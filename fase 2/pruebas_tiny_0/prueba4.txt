@@ -1,0 +1,4 @@
+{
+## error sintactico: falta @
+x = 5
+}
