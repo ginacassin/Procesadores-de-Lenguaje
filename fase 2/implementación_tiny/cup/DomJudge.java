@@ -1,8 +1,10 @@
-import alex.AnalizadorLexicoTiny;
-import asint.AnalizadorSintacticoTiny;
-import asint.AnalizadorSintacticoTinyDJ;
-import errors.GestionErroresTiny.ErrorLexico;
-import errors.GestionErroresTiny.ErrorSintactico;
+package cup;
+
+import cup.alex.AnalizadorLexicoTiny;
+import cup.asint.AnalizadorSintacticoTiny;
+import cup.asint.AnalizadorSintacticoTinyDJ;
+import cup.errors.GestionErroresTiny.ErrorLexico;
+import cup.errors.GestionErroresTiny.ErrorSintactico;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;

@@ -4,12 +4,12 @@
 // Sun Mar 03 23:46:05 CET 2024
 //----------------------------------------------------
 
-package asint;
+package cup.asint;
 
 import java_cup.runtime.*;
-import alex.AnalizadorLexicoTiny;
-import alex.UnidadLexica;
-import errors.GestionErroresTiny;
+import cup.alex.AnalizadorLexicoTiny;
+import cup.alex.UnidadLexica;
+import cup.errors.GestionErroresTiny;
 import java_cup.runtime.ComplexSymbolFactory.Location;
 
 /** CUP v0.11b beta 20140220 generated parser.

@@ -1,7 +1,9 @@
-import asint.AnalizadorSintacticoTiny;
-import asint.AnalizadorSintacticoTinyDJ;
-import asint.ParseException;
-import asint.TokenMgrError;
+package javacc;
+
+import javacc.asint.AnalizadorSintacticoTiny;
+import javacc.asint.AnalizadorSintacticoTinyDJ;
+import javacc.asint.ParseException;
+import javacc.asint.TokenMgrError;
 import java.io.FileReader;
 import java.io.InputStreamReader;
 public class DomJudge{
