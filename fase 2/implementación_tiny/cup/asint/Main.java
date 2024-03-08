@@ -1,4 +1,4 @@
-package asint;
+package cup.asint;
 
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
@@ -9,8 +9,8 @@ public class Main {
     public static void main(String[] args) throws Exception {
         Reader input = new InputStreamReader(new FileInputStream(args[0]));
         AnalizadorLexicoTiny alex = new AnalizadorLexicoTiny(input);
-        AnalizadorSintacticoTiny asint = new AnalizadorSintacticoTiny(alex);
+        asint.AnalizadorSintacticoTiny asintactico = new asint.AnalizadorSintacticoTiny(alex);
         //asint.setScanner(alex);
-        asint.parse();
+        asintactico.parse();
     }
 }

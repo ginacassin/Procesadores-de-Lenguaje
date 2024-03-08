@@ -20,10 +20,10 @@ public class Main {
         }
         try {
             if (op.equals("desc")) {
-                // llamar a analizador descendente (javacc) con archivo
+                javacc.asint.Main.main(args);
                 System.out.println("OK");
             } else {
-                // llamar a analizador ascendente (cup) con archivo
+                cup.asint.Main.main(args);
                 System.out.println("OK");
             }
         } catch (Exception e) {
