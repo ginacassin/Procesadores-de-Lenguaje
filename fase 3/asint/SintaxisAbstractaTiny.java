@@ -853,6 +853,15 @@ public class SintaxisAbstractaTiny {
     public DecsAux una_dec(Dec dec) {
         return new UnaDec(dec);
     }
+    public Dec dec_var(T tipo, String iden) {
+        return new DecVar(tipo, iden);
+    }
+    public Dec dec_tipo(T tipo, String iden) {
+        return new DecTipo(tipo, iden);
+    }
+    public Dec dec_proc(String iden, ParamsF paramsF, Bloq bloq) {
+        return new DecProc(iden, paramsF, bloq);
+    }
     public ParamsF si_paramF(ParamsFL paramsFL) {
         return new SiParamF(paramsFL);
     }
