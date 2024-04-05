@@ -36,4 +36,1114 @@
         En el siguiente documento se expondrá una memoria sobre el desarrollo de constructores de ASTs descendentes y ascendentes sobre el lenguaje de programación Tiny.
         Se presentará una especificación abstracta del lenguaje mediante la enumeración de las signaturas de las funciones constructoras de ASTs, se especificará el constructor de ASTs mediante una gramática s-atribuida y se acondicionará para permitir la implementación descendente. También se especificará un procesamiento para imprimir los tokens del programa leído. 
 
+    \section{Especificación de la sintaxis abstracta}
+        A continuación se presentará la especificación de la sintaxis abstracta del lenguaje Tiny. Esto se hará siguiendo los siguientes pasos:
+        \begin{enumerate}
+            \item Eliminar terminales que no tienen carga semántica.
+            \item Fusionar todos los terminales que sean equivalentes entre sí.
+            \item Simplificar la gramática aplicando transformaciones.
+        \end{enumerate}
+
+        \begin{itemize}
+            \item programa $\rightarrow$ bloque
+            \item bloque $\rightarrow$ \{ declaraciones instrucciones \}
+        \end{itemize}
+        \
+        \begin{itemize}
+            \item declaraciones $\rightarrow$ declaracionesAux
+            \item declaraciones $\rightarrow$ $\varepsilon$
+            \item declaracionesAux $\rightarrow$ declaracionesAux declaracion
+            \item declaracionesAux $\rightarrow$ declaracion
+            \item declaracion $\rightarrow$ tipo identificador
+            \item declaracion $\rightarrow$ type tipo identificador
+            \item declaracion $\rightarrow$ identificador paramsFormales bloque
+        \end{itemize}
+        \
+        \begin{itemize}
+            \item paramsFormales $\rightarrow$ paramsFormalesLista
+            \item paramsFormales $\rightarrow$ $\varepsilon$
+            \item paramsFormalesLista $\rightarrow$ paramsFormalesLista param 
+            \item paramsFormalesLista $\rightarrow$ param
+            \item param $\rightarrow$ tipo \& identificador 
+            \item param $\rightarrow$ tipo identificador
+        \end{itemize}
+        \
+        \begin{itemize}
+            \item tipo $\rightarrow$ tipo literalEntero
+            \item tipo $\rightarrow$ \^{} tipo
+            \item tipo $\rightarrow$ struct listaCampos
+            \item tipo $\rightarrow$ int
+            \item tipo $\rightarrow$ real
+            \item tipo $\rightarrow$ bool
+            \item tipo $\rightarrow$ string
+            \item tipo $\rightarrow$ identificador
+            \item listaCampos $\rightarrow$ listaCampos campo
+            \item listaCampos $\rightarrow$ campo
+            \item campo $\rightarrow$ tipo identificador
+        \end{itemize}
+        \
+        \begin{itemize}
+            \item instrucciones $\rightarrow$ instruccionesAux
+            \item instrucciones $\rightarrow \varepsilon$
+            \item instruccionesAux $\rightarrow$ instruccionesAux instruccion 
+            \item instruccionesAux $\rightarrow$ instruccion 
+            \item instruccion  $\rightarrow$ E
+            \item instruccion  $\rightarrow$ if E bloque
+            \item instruccion  $\rightarrow$ if E bloque else bloque
+            \item instruccion  $\rightarrow$ while E bloque
+            \item instruccion  $\rightarrow$ read E
+            \item instruccion  $\rightarrow$ write E
+            \item instruccion  $\rightarrow$ nl
+            \item instruccion  $\rightarrow$ new E
+            \item instruccion  $\rightarrow$ delete E
+            \item instruccion  $\rightarrow$ identificador paramsReales
+            \item instruccion $\rightarrow$ bloque
+            \item paramsReales $\rightarrow$ paramsRealesLista
+            \item paramsReales $\rightarrow$ $\varepsilon$
+            \item paramsRealesLista $\rightarrow$ paramsRealesLista E 
+            \item paramsRealesLista $\rightarrow$ E
+        \end{itemize}
+        \ 
+        \begin{itemize}
+            \item E $\rightarrow$ E = E
+            \item E $\rightarrow$ E $<$ E
+            \item E $\rightarrow$ E $>$ E
+            \item E $\rightarrow$ E $<=$ E
+            \item E $\rightarrow$ E $>=$ E
+            \item E $\rightarrow$ E $==$ E
+            \item E $\rightarrow$ E $!=$ E
+            \item E $\rightarrow$ E $+$ E
+            \item E $\rightarrow$ E $-$ E
+            \item E $\rightarrow$ E and E
+            \item E $\rightarrow$ E or E
+            \item E $\rightarrow$ E * E
+            \item E $\rightarrow$ E / E
+            \item E $\rightarrow$ E \% E
+            \item E $\rightarrow$ - E
+            \item E $\rightarrow$ not E
+            \item E $\rightarrow$ E [ E ]
+            \item E $\rightarrow$ E . identificador 
+            \item E $\rightarrow$ E \^{}
+            \item E $\rightarrow$ literalEntero
+            \item E $\rightarrow$ literalReal
+            \item E $\rightarrow$ true
+            \item E $\rightarrow$ false
+            \item E $\rightarrow$ literalCadena
+            \item E $\rightarrow$ identificador
+            \item E $\rightarrow$ null
+        \end{itemize}
+
+        A partir de lo generado anteriormente, se eligen nombres mnemotécnicos significativos para los géneros, especificado a continuación.
+
+        \subsection{Géneros}
+        \begin{longtable}{|p{6cm}|p{6cm}|}
+            \hline
+            \textbf{NO TERMINAL} & \textbf{GÉNERO} \\
+            \hline
+            programa & Prog \\
+            \hline
+            bloque & Bloq \\
+            \hline
+            declaraciones & Decs \\
+            \hline
+            declaracionesAux & DecsAux \\
+            \hline
+            declaracion & Dec \\
+            \hline
+            paramsFormales & ParamsF \\
+            \hline
+            paramsFormalesLista & ParamsFL \\
+            \hline
+            param & Param \\
+            \hline
+            tipo & T \\
+            \hline
+            listaCampos & LCampos \\
+            \hline
+            campo & Campo \\
+            \hline
+            instrucciones & Insts \\
+            \hline
+            instruccionesAux & InstsAux \\
+            \hline
+            instruccion & Inst \\
+            \hline
+            paramsReales & ParamsR \\
+            \hline
+            paramsRealesLista & ParamsRL \\
+            \hline
+            E & Exp \\
+            \hline
+        \end{longtable}
+    \subsection{Constructores}
+    A partir de los géneros construidos arriba, se especifican los constructores.
+    \begin{center}
+    \begin{longtable}{|p{7cm}|p{7cm}|} 
+        \hline
+        \textbf{REGLA} & \textbf{CONSTRUCTOR} \\
+        \hline
+        programa $\rightarrow$ bloque & prog: Bloq $\rightarrow$ Prog \\
+        \hline
+        bloque $\rightarrow$ declaraciones instrucciones & bloq: Decs x Insts $\rightarrow$ Prog \\
+        \hline
+        declaraciones $\rightarrow$ declaracionesAux & si\_decs: DecsAux $\rightarrow$ Decs \\
+        \hline
+        declaraciones $\rightarrow$ $\varepsilon$ & no\_decs: $\rightarrow$ Decs \\
+        \hline
+        declaracionesAux $\rightarrow$ declaracionesAux declaracion & muchas\_decs: DecsAux x Dec $\rightarrow$ DecsAux \\
+        \hline
+        declaracionesAux $\rightarrow$ declaracion & una\_dec: Dec $\rightarrow$ DecsAux \\
+        \hline
+        declaracion $\rightarrow$ tipo identificador & dec\_var: T x string $\rightarrow$ Dec \\
+        \hline
+        declaracion $\rightarrow$ type tipo identificador & dec\_tipo: T x string $\rightarrow$ Dec \\
+        \hline
+        declaracion $\rightarrow$ identificador paramsFormales bloque & dec\_proc: string x ParamsF x Bloq $\rightarrow$ Dec \\
+        \hline
+        paramsFormales $\rightarrow$ paramsFormalesLista & si\_paramF: ParamsFL $\rightarrow$ ParamsF \\
+        \hline
+        paramsFormales $\rightarrow$ $\varepsilon$ & no\_paramF: $\rightarrow$ ParamsF \\
+        \hline
+        paramsFormalesLista $\rightarrow$ paramsFormalesLista param & muchos\_paramsF: ParamsFL x Param $\rightarrow$ ParamsFL \\
+        \hline
+        paramsFormalesLista $\rightarrow$ param & un\_paramF: Param $\rightarrow$ ParamsFL \\
+        \hline
+        param $\rightarrow$ tipo \& identificador & param\_ref: T x string $\rightarrow$ Param \\
+        \hline
+        param $\rightarrow$ tipo identificador & param: T x string $\rightarrow$ Param \\
+        \hline
+        tipo $\rightarrow$ tipo literalEntero & tipo\_array: T x string $\rightarrow$ T \\
+        \hline
+        tipo $\rightarrow$ $\hat{}$ tipo & tipo\_punt: T $\rightarrow$ T \\
+        \hline
+        tipo $\rightarrow$ struct listaCampos & tipo\_struct: LCampos $\rightarrow$ T \\
+        \hline
+        listaCampos $\rightarrow$ listaCampos campo & muchos\_campos: LCampos x Campo $\rightarrow$ LCampos \\
+        \hline
+        listaCampos $\rightarrow$ campo & un\_campo: Campo $\rightarrow$ LCampos \\
+        \hline
+        campo $\rightarrow$ tipo identificador & campo: T x string $\rightarrow$ Campo \\
+        \hline
+        tipo $\rightarrow$ int & tipo\_int: $\rightarrow$ T \\
+        \hline
+        tipo $\rightarrow$ real & tipo\_real: $\rightarrow$ T \\
+        \hline
+        tipo $\rightarrow$ bool & tipo\_bool: $\rightarrow$ T \\
+        \hline
+        tipo $\rightarrow$ string & tipo\_string: $\rightarrow$ T \\
+        \hline
+        tipo $\rightarrow$ identificador & tipo\_iden: string $\rightarrow$ T \\
+        \hline
+        instrucciones $\rightarrow$ instruccionesAux & si\_instr: InstAux $\rightarrow$ Insts \\
+        \hline
+        instrucciones $\rightarrow$ $\varepsilon$ & no\_instr: $\rightarrow$ Insts \\
+        \hline
+        instruccionesAux $\rightarrow$ instruccionesAux instruccion & muchas\_instr: InstsAux x Inst $\rightarrow$ InstsAux \\
+        \hline
+        instruccionesAux $\rightarrow$ instruccion & una\_instr: Inst $\rightarrow$ InstsAux \\
+        \hline
+        instruccion $\rightarrow$ E & instr\_expr: Exp $\rightarrow$ Inst \\
+        \hline
+        instruccion $\rightarrow$ if E bloque & instr\_if: Exp x Bloq $\rightarrow$ Inst \\
+        \hline
+        instruccion $\rightarrow$ if E bloque else bloque & instr\_if\_else: Exp x Bloq x Bloq $\rightarrow$ Inst \\
+        \hline
+        instruccion $\rightarrow$ while E bloque & instr\_while: Exp x Bloq $\rightarrow$ Inst \\
+        \hline
+        instruccion $\rightarrow$ read E & instr\_read: Exp $\rightarrow$ Inst \\
+        \hline
+        instruccion $\rightarrow$ write E & instr\_write: Exp $\rightarrow$ Inst \\
+        \hline
+        instruccion $\rightarrow$ nl & instr\_nl: $\rightarrow$ Inst \\
+        \hline
+        instruccion $\rightarrow$ new E & instr\_new: Exp $\rightarrow$ Inst \\
+        \hline
+        instruccion $\rightarrow$ delete E & instr\_del: Exp $\rightarrow$ Inst \\
+        \hline
+        instruccion $\rightarrow$ identificador paramsReales & instr\_call: string x ParamsR $\rightarrow$ Inst \\
+        \hline
+        instruccion $\rightarrow$ bloque & instr\_bloque: Bloq $\rightarrow$ Inst \\
+        \hline
+        paramsReales $\rightarrow$ paramsRealesLista & si\_paramsR: ParamsRL $\rightarrow$ ParamsR \\
+        \hline
+        paramsReales $\rightarrow$ $\varepsilon$ & no\_paramsR: $\rightarrow$ ParamsR \\
+        \hline
+        paramsRealesLista $\rightarrow$ paramsRealesLista E & muchos\_paramsR: ParamsRL x Exp $\rightarrow$ ParamsRL \\
+        \hline
+        paramsRealesLista $\rightarrow$ E & un\_paramsR: Exp $\rightarrow$ ParamsRL \\
+        \hline
+        E $\rightarrow$ E = E & asig: Exp x Exp $\rightarrow$ Exp \\
+        \hline
+        E $\rightarrow$ E < E & menor: Exp x Exp $\rightarrow$ Exp \\
+        \hline
+        E $\rightarrow$ E > E & mayor: Exp x Exp $\rightarrow$ Exp \\
+        \hline
+        E $\rightarrow$ E <= E & menor\_igual: Exp x Exp $\rightarrow$ Exp \\
+        \hline
+        E $\rightarrow$ E >= E & mayor\_igual: Exp x Exp $\rightarrow$ Exp \\
+        \hline
+        E $\rightarrow$ E == E & igual: Exp x Exp $\rightarrow$ Exp \\
+        \hline
+        E $\rightarrow$ E != E & no\_igual: Exp x Exp $\rightarrow$ Exp \\
+        \hline
+        E $\rightarrow$ E + E & suma: Exp x Exp $\rightarrow$ Exp \\
+        \hline
+        E $\rightarrow$ E - E & resta: Exp x Exp $\rightarrow$ Exp \\
+        \hline
+        E $\rightarrow$ E and E & and: Exp x Exp $\rightarrow$ Exp \\
+        \hline
+        E $\rightarrow$ E or E & or: Exp x Exp $\rightarrow$ Exp \\
+        \hline
+        E $\rightarrow$ E * E & mult: Exp x Exp $\rightarrow$ Exp \\
+        \hline
+        E $\rightarrow$ E / E & div: Exp x Exp $\rightarrow$ Exp \\
+        \hline
+        E $\rightarrow$ E \% E & mod: Exp x Exp $\rightarrow$ Exp \\
+        \hline
+        E $\rightarrow$ - E & negativo: Exp $\rightarrow$ Exp \\
+        \hline
+        E $\rightarrow$ not E & not: Exp $\rightarrow$ Exp \\
+        \hline
+        E $\rightarrow$ E [E] & index: Exp x Exp $\rightarrow$ Exp \\
+        \hline
+        E $\rightarrow$ E . identificador & acceso: Exp x string $\rightarrow$ Exp \\
+        \hline
+        E $\rightarrow$ E \^{} & indireccion: Exp $\rightarrow$ Exp \\
+        \hline
+        E $\rightarrow$ literalEntero & lit\_ent: string $\rightarrow$ Exp \\
+        \hline
+        E $\rightarrow$ literaReal & lit\_real: string $\rightarrow$ Exp \\
+        \hline
+        E $\rightarrow$ true & true: $\rightarrow$ Exp \\
+        \hline
+        E $\rightarrow$ false & false: $\rightarrow$ Exp \\
+        \hline
+        E $\rightarrow$ literalCadena & lit\_cadena: string $\rightarrow$ Exp \\
+        \hline
+        E $\rightarrow$ identificador & iden: string $\rightarrow$ Exp \\
+        \hline
+        E $\rightarrow$ null & null: $\rightarrow$ Exp \\
+        \hline
+    \end{longtable}
+    \end{center}
+
+    \section{Especificación del constructor de ASTs mediante una gramática s-atribuida}
+
+    A partir de lo obtenido previamente, podemos especificar el constructor de ASTs con una gramática s-atribuida.
+
+        \begin{itemize}
+            \item programa $\rightarrow$ bloque
+                \subitem programa.a = prog(bloque a)
+            \item bloque $\rightarrow$ \{ declaraciones instrucciones \}
+                \subitem bloque.a = bloq(declaraciones.a, instrucciones.a)
+        \end{itemize}
+        \
+        \begin{itemize}
+            \item declaraciones $\rightarrow$ declaracionesAux \&\&
+                \subitem declaraciones.a = si\_decs(declaracionesAux.a)
+            \item declaraciones $\rightarrow$ $\varepsilon$
+                \subitem declaraciones.a = no\_decs()
+            \item declaracionesAux $\rightarrow$ declaracionesAux ; declaracion 
+                \subitem declaracionesAux1.a = muchas\_decs(declaracionesAux2.a, declaracion.a)
+            \item declaracionesAux $\rightarrow$ declaracion  
+                \subitem declaracionesAux.a = una\_dec(declaracion.a)                                         
+            \item declaracion $\rightarrow$ declaracionVar
+                \subitem declaracion.a = declaracionVar.a
+            \item declaracion $\rightarrow$ declaracionTipo
+                \subitem declaracion = declaracionTipo.a
+            \item declaracion $\rightarrow$ declaracionProc
+                \subitem declaracion = declaracionProc.a
+            \item declaracionVar $\rightarrow$ tipo0 identificador
+                \subitem declaracionVar.a = dec\_var(tipo0.a, identificador.lex)
+            \item declaracionTipo $\rightarrow$ type tipo0 identificador
+                \subitem declaracionTipo.a $=$ dec\_tipo(tipo0.a, identificador.lex)
+            \item declaracionProc $\rightarrow$ proc identificador paramsFormales bloque
+                \subitem declaracionProc.a $=$ dec\_proc(identificador.lex, paramsFormales.a, bloque.a)
+        \end{itemize}
+        \ 
+        \begin{itemize}
+            \item paramsFormales $\rightarrow$ ( paramsFormalesAux )
+                \subitem paramsFormales.a = paramsFormalesAux.a
+            \item paramsFormalesAux $\rightarrow$ paramsFormalesLista
+                \subitem paramsFormalesAux.a = si\_params(paramsFormalesLista.a)
+            \item paramsFormalesAux $\rightarrow$ $\varepsilon$
+                \subitem paramsFormalesAux.a = no\_params()
+            \item paramsFormalesLista $\rightarrow$ paramsFormalesLista , param
+                \subitem paramsFormalesLista.a = muchos\_params(paramsFormalesLista.a, param.a)
+            \item paramsFormalesLista $\rightarrow$ param
+                \subitem paramsFormalesLista.a = un\_param(param.a)
+            \item param $\rightarrow$ tipo0 \& identificador
+                \subitem param.a = param\_ref(tipo0.a, identificador.lex)
+            \item param $\rightarrow$ tipo0 identificador
+                \subitem param.a = param(tipo0.a, identificador.lex)
+        \end{itemize}
+        \ 
+        \begin{itemize}
+            \item tipo0 $\rightarrow$ tipo0 literalEntero 
+                \subitem tipo$0_1$.a = tipo\_array(tipo$0_2$.a, literalEntero.lex)
+            \item tipo0 $\rightarrow$ tipo1
+                \subitem tipo0.a = tipo.a
+            \item tipo1 $\rightarrow$ \^{} tipo1
+                \subitem tipo$1_1$.a = tipo\_punt(tipo$1_2$.a)
+            \item tipo1 $\rightarrow$ tipo2
+                \subitem tipo1.a = tipo2.a
+            \item tipo2 $\rightarrow$ struct \{ listaCampos \}
+                \subitem tipo2.a = tipo\_struct(listaCampos.a)
+            \item listaCampos $\rightarrow$ listaCampos , campo
+                \subitem listaCampos1.a = muchos\_campos(listaCampos2.a, campo.a)
+            \item listaCampos $\rightarrow$ campo
+                \subitem listaCampos.a = un\_campo(campo.a)
+            \item campo $\rightarrow$ tipo0 identificador
+                \subitem campo.a = campo(tipo0.a, identificador.lex)
+            \item tipo2 $\rightarrow$ int
+                \subitem tipo2.a = tipo\_int()
+            \item tipo2 $\rightarrow$ real
+                \subitem tipo2.a = tipo\_real()
+            \item tipo2 $\rightarrow$ bool
+                \subitem tipo2.a = tipo\_bool()
+            \item tipo2 $\rightarrow$ string
+                \subitem tipo2.a = tipo\_string()
+            \item tipo2 $\rightarrow$ identificador
+                \subitem tipo2.a = tipo\_iden(string.lex)
+        \end{itemize}
+        \ 
+        \begin{itemize}
+            \item instrucciones $\rightarrow$ instruccionesAux
+                \subitem instrucciones.a = si\_instr(instruccionesAux.a)
+            \item instrucciones $\rightarrow$ $\varepsilon$
+                \subitem instrucciones.a = no\_instr()
+            \item instruccionesAux $\rightarrow$ instruccionesAux ; instruccion
+                \subitem instruccionesAux1.a = muchas\_instr(instruccionesAux2.a, instruccion.a)
+            \item instruccionesAux $\rightarrow$ instruccion 
+                \subitem instruccionesAux.a = una\_instr(instruccion.a)
+            \item instruccion $\rightarrow$ @ expr
+                \subitem instruccion.a = instr\_expr(expr.a)
+            \item instruccion $\rightarrow$ if expr bloque 
+                \subitem instruccion.a = instr\_if(expr.a, bloque.a)
+            \item instruccion $\rightarrow$ if expr bloque else bloque
+                \subitem instruccion.a = instr\_if\_else(expr.a, bloque1.a, bloque2.a)
+            \item instruccion $\rightarrow$ while expr bloque
+                \subitem instruccion.a = instr\_while(expr.a, bloque.a)
+            \item instruccion $\rightarrow$ read expr
+                \subitem instruccion.a = instr\_read(expr.a)
+            \item instruccion $\rightarrow$ write expr 
+                \subitem instruccion.a = instr\_write(expr.a)
+            \item instruccion $\rightarrow$ nl
+                \subitem instruccion.a = instr\_nl()
+            \item instruccion $\rightarrow$ new expr
+                \subitem instruccion.a = instr\_new(expr.a)
+            \item instruccion $\rightarrow$ delete expr
+                \subitem instruccion.a = instr\_del(expr.a)
+            \item instruccion $\rightarrow$ call identificador paramsReales
+                \subitem instruccion.a = instr\_call(identificador.lex, paramsReales.a)
+            \item instruccion $\rightarrow$ bloque
+                \subitem instruccion.a = instr\_bloque(bloque.a)
+            \item paramsReales $\rightarrow$ ( paramsRealesAux )
+                \subitem paramsReales.a = paramsRealesAux.a
+            \item paramsRealesAux $\rightarrow$ paramsRealesLista
+                \subitem paramsRealesAux.a = si\_paramsR(paramsRealesLista.a)
+            \item paramsRealesAux $\rightarrow$ $\varepsilon$
+                \subitem paramsRealesAux.a = no\_paramsR()
+            \item paramsRealesLista $\rightarrow$ paramsRealesLista , expr
+                \subitem paramsRealesLista1.a = muchos\_paramsR(paramsRealesLista2.a, expr.a)
+            \item paramsRealesLista $\rightarrow$ expr
+                \subitem paramsRealesLista.a = un\_paramsR(expr.a)
+        \end{itemize}
+        \ 
+        \begin{itemize}
+            \item expr $\rightarrow$ e0
+                \subitem expr.a = e0.a
+            \item e0 $\rightarrow$ e1 = e0
+                \subitem e$0_1$.a = asig(e1.a, e$0_2$.a)
+            \item e0 $\rightarrow$ e1
+                \subitem e0.a = e1.a
+            \item e1 $\rightarrow$ e1 op1 e2
+                \subitem e$1_1$.a = mkop1(op1.op, e$1_2$.a, e2.a)
+            \item e1 $\rightarrow$ e2
+                \subitem e1.a = e2.a
+            \item e2 $\rightarrow$ e2 + e3
+                \subitem e$2_1$.a = suma(e$2_2$.a, e3.a)
+            \item e2 $\rightarrow$ e3 - e3
+                \subitem e2.a = resta(e$3_1$.a, e$3_2$.a)
+            \item e2 $\rightarrow$ e3
+                \subitem e2.a = e3.a
+            \item e3 $\rightarrow$ e4 and e3
+                \subitem e$3_1$.a = and(e4.a, e$3_2$.a)
+            \item e3 $\rightarrow$ e4 or e4
+                \subitem e3.a = or(e$4_1$.a, e$4_2$.a)
+            \item e3 $\rightarrow$ e4
+                \subitem e3.a = e4.a
+            \item e4 $\rightarrow$ e4 op4 e5
+                \subitem e$4_1$.a = mkop4(op4.op, e$4_2$.a, e5.a)
+            \item e4 $\rightarrow$ e5
+                \subitem e4.a = e5.a
+            \item e5 $\rightarrow$ op5 e5
+                \subitem e$5_1$.a = mkop5(op5.op, e$5_2$.a)
+            \item e5 $\rightarrow$ e6
+                \subitem e5.a = e6.a
+            \item e6 $\rightarrow$ e6 [ expr ]
+                \subitem e$6_1$.a = index(e$6_2$.a, expr.a)
+            \item e6 $\rightarrow$ e6 . identificador
+                \subitem e$6_1$.a = acceso(e$6_2$.a, identificador.lex)
+            \item e6 $\rightarrow$ e6 \^{}
+                \subitem e$6_1$.a = indireccion(e$6_2$.a)
+            \item e6 $\rightarrow$ e7
+                \subitem e6.a = e7.a
+            \item e7 $\rightarrow$ ( e0 )
+                \subitem e7.a = e0.a
+            \item e7 $\rightarrow$ literalEntero
+                \subitem e7.a = lit\_ent(literalEntero.lex)
+            \item e7 $\rightarrow$ literaReal
+                \subitem e7.a = lit\_Real(literalReal.lex)
+            \item e7 $\rightarrow$ true
+                \subitem e7.a = lit\_true()
+            \item e7 $\rightarrow$ false
+                \subitem e7.a = lit\_false()
+            \item e7 $\rightarrow$ literalCadena
+                \subitem e7.a = lit\_cadena(literalCadena.lex)
+            \item e7 $\rightarrow$ identificador
+                \subitem e7.a = identificador.lex
+            \item e7 $\rightarrow$ null
+                \subitem e7.a = null()
+            \item op1 $\rightarrow$ $<$
+                \subitem op1.op = “$<$”
+            \item op1 $\rightarrow$ $>$
+                \subitem op1.op = “$>$”
+            \item op1 $\rightarrow$ $<=$
+                \subitem op1.op = “$<=$”
+            \item op1 $\rightarrow$ $>=$
+                \subitem op1.op = “$>=$”
+            \item op1 $\rightarrow$ ==
+                \subitem op1.op = “==”
+            \item op1 $\rightarrow$ !=
+                \subitem op1.op = “!=”
+            \item op4 $\rightarrow$ *
+                \subitem op4.op = “*”
+            \item op4 $\rightarrow$ /
+                \subitem op4.op = “/”
+            \item op4 $\rightarrow$ \%
+                \subitem op4.op = “\%”
+            \item op5 $\rightarrow$ -
+                \subitem op5.op = “-”
+            \item op5 $\rightarrow$ not
+                \subitem op5.op = “not”
+        \end{itemize}   
+        \
+        \begin{itemize}
+            \item fun mkop1(op, opnd1, opnd2):
+                \subitem op = “$<$”    $\rightarrow$ return menor(opnd1, opnd2)
+                \subitem op = “$>$”    $\rightarrow$ return mayor(opnd1, opnd2)
+                \subitem op = “$<=$”  $\rightarrow$ return menor\_igual(opnd1, opnd2)
+                \subitem op = “$>=$”  $\rightarrow$ return mayor\_igual(opnd1, opnd2)
+                \subitem op = “==”  $\rightarrow$ return igual(opnd1, opnd2)
+                \subitem op = “!=”   $\rightarrow$ return no\_igual(opnd1, opnd2)
+        \end{itemize}
+        \
+        \begin{itemize}
+            \item fun mkop4(op, opnd1, opnd2):
+                \subitem op = “*”    $\rightarrow$ return mul(opnd1, opnd2)
+                \subitem op = “/”    $\rightarrow$ return div(opnd1, opnd2)
+                \subitem op = “\%”  $\rightarrow$ return mod(opnd1, opnd2)
+        \end{itemize}
+        \ 
+        \
+        \begin{itemize}
+            \item fun mkop5(op, opnd):
+                \subitem op = “-”    $\rightarrow$ return neg(opnd)
+                \subitem op = “not”    $\rightarrow$ return not(opnd)
+        \end{itemize}
+
+    \section{Acondicionamiento para permitir la implementación descendente}
+        \begin{itemize}
+            \item programa $\rightarrow$ bloque
+                \subitem programa.a = prog(bloque.a)
+            \item bloque $\rightarrow$ \{ declaraciones instrucciones \}
+                \subitem bloque.a = bloq(declaraciones.a, instrucciones.a)
+        \end{itemize}
+        \
+        \begin{itemize}
+            \item declaraciones $\rightarrow$ declaracionesAux \&\&
+                \subitem declaraciones.a = si\_decs(declaracionesAux.a)
+            \item declaraciones $\rightarrow$ $\varepsilon$
+                \subitem declaraciones.a = no\_decs()
+            \item declaracionesAux $\rightarrow$ declaracion recDeclaracion
+                \subitem recDeclaracion.h = una\_dec(declaracion.a)
+                \subitem declaracionesAux.a = recDeclaracion.a
+            \item recDeclaracion $\rightarrow$ ; declaracion recDeclaracion
+                \subitem recDeclaracion2.h = muchas\_decs(recDeclaracion1.h, declaraciones.a)
+                \subitem recDeclaracion1.a = recDeclaracion2.a
+            \item recDeclaracion $\rightarrow$ $\varepsilon$
+                \subitem recDeclaracion.a = recDeclaracion.h
+            \item declaracion $\rightarrow$ declaracionVar
+                \subitem declaracion.a = declaracionVar.a
+            \item declaracion $\rightarrow$ declaracionTipo
+                \subitem declaracion = declaracionTipo.a
+            \item declaracion $\rightarrow$ declaracionProc
+                \subitem declaracion = declaracionProc.a
+            \item declaracionVar $\rightarrow$ tipo0 identificador
+                \subitem declaracionVar.a = dec\_var(tipo0.a, identificador.lex)
+            \item declaracionTipo $\rightarrow$ type tipo0 identificador
+                \subitem declaracionTipo.a = dec\_tipo(tipo0.a, identificador.lex)
+            \item declaracionProc $\rightarrow$ proc identificador paramsFormales bloque
+                \subitem declaracionProc.a = dec\_proc(identificador.lex, paramsFormales.a, bloque.a)
+        \end{itemize}
+        \
+        \begin{itemize}
+            \item paramsFormales $\rightarrow$ ( paramsFormalesAux )
+                \subitem paramsFormales.a = paramsFormalesAux.a
+            \item paramsFormalesAux $\rightarrow$ paramsFormalesLista
+                \subitem paramsFormalesAux.a = si\_params(paramsFormalesLista.a)
+            \item paramsFormalesAux $\rightarrow$ $\varepsilon$
+                \subitem paramsFormalesAux.a = no\_params()
+            \item paramsFormalesLista $\rightarrow$ param recParamFormal
+                \subitem recParamFormal.h = un\_param(param.a)
+                \subitem paramsFormalesLista.a = recParamFormal.a
+            \item recParamFormal $\rightarrow$ , param recParamFormal
+                \subitem recParamFormal2.h = muchos\_params(recParamFormal1.h, param.a)
+                \subitem recParamFormal1.a = recParamFormal2.a
+            \item recParamFormal $\rightarrow$ $\varepsilon$
+                \subitem recParamFormal.a = recParamFormal.h
+            \item param $\rightarrow$ tipo0 referencia identificador
+                \subitem referencia.ht = tipo0.a
+                \subitem referencia.hi = identificador.lex
+                \subitem param.a = referencia.a
+            \item referencia $\rightarrow$ \&
+                \subitem referencia.a = param\_ref(referencia.ht, referencia.hi)
+            \item referencia $\rightarrow$ $\varepsilon$
+                \subitem referencia.a = param(referencia.ht, referencia.hi)
+        \end{itemize}
+        \
+        \begin{itemize}
+            \item tipo0 $\rightarrow$ tipo1 recArray
+                \subitem recArray.h = tipo1.a
+                \subitem tipo0.a = recArray.a
+            \item recArray $\rightarrow$ [ literalEntero ] recArray
+                \subitem recArray2.h = tipo\_array(recArray1.h, literalEntero.lex)
+                \subitem recArray1.a = recArray2.a
+            \item recArray $\rightarrow$ $\varepsilon$
+                \subitem recArray.a = recArray.h
+            \item tipo1 $\rightarrow$ \^{} tipo1
+                \subitem tipo$1_1$.a = tipo\_punt(tipo$1_2$.a)
+            \item tipo1 $\rightarrow$ tipo2
+                \subitem tipo1.a = tipo2.a
+            \item tipo2 $\rightarrow$ struct \{ listaCampos \}
+                \subitem tipo2.a = tipo\_struct(listaCampos.a)
+            \item listaCampos $\rightarrow$ campo recCampo
+                \subitem recCampo.h = un\_campo(campo.a)
+                \subitem listaCampos.a = recCampo.a
+            \item recCampo $\rightarrow$ , campo recCampo
+                \subitem recCampo2.h = muchos\_campos(recCampo1.h, campo.a)
+                \subitem recCampo1.a = recCampo2.a
+            \item recCampo $\rightarrow$ $\varepsilon$
+                \subitem recCampo.a = recCampo.h
+            \item campo $\rightarrow$ tipo0 identificador
+                \subitem campo.a = campo(tipo0.a, identificador.lex)
+            \item tipo2 $\rightarrow$ int
+                \subitem tipo2.a = tipo\_int()
+            \item tipo2 $\rightarrow$ real
+                \subitem tipo2.a = tipo\_real()
+            \item tipo2 $\rightarrow$ bool
+                \subitem tipo2.a = tipo\_bool()
+            \item tipo2 $\rightarrow$ string
+                \subitem tipo2.a = tipo\_string()
+            \item tipo2 $\rightarrow$ identificador
+                \subitem tipo2.a = tipo\_iden(string.lex)
+        \end{itemize}
+        \
+        \begin{itemize}
+            \item instrucciones $\rightarrow$ instruccionesAux
+                \subitem instrucciones.a = si\_instr(instruccionesAux.a)
+            \item instrucciones $\rightarrow$ $\varepsilon$
+                \subitem instrucciones.a = no\_instr()
+            \item instruccionesAux $\rightarrow$ instruccion recInstruccion
+                \subitem recInstruccion.h = una\_instr(instruccion.a)
+                \subitem instruccionesAux.a = recInstruccion.a
+            \item recInstruccion $\rightarrow$ ; instruccion recInstruccion
+                \subitem recInstruccion2.h = muchas\_instr(recInstruccion1.h, intruccion.a)
+                \subitem recInstruccion1.a = recInstruccion2.a
+            \item recInstruccion $\rightarrow$ $\varepsilon$
+                \subitem recInstruccion.a = recInstruccion.h
+            \item instruccion $\rightarrow$ @ expr
+                \subitem instruccion.a = instr\_expr(expr.a)
+            \item instruccion $\rightarrow$ if expr bloque facIf
+                \subitem facIf.h1 = expr.a
+                \subitem facIf.h2 = bloque.a
+                \subitem instruccion.a = factIf.a
+            \item facIf $\rightarrow$ else bloque
+                \subitem facIf.a = instr\_if\_else(facIf.h1, facIf.h2, bloque.a)
+            \item facIf $\rightarrow$ $\varepsilon$
+                \subitem facIf.a = instr\_if(facIf.h1, facIf.h2)
+            \item instruccion $\rightarrow$ while expr bloque
+                \subitem instruccion.a = instr\_while(expr.a, bloque.a)
+            \item instruccion $\rightarrow$ read expr
+                \subitem instruccion.a = instr\_read(expr.a)
+            \item instruccion $\rightarrow$ write expr 
+                \subitem instruccion.a = instr\_write(expr.a)
+            \item instruccion $\rightarrow$ nl
+                \subitem instruccion.a = instr\_nl()
+            \item instruccion $\rightarrow$ new expr
+                \subitem instruccion.a = instr\_new(expr.a)
+            \item instruccion $\rightarrow$ delete expr
+                \subitem instruccion.a = instr\_del(expr.a)
+            \item instruccion $\rightarrow$ call identificador paramsReales
+                \subitem instruccion.a = instr\_call(identificador.lex, paramsReales.a)
+            \item instruccion $\rightarrow$ bloque
+                \subitem instruccion.a = instr\_bloque(bloque.a)
+            \item paramsReales $\rightarrow$ ( paramsRealesAux )
+                \subitem paramsReales.a = paramsRealesAux.a
+            \item paramsRealesAux $\rightarrow$ paramsRealesLista
+                \subitem paramsRealesAux.a = si\_paramsR(paramsRealesLista.a)
+            \item paramsRealesAux $\rightarrow$ $\varepsilon$
+                \subitem paramsRealesAux.a = no\_paramsR()
+            \item paramsRealesLista $\rightarrow$ expr recParamReal
+                \subitem recParamReal.h = un\_paramsR(expr.a)
+                \subitem paramsRealesLista.a = recParamReal.a
+            \item recParamReal $\rightarrow$ , expr recParamReal
+                \subitem recParamReal2.h = muchos\_paramsR(recParamReal1.h, expr.a)
+                \subitem recParamReal1.a = recParamReal2.a
+            \item recParamReal $\rightarrow$ $\varepsilon$
+                \subitem recParamReal.a = recParamReal.h
+        \end{itemize}
+        \
+        \begin{itemize}
+            \item expr $\rightarrow$ e0
+            \item e0 $\rightarrow$ e1 facE1
+                \subitem facE1.h = e1.a
+                \subitem e0.a = facE1.a
+            \item facE1 $\rightarrow$ = e0 facE1
+                \subitem facE$1_2$.h = asig(facE$1_1$.h, e0.a)
+                \subitem facE$1_1$.a = facE$1_2$.a
+            \item facE1 $\rightarrow$ $\varepsilon$
+                \subitem facE1.a = facE1.h
+            \item e1 $\rightarrow$ e2 recOp1
+                \subitem recOp1.h = e2.a
+                \subitem e1.a = recOp1.a
+            \item recOp1 $\rightarrow$ op1 e2 recOp1
+                \subitem recOp$1_2$.h = mkop1(op1.op, recOp$1_1$.h, e2.a)
+                \subitem recOp$1_1$.a = recOp$1_2$.a
+            \item recOp1 $\rightarrow$ $\varepsilon$
+                \subitem recOp1.a = recOp1.h
+            \item e2 $\rightarrow$ e3 facE3 recSuma
+                \subitem facE3.h = e3.a
+                \subitem recSuma.h = facE3.a
+                \subitem e2.a = recSuma.a
+            \item recSuma $\rightarrow$ + e3 recSuma
+                \subitem recSuma2.h = suma(recSuma1.h, e3.a)
+                \subitem recSuma1.a = recSuma2.a
+            \item recSuma $\rightarrow$ $\varepsilon$
+                \subitem recSuma.a = recSuma.h
+            \item facE3 $\rightarrow$ - e3
+                \subitem facE3.a = resta(fecE3.h, e3.a)
+            \item facE3 $\rightarrow$ $\varepsilon$
+                \subitem facE3.a = facE3.h
+            \item e3 $\rightarrow$ e4 facE4
+                \subitem facE4.h = e4.a
+                \subitem e3.a = facE4.a
+            \item facE4 $\rightarrow$ and e3
+                \subitem facE4.a = and(facE4.h, e3.a)
+            \item facE4 $\rightarrow$ or e4
+                \subitem facE4.a = or(facE4.h, e3.a)
+            \item facE4 $\rightarrow$ $\varepsilon$
+                \subitem facE4.a = facE4.h
+            \item e4 $\rightarrow$ e5 recOp4
+                \subitem recOp4.h = e5.a
+                \subitem r4.a = recOp4.a
+            \item recOp4 $\rightarrow$ op4 e5 recOp4
+                \subitem recOp$4_2$.h = mkop4(op4.op, recOp$4_1$.h, e5.a)
+                \subitem recOp$4_1$.a = recOp$4_2$.a
+            \item recOp4 $\rightarrow$ $\varepsilon$
+                \subitem recOp4.a = recOp4.h
+            \item e5 $\rightarrow$ op5 e5
+                \subitem e$5_1$.a = mkop5(op5.op, e$5_2$.a)
+            \item e5 $\rightarrow$ e6
+                \subitem e5.a = e6.a
+            \item e6 $\rightarrow$ e7 recOp6
+                \subitem recOp6.h = e6Aux.a
+                \subitem e6.a = recOp6.a
+            \item recOp6 $\rightarrow$ [ expr ] recOp6
+                \subitem recOp$6_2$.h = index(recOp6.h, expr.a)
+                \subitem recOp$6_1$.a = recOp$6_2$.a
+            \item recOp6 $\rightarrow$ . identificador recOp6
+                \subitem recOp$6_2$.h = acceso(recOp6.a, identificador.lex)
+                \subitem recOp$6_1$.a = recOp$6_2$.a
+            \item recOp6 $\rightarrow$ \^{} recOp6
+                \subitem recOp$6_2$.h = indireccion(recOp6.h)
+                \subitem recOp$6_1$.a = recOp$6_2$.a
+            \item recOp6 $\rightarrow$ $\varepsilon$
+                \subitem recOp6.a = recOp6.h
+            \item e7 $\rightarrow$ ( e0 )
+                \subitem e7.a = e0.a
+            \item e7 $\rightarrow$ literalEntero
+                \subitem e7.a = lit\_ent(literalEntero.lex)
+            \item e7 $\rightarrow$ literaReal
+                \subitem e7.a = lit\_real(literalReal.lex)
+            \item e7 $\rightarrow$ true
+                \subitem e7.a = lit\_true()
+            \item e7 $\rightarrow$ false
+                \subitem e7.a = lit\_false()
+            \item e7 $\rightarrow$ literalCadena
+                \subitem e7.a = lit\_cadena(literalCadena.lex)
+            \item e7 $\rightarrow$ identificador
+                \subitem e7.a = identificador.lex
+            \item e7 $\rightarrow$ null
+                \subitem e7.a = null()
+        \end{itemize}
+        \ 
+        \begin{itemize}
+            \item op1 $\rightarrow$ $<$
+                \subitem op1.op = “$<$”
+            \item op1 $\rightarrow$ $>$
+                \subitem op1.op = “$>$”
+            \item op1 $\rightarrow$ $<=$
+                \subitem op1.op = “$<=$”
+            \item op1 $\rightarrow$ $>=$
+                \subitem op1.op = “$>=$”
+            \item op1 $\rightarrow$ ==
+                \subitem op1.op = “==”
+            \item op1 $\rightarrow$ !=
+                \subitem op1.op = “!=”
+            \item op4 $\rightarrow$ *
+                \subitem op4.op = “*”
+            \item op4 $\rightarrow$ /
+                \subitem op4.op = “/”
+            \item op4 $\rightarrow$ \%
+                \subitem op4.op = “\%”
+            \item op5 $\rightarrow$ -
+                \subitem op5.op = “-”
+            \item op5 $\rightarrow$ not
+                \subitem op5.op = “not”
+        \end{itemize}
+        \
+        \begin{itemize}
+            \item fun mkop1(op, opnd1, opnd2):
+                \subitem op = “$<$”    $\rightarrow$ return menor(opnd1, opnd2)
+                \subitem op = “$>$”   $\rightarrow$  return mayor(opnd1, opnd2)
+                \subitem op = “$<=$”  $\rightarrow$  return menor\_igual(opnd1, opnd2)
+                \subitem op = “$>=$”  $\rightarrow$  return mayor\_igual(opnd1, opnd2)
+                \subitem op = “==”  $\rightarrow$  return igual(opnd1, opnd2)
+                \subitem op = “!=”   $\rightarrow$  return no\_igual(opnd1, opnd2)
+        \end{itemize}
+        \
+        \begin{itemize}
+            \item fun mkop4(op, opnd1, opnd2):
+                \subitem op = “*”   $\rightarrow$  return mul(opnd1, opnd2)
+                \subitem op = “/”    $\rightarrow$  return div(opnd1, opnd2)
+                \subitem op = “\%” $\rightarrow$  return mod(opnd1, opnd2)
+        \end{itemize}
+        \
+        \begin{itemize}
+            \item fun mkop5(op, opnd):
+                \subitem op = “-” $\rightarrow$      return neg(opnd)
+                \subitem op = “not” $\rightarrow$  return not(opnd)
+        \end{itemize}
+
+    \section{Especificación de proceso para imprimir}
+        \begin{itemize}
+            \item imprime(prog(Bloq)):
+                \subitem imprime(Bloq)
+            
+            \item imprime(bloq(Decs, Insts)):
+                \subitem print “\{”
+                \subitem nl
+                \subitem imprime(Decs)
+                \subitem imprime(Insts)
+                \subitem nl
+                \subitem print “\}”
+            
+            \item imprime(si\_decs(DecsAux)):
+                \subitem imprime(DecsAux)
+                \subitem print “\&\&”
+            
+            \item imprime(no\_decs()): noop
+            
+            \item imprime(muchas\_decs(DecsAux, Dec)):
+                \subitem imprime(DecsAux)
+                \subitem print “;”
+                \subitem nl
+                \subitem imprime(Dec)
+            
+            \item imprime(una\_dec(Dec)):
+                \subitem imprime(Dec)
+            
+            \item imprime(dec\_var(T, Iden)):
+                \subitem imprime(T)
+                \subitem imprime(Iden)
+            
+            \item imprime(dec\_tipo(T, Iden)):
+                \subitem print “type”
+                \subitem imprime(T)
+                \subitem imprime(Iden)
+            
+            \item imprime(dec\_proc(Iden, ParamsF, Bloq)):
+                \subitem print “proc”
+                \subitem imprime(Iden)
+                \subitem print “(”
+                \subitem imprime(ParamsF)
+                \subitem print “)”
+                \subitem imprime(Bloq)
+            
+            \item imprime(si\_paramF(ParamsFL)):
+                \subitem imprime(ParamsFL)
+            
+            \item imprime(no\_paramF()): noop
+            
+            \item imprime(muchos\_paramsF(ParamsFL, Param)):
+                \subitem imprime(ParamsFL)
+                \subitem print “,”
+                \subitem imprime(Param)
+            
+            \item imprime(un\_paramF(Param)):
+                \subitem imprime(Param)
+            
+            \item imprime(param\_ref(T, Iden)):
+                \subitem imprime(T)
+                \subitem print “\&”
+                \subitem imprime(Iden)
+            
+            \item imprime(param(T, Iden)):
+                \subitem imprime(T)
+                \subitem imprime(Iden)
+            
+            \item imprime(tipo\_array(T, LitEnt)):
+                \subitem imprime(T)
+                \subitem print “[”
+                \subitem imprime(LitEnt)
+                \subitem print “]”
+            
+            \item imprime(tipo\_punt(T)):
+                \subitem print “\^{}”
+                \subitem imprime(T)
+            
+            \item imprime(tipo\_struct(LCampos)):
+                \subitem print “struct”
+                \subitem print “\{”
+                \subitem imprime(LCampos)
+                \subitem print “\}”
+            
+            \item imprime(muchos\_campos(LCampos, Campo)):
+                \subitem imprime(LCampos)
+                \subitem print “,”
+                \subitem imprime(Campo)
+            
+            \item imprime(un\_campo(Campo)):
+                \subitem imprime(Campo)
+            
+            \item imprime(campo(T, Iden)):
+                \subitem imprime(T)
+                \subitem imprime(Iden)
+            
+            \item imprime(tipo\_int()):
+                \subitem print “int”
+            
+            \item imprime(tipo\_real()):
+                \subitem print “real”
+            
+            \item imprime(tipo\_bool()):
+                \subitem print “bool”
+            
+            \item imprime(tipo\_string()):
+                \subitem print “string”
+            
+            \item imprime(tipo\_iden(Iden)):
+                \subitem imprime(Iden)
+            
+            \item imprime(si\_instr(InstAux)):
+                \subitem imprime(InstAux)
+            
+            \item imprime(no\_instr()): noop
+            
+            \item imprime(muchas\_instr(InstsAux, Inst)):
+                \subitem imprime(InstAux)
+                \subitem print “;”
+                \subitem imprime(Inst)
+            
+            \item imprime(una\_instr(Inst)):
+                \subitem imprime(Inst)
+            
+            \item imprime(instr\_expr(Exp)):
+                \subitem print “@”
+                \subitem imprime(Exp)
+            
+            \item imprime(instr\_if(Exp, Bloq)):
+                \subitem print “if”
+                \subitem imprime(Exp)
+                \subitem imprime(Bloq)
+            
+            \item imprime(instr\_if\_else(Exp, Bloq, Bloq)):
+                \subitem print “if”
+                \subitem imprime(Exp)
+                \subitem imprime(Bloq)
+                \subitem print “else”
+                \subitem imprime(Bloq)
+            
+            \item imprime(instr\_while(Exp, Bloq)):
+                \subitem print “while”
+                \subitem imprime(Exp)
+                \subitem imprime(Bloq)
+            
+            \item imprime(instr\_read(Exp)):
+                \subitem print “read”
+                \subitem imprime(Exp)
+            
+            \item imprime(instr\_write(Exp)):
+                \subitem print “write”
+                \subitem imprime(Exp)
+            
+            \item imprime(instr\_nl()):
+                \subitem print “nl”
+            
+            \item imprime(instr\_new(Exp)):
+                \subitem print “new”
+                \subitem imprime(Exp)
+            
+            \item imprime(instr\_del(Exp)):
+                \subitem print “delete”
+                \subitem imprime(Exp)
+            
+            \item imprime(instr\_call(Iden, ParamsR)):
+                \subitem print “call”
+                \subitem imprime(Iden)
+                \subitem print “(”
+                \subitem imprime(ParamsR)
+                \subitem print “)”
+            
+            \item imprime(instr\_bloque(Bloq)):
+                \subitem imprime(Bloq)
+            
+            \item imprime(si\_paramsR(ParamsRL)):
+                \subitem imprime(ParamsRL)
+            
+            \item imprime(no\_paramsR()): noop
+            
+            \item imprime(muchos\_paramsR(ParamsRL, Exp)):
+                \subitem imprime(ParamsRL)
+                \subitem print “,”
+                \subitem imprime(Exp)
+            
+            \item imprime(un\_paramsR(Exp)):
+                \subitem imprime(Exp)
+            
+            \item imprime(asig(Exp1, Exp2)):
+                \subitem imprimeExpBin(Exp1, “=”, Exp2, 1, 0)
+            
+            \item imprime(menor(Exp1, Exp2)):
+                \subitem imprimeExpBin(Exp1, “$<$”, Exp2, 1, 2)
+            
+            \item imprime(mayor(Exp1, Exp2)):
+                \subitem imprimeExpBin(Exp1, “$>$”, Exp2, 1, 2)
+            
+            \item imprime(menor\_igual(Exp1, Exp2)):
+                \subitem imprimeExpBin(Exp1, “$<=$”, Exp2, 1, 2)
+            
+            \item imprime(mayor\_igual(Exp1, Exp2)):
+                \subitem imprimeExpBin(Exp1, “$>=$”, Exp2, 1, 2)
+            
+            \item imprime(igual(Exp1, Exp2)):
+                \subitem imprimeExpBin(Exp1, “==”, Exp2, 1, 2)
+            
+            \item imprime(no\_igual(Exp1, Exp2)):
+                \subitem imprimeExpBin(Exp1, “!=”, Exp2, 1, 2)
+            
+            \item imprime(suma(Exp1, Exp2)):
+                \subitem imprimeExpBin(Exp1, “+”, Exp2, 2, 3)
+            
+            \item imprime(resta(Exp1, Exp2)):
+                \subitem imprimeExpBin(Exp1, “-”, Exp2, 3, 3)
+            
+            \item imprime(and(Exp1, Exp2)):
+                \subitem imprimeExpBin(Exp1, “and”, Exp2, 4, 3)
+            
+            \item imprime(or(Exp1, Exp2)):
+                \subitem imprimeExpBin(Exp1, “or”, Exp2, 4, 4)
+            
+            \item imprime(mult(Exp1, Exp2)):
+                \subitem imprimeExpBin(Exp1, “*”, Exp2, 4, 5)
+            
+            \item imprime(div(Exp1, Exp2)):
+                \subitem imprimeExpBin(Exp1, “/”, Exp2, 4, 5)
+            
+            \item imprime(mod(Exp1, Exp2)):
+                \subitem imprimeExpBin(Exp1, “\%”, Exp2, 4, 5)
+            
+            \item imprime(negativo(Exp)):
+                \subitem imprimeExpUnarioPrefijo(“-”, 5)
+            
+            \item imprime(not(Exp)):
+                \subitem imprimeExpUnarioPrefijo(“not”, 5)
+            
+            \item imprime(index(Exp1, Exp2)):
+                \subitem imprimeOpnd(Exp1,6)
+                \subitem print “[“
+                \subitem imprime(Exp)
+                \subitem print “]”
+            
+            \item imprime(acceso(Exp, Iden)):
+                \subitem imprimeOpnd(Exp1,6)
+                \subitem print “.”
+                \subitem imprime(Iden)
+            
+            \item imprime(indireccion(Exp)):
+                \subitem imprimeOpnd(Exp1,6)
+                \subitem print “\^{}”
+            
+            \item imprime(lit\_ent(N)):
+                \subitem print N
+            
+            \item imprime(lit\_real(R)):
+                \subitem print R
+            
+            \item imprime(true()):
+                \subitem print “true”
+            
+            \item imprime(false()):
+                \subitem print “false”
+            
+            \item imprime(lit\_cadena(Cad)):
+                \subitem print Cad
+            
+            \item imprime(iden(Id)):
+                \subitem print Id
+            
+            \item imprime(null()):
+                \subitem print “null”
+                \item imprimeOpnd(Opnd,MinPrior):
+                \subitem if prioridad(Opnd) $<$ MinPrior
+                    \subsubitem print “(“
+                \subitem end if
+                \subitem imprime(Opnd)
+                \subitem if prioridad(Opnd) $<$ MinPrior
+                    \subsubitem print “)“
+                \subitem end if
+            
+            \item imprimeExpBin(Opnd0,Op,Opnd1,np0,np1):
+                \subitem imprimeOpnd(Opnd0,np0) 
+                \subitem print " "++Op++" " 
+                \subitem imprimeOpnd(Opnd1,np1) 
+            
+            \item imprimeExpUnarioPrefijo(Opnd, Op, np):
+                \subitem print Op++" " 
+                \subitem imprimeOpnd(Opnd,np)
+            
+            \item prioridad(asig(\_,\_)): return 0
+            \item prioridad(menor(\_,\_)): return 1
+            \item prioridad(mayor(\_,\_)): return 1
+            \item prioridad(menor\_igual(\_,\_)): return 1
+            \item prioridad(mayor\_igual(\_,\_)): return 1
+            \item prioridad(igual(\_,\_)): return 1
+            \item prioridad(no\_igual(\_,\_)): return 1
+            \item prioridad(suma(\_,\_)): return 2
+            \item prioridad(resta(\_,\_)): return 2
+            \item prioridad(and(\_,\_)): return 3
+            \item prioridad(or(\_,\_)): return 3
+            \item prioridad(mul(\_,\_)): return 4
+            \item prioridad(div(\_,\_)): return 4
+            \item prioridad(mod(\_,\_)): return 4
+            \item prioridad(negativo(\_)): return 5
+            \item prioridad(not(\_)): return 5
+            \item prioridad(index(\_,\_)): return 6
+            \item prioridad(acceso(\_,\_)): return 6
+            \item prioridad(indireccion(\_)): return 6
+        \end{itemize}
+    
+
 \end{document}
