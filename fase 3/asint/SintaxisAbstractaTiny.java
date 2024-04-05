@@ -46,7 +46,7 @@ public class SintaxisAbstractaTiny {
 
     private static abstract class ExpUn extends Exp {
         protected Exp opnd0;
-        public ExpBin(Exp opnd0) {
+        public ExpUn(Exp opnd0) {
             super();
             this.opnd0 = opnd0;
         }
@@ -109,7 +109,7 @@ public class SintaxisAbstractaTiny {
         }
     }
     public static class MenorIgual extends ExpBin {
-        public menorIgual(Exp opnd0, Exp opnd1) {
+        public MenorIgual(Exp opnd0, Exp opnd1) {
             super(opnd0,opnd1);
         }
         public String toString() {
@@ -190,15 +190,6 @@ public class SintaxisAbstractaTiny {
             return "indireccion("+opnd0+")";
         }
     }
-    public static class Negativo extends ExpUn {
-        public Negativo(Exp opnd0) {
-            super(opnd0);
-        }
-        public String toString() {
-            return "negativo("+opnd0+")";
-        }
-    }
-
 
     public static class Index extends Exp {
         protected Exp opnd;
@@ -209,7 +200,7 @@ public class SintaxisAbstractaTiny {
             this.opnd = opnd;
         }
         public String toString() {
-            return "index("+opnd0+","+index+")";
+            return "index("+opnd+","+index+")";
         }
     }
 
@@ -265,9 +256,9 @@ public class SintaxisAbstractaTiny {
     }
     public static class Lit_cadena extends Exp {
         private String cadena;
-        public Lit_real(String cadena) {
+        public Lit_cadena(String cadena) {
             super();
-            this.iden = cadena;
+            this.cadena = cadena;
         }
         public String toString() {
             return "lit_cadena("+cadena+"["+leeFila()+","+leeCol()+"])";
@@ -306,7 +297,7 @@ public class SintaxisAbstractaTiny {
             this.paramsrl = paramsrl;
         }
         public String toString() {
-            return "si_paramsR("+decs+")";
+            return "si_paramsR("+paramsrl+")";
         }
     }
     public static class No_ParamsR extends ParamsR {
@@ -391,7 +382,7 @@ public class SintaxisAbstractaTiny {
         private Inst inst;
         public Una_Instr(Inst inst) {
             super();
-            this.Inst = inst;
+            this.inst = inst;
         }
         public String toString() {
             return "una_instr("+inst+")";
@@ -572,8 +563,8 @@ public class SintaxisAbstractaTiny {
     }
     public static class TipoArray extends T {
         private T tipo;
-        private Lit_ent litEnt;
-        public TipoArray(T tipo, Lit_ent litEnt) {
+        private String litEnt;
+        public TipoArray(T tipo, String litEnt) {
             super();
             this.tipo = tipo;
             this.litEnt = litEnt;
@@ -624,12 +615,12 @@ public class SintaxisAbstractaTiny {
     }
     public static class Identificador extends T {
         private String iden;
-        public Muchos_Campos(String iden) {
+        public Identificador(String iden) {
             super();
             this.iden = iden;
         }
         public String toString() {
-            return "muchos_campos("+iden+)";
+            return "muchos_campos("+iden+")";
         }
     }
 
@@ -673,14 +664,14 @@ public class SintaxisAbstractaTiny {
         private ParamsFL paramsFL;
         public SiParamF(ParamsFL paramsFL) {
             super();
-            this.paramsFL = paramsFL
+            this.paramsFL = paramsFL;
         }
         public String toString() {
             return "si_paramF("+paramsFL+")";
         }
     }
     public static class NoParamF extends ParamsF {
-        public NoParamF(T tipo, String iden) {
+        public NoParamF() {
             super();
         }
         public String toString() {
@@ -696,7 +687,7 @@ public class SintaxisAbstractaTiny {
     public static class MuchosParamsF extends ParamsFL {
         private ParamsFL paramsFL;
         private Param param;
-        public MuchosParamF(ParamsFL paramsFL, Param param) {
+        public MuchosParamsF(ParamsFL paramsFL, Param param) {
             super();
             this.paramsFL = paramsFL;
             this.param = param;
@@ -706,7 +697,7 @@ public class SintaxisAbstractaTiny {
         }
     }
     public static class UnParamF extends ParamsFL {
-        private Param param
+        private Param param;
         public UnParamF(Param param) {
             super();
             this.param = param;
@@ -736,7 +727,7 @@ public class SintaxisAbstractaTiny {
     public static class DecTipo extends Dec {
         private T tipo;
         private String iden;
-        public DecTipo(ParamsFL paramsFL, Param param) {
+        public DecTipo(T tipo, String iden) {
             super();
             this.tipo = tipo;
             this.iden = iden;
@@ -812,7 +803,7 @@ public class SintaxisAbstractaTiny {
     public static class Bloq extends Nodo {
         private Insts insts;
         private Decs decs;
-        public Bloq(Insts insts, Decs decs) {
+        public Bloq(Decs decs, Insts insts) {
             super();
             this.insts = insts;
             this.decs = decs;
@@ -889,7 +880,7 @@ public class SintaxisAbstractaTiny {
     public T tipo_struct(LCampos lCampos) {
         return new TipoStruct(lCampos);
     }
-    public T int() {
+    public T ent() {
         return new TipoInt();
     }
     public T real() {
@@ -1033,10 +1024,10 @@ public class SintaxisAbstractaTiny {
     public Exp lit_real(String iden) {
         return new Lit_real(iden);
     }
-    public Exp true() {
+    public Exp btrue() {
         return new True();
     }
-    public Exp false() {
+    public Exp bfalse() {
         return new False();
     }
     public Exp lit_cadena(String iden) {
@@ -1045,7 +1036,7 @@ public class SintaxisAbstractaTiny {
     public Exp iden(String iden) {
         return new Iden(iden);
     }
-    public Exp null() {
+    public Exp vnull() {
         return new Null();
     }
 }

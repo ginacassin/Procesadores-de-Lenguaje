@@ -3,13 +3,34 @@ options  {
   DEBUG_PARSER=true;
   TOKEN_MANAGER_USES_PARSER=true;
 }
-PARSER_BEGIN(AnalizadorSintacticoTiny)
-package asint;
+PARSER_BEGIN(ConstructorASTsTiny)
+package implementacion_desc_javacc;
+import asint.ClaseSemanticaEval;
+import asint.SintaxisAbstractaTiny.Exp;
+import asint.SintaxisAbstractaTiny.ParamsR;
+import asint.SintaxisAbstractaTiny.ParamsRL;
+import asint.SintaxisAbstractaTiny.Insts;
+import asint.SintaxisAbstractaTiny.InstsAux;
+import asint.SintaxisAbstractaTiny.Inst;
+import asint.SintaxisAbstractaTiny.Campo;
+import asint.SintaxisAbstractaTiny.LCampos;
+import asint.SintaxisAbstractaTiny.T;
+import asint.SintaxisAbstractaTiny.ParamsF;
+import asint.SintaxisAbstractaTiny.Param;
+import asint.SintaxisAbstractaTiny.ParamsFL;
+import asint.SintaxisAbstractaTiny.Dec;
+import asint.SintaxisAbstractaTiny.Decs;
+import asint.SintaxisAbstractaTiny.DecsAux;
+import asint.SintaxisAbstractaTiny.Bloq;
+import asint.SintaxisAbstractaTiny.Prog;
+//import de StringLocalizado ???
 
-public class AnalizadorSintacticoTiny {
-    protected void newToken(Token t) {}
+
+public class ConstructorASTsTiny {
+    //protected void newToken(Token t) {}
+    private ClaseSemanticaTiny sem = new ClaseSemanticaTiny();
 }
-PARSER_END(AnalizadorSintacticoTiny)
+PARSER_END(ConstructorASTsTiny)
 
 // ======== REGLAS LEXICAS ========
 
