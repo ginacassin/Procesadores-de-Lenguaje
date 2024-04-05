@@ -904,5 +904,139 @@ public class SintaxisAbstractaTiny {
     public Campo campo(T tipo, String iden) {
         return new Campo(tipo, iden);
     }
-    
+    public Insts si_instr(InstsAux instsAux) {
+        return new Si_Instr(instsAux);
+    }
+    public Insts no_instr() {
+        return new No_Instr();
+    }
+    public InstsAux muchas_instr(InstsAux instsAux, Inst inst) {
+        return new Muchas_Instr(instsAux, inst);
+    }
+    public InstsAux una_instr(Inst inst) {
+        return new Una_Instr(inst);
+    }
+    public Inst instr_expr(Exp exp) {
+        return new Instr_Expr(exp);
+    }
+    public Inst instr_if(Exp exp, Bloq bloq) {
+        return new Instr_If(exp, bloq);
+    }
+    public Inst instr_if_else(Exp exp, Bloq bloq1, Bloq bloq2) {
+        return new Instr_If_Else(exp, bloq1, bloq2);
+    }
+    public Inst instr_while(Exp exp, Bloq bloq) {
+        return new Instr_While(exp, bloq);
+    }
+    public Inst instr_read(Exp exp) {
+        return new Instr_Read(exp);
+    }
+    public Inst instr_write(Exp exp) {
+        return new Instr_Write(exp);
+    }
+    public Inst instr_nl() {
+        return new Instr_Nl();
+    }
+    public Inst instr_new(Exp exp) {
+        return new Instr_New(exp);
+    }
+    public Inst instr_del(Exp exp) {
+        return new Instr_Del(exp);
+    }
+    public Inst instr_call(String iden, ParamsR paramsR) {
+        return new Instr_Call(iden, paramsR);
+    }
+    public Inst instr_bloque(Bloq bloq) {
+        return new Instr_Bloque(bloq);
+    }
+    public ParamsR si_paramsR(ParamsRL paramsRL) {
+        return new Si_ParamsR(paramsRL);
+    }
+    public ParamsR no_paramsR() {
+        return new No_ParamsR();
+    }
+    public ParamsRL muchos_paramsR(ParamsRL paramsRL, Exp exp) {
+        return new Muchos_ParamsR(paramsRL, exp);
+    }
+    public ParamsRL un_paramsR(Exp exp) {
+        return new Un_ParamsR(exp);
+    }
+    public Exp asig(Exp exp1, Exp exp2) {
+        return new Asignacion(exp1, exp2);
+    }
+    public Exp menor(Exp exp1, Exp exp2) {
+        return new Menor(exp1, exp2);
+    }
+    public Exp mayor(Exp exp1, Exp exp2) {
+        return new Mayor(exp1, exp2);
+    }
+    public Exp menor_igual(Exp exp1, Exp exp2) {
+        return new MenorIgual(exp1, exp2);
+    }
+    public Exp mayor_igual(Exp exp1, Exp exp2) {
+        return new MayorIgual(exp1, exp2);
+    }
+    public Exp igual(Exp exp1, Exp exp2) {
+        return new Igual(exp1, exp2);
+    }
+    public Exp no_igual(Exp exp1, Exp exp2) {
+        return new NoIgual(exp1, exp2);
+    }
+    public Exp suma(Exp exp1, Exp exp2) {
+        return new Suma(exp1, exp2);
+    }
+    public Exp resta(Exp exp1, Exp exp2) {
+        return new Resta(exp1, exp2);
+    }
+    public Exp and(Exp exp1, Exp exp2) {
+        return new And(exp1, exp2);
+    }
+    public Exp or(Exp exp1, Exp exp2) {
+        return new Or(exp1, exp2);
+    }
+    public Exp mult(Exp exp1, Exp exp2) {
+        return new Mul(exp1, exp2);
+    }
+    public Exp div(Exp exp1, Exp exp2) {
+        return new Div(exp1, exp2);
+    }
+    public Exp mod(Exp exp1, Exp exp2) {
+        return new Mod(exp1, exp2);
+    }
+    public Exp negativo(Exp exp) {
+        return new Negativo(exp);
+    }
+    public Exp not(Exp exp) {
+        return new Not(exp);
+    }
+    public Exp index(Exp exp1, Exp exp2) {
+        return new Index(exp1, exp2);
+    }
+    public Exp acceso(Exp exp, String iden) {
+        return new Acceso(exp, iden);
+    }
+    public Exp indireccion(Exp exp) {
+        return new Indireccion(exp);
+    }
+    public Exp lit_ent(String iden) {
+        return new Lit_ent(iden);
+    }
+    public Exp lit_real(String iden) {
+        return new Lit_real(iden);
+    }
+    public Exp true() {
+        return new True();
+    }
+    public Exp false() {
+        return new False();
+    }
+    public Exp lit_cadena(String iden) {
+        return new Lit_cadena(iden);
+    }
+    public Exp iden(String iden) {
+        return new Iden(iden);
+    }
+    public Exp null() {
+        return new Null();
+    }
 }
