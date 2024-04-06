@@ -23,7 +23,7 @@ import asint.SintaxisAbstractaTiny.Decs;
 import asint.SintaxisAbstractaTiny.DecsAux;
 import asint.SintaxisAbstractaTiny.Bloq;
 import asint.SintaxisAbstractaTiny.Prog;
-//import de StringLocalizado ???
+import c_ast_ascendente.UnidadLexica.StringLocalizado;
 
 public class ConstructorASTsTiny {
     protected void newToken(Token t) {}
@@ -86,7 +86,7 @@ PARSER_END(ConstructorASTsTiny)
              bloq = bloque()
                 {return sem.prog(bloq);}
           }
-    Prog bloque()   :
+    Bloq bloque()   :
           {Decs decs; Insts insts;}
           {
              "{" decs = declaraciones() insts = instrucciones() "}"
