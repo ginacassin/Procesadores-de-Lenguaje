@@ -32,6 +32,10 @@ public class SintaxisAbstractaTiny {
         public Exp() {
             super();
         }
+        public String getIden() {throw new UnsupportedOperationException();}
+        public String valor() {throw new UnsupportedOperationException();}
+        public Exp getOpnd0() {throw new UnsupportedOperationException();}
+        public Exp getOpnd1() {throw new UnsupportedOperationException();}
     }
 
     private static abstract class ExpBin extends Exp {
@@ -639,6 +643,8 @@ public class SintaxisAbstractaTiny {
         public LCampos() {
             super();
         }
+        public Campo getCampo() { throw new UnsupportedOperationException();}
+        public LCampos getlCampos() { throw new UnsupportedOperationException();}
     }
     public static class Muchos_Campos extends LCampos {
         private LCampos lCampos;
@@ -677,6 +683,8 @@ public class SintaxisAbstractaTiny {
         public T() {
             super();
         }
+        public LCampos getlCampos() { throw new UnsupportedOperationException();}
+        public T getTipo() { throw new UnsupportedOperationException();}
     }
     public static class TipoArray extends T {
         private T tipo;
@@ -761,6 +769,8 @@ public class SintaxisAbstractaTiny {
         public Param() {
             super();
         }
+        public String getIden() { throw new UnsupportedOperationException();}
+        public T getTipo() { throw new UnsupportedOperationException();}
     }
     public static class ParamRef extends Param {
         private T tipo;
@@ -803,6 +813,7 @@ public class SintaxisAbstractaTiny {
         public ParamsF() {
             super();
         }
+        public ParamsFL getParamsFL() { throw new UnsupportedOperationException();}
     }
     public static class SiParamF extends ParamsF {
         private ParamsFL paramsFL;
@@ -830,6 +841,8 @@ public class SintaxisAbstractaTiny {
         public ParamsFL() {
             super();
         }
+        public Param getParam() { throw new UnsupportedOperationException();}
+        public ParamsFL getParamsFL() { throw new UnsupportedOperationException();}
     }
     public static class MuchosParamsF extends ParamsFL {
         private ParamsFL paramsFL;
@@ -867,6 +880,10 @@ public class SintaxisAbstractaTiny {
         public Dec() {
             super();
         }
+        public String getIden() { throw new UnsupportedOperationException();}
+        public T getTipo() { throw new UnsupportedOperationException();}
+        public Bloq getBloq() { throw new UnsupportedOperationException();}
+        public ParamsF getParamsF() { throw new UnsupportedOperationException();}
     }
     public static class DecVar extends Dec {
         private T tipo;
@@ -932,6 +949,7 @@ public class SintaxisAbstractaTiny {
         public Decs() {
             super();
         }
+        public DecsAux getDecsAux() { throw new UnsupportedOperationException();}
     }
     public static class SiDecs extends Decs {
         private DecsAux decsAux;
@@ -956,6 +974,8 @@ public class SintaxisAbstractaTiny {
         public DecsAux() {
             super();
         }
+        public Dec getDec() { throw new UnsupportedOperationException();}
+        public DecsAux getDecsAux() { throw new UnsupportedOperationException();}
     }
     public static class MuchasDecs extends DecsAux {
         private DecsAux decsAux;
