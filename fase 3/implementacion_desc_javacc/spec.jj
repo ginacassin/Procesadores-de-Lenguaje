@@ -129,10 +129,15 @@ PARSER_END(ConstructorASTsTiny)
     ParamsF paramsFormales()   :
           {ParamsFL paramsFL;}
           {
-             "(" paramsFL = paramsFormalesLista() ")"
+             "(" paramsFL = paramsFormalesAux() ")"
+                {return paramsFL;}
+          }
+    ParamsF paramsFormalesAux()   :
+          {ParamsFL paramsFL;}
+          {
+             paramsFL = paramsFormalesLista()
                 {return sem.si_paramF(paramsFL);}
              |
-             "()"
                 {return sem.no_paramF();}
           }
     ParamsFL paramsFormalesLista()   :
@@ -158,21 +163,21 @@ PARSER_END(ConstructorASTsTiny)
              tipo0 = tipo0() iden = <iden>
                 {return sem.param(tipo0, iden.image);}
           }
-T tipo0()   :
+    T tipo0()   :
           {T tipo; T recArray;}
           {
-             tipo = tipo1()   /////////////////////////////////////////////////)
-                {return recArray(tipo);}
+             tipo = tipo1() recArray = recArray(tipo)
+                {return recArray;}
           }
-T recArray(T tipoh)   :
+    T recArray(T tipoh)   :
           {String litEntero; T recArray;}
           {
-             "[" litEntero = <iden> "]" recArray = recArray(tipoh)
+             "[" litEntero = <iden> "]" recArray = recArray((T)sem.tipo_array(tipoh, litEntero.image).ponFile(litEntero.beginLine).ponCol(litEntero.beginColumn))
                 {return recArray;}
              |
                 {return tipoh;}
           }
-T tipo1()   :
+    T tipo1()   :
           {T tipo;}
           {
              "^" tipo = tipo1()
@@ -180,7 +185,7 @@ T tipo1()   :
              |
                 {return tipo2();}
           }
-T tipo2()   :
+    T tipo2()   :
           {LCampos lCampos; String iden;}
           {
              <struct> "{" lCampos = listaCampos() "}"
@@ -198,15 +203,15 @@ T tipo2()   :
              <string>
                 {return sem.tipo_string();}
              iden = <iden>
-                {return sem.tipo_iden(iden);}
+                {return (T)sem.tipo_iden(iden.image).ponFile(iden.beginLine).ponCol(iden.beginColumn);}
           }
-LCampos listaCampos()   :
+    LCampos listaCampos()   :
           {LCampos lCampos; Campo campo;}
           {
              campo = campo() lCampos = recCampo(sem.un_campo(campo))
                 {return lCampos;}
           }
-LCampos recCampo(Campo campoh)   :
+    LCampos recCampo(Campo campoh)   :
           {LCampos lCampos; Campo campo;}
           {
              "," campo = campo() lCampos = recCampo(sem.muchos_campos(campoh, campo))
@@ -214,13 +219,13 @@ LCampos recCampo(Campo campoh)   :
              |
                 {return campoh;}
           }
-Campo campo()   :
+    Campo campo()   :
           {T tipo; String iden;}
           {
              tipo = tipo0() iden = <iden>
                 {return (Campo)sem.campo(tipo, iden.image).ponFile(iden.beginLine).ponCol(iden.beginColumn);}
           }
-Insts instrucciones()   :
+    Insts instrucciones()   :
           {InstsAux instsAux;}
           {
              instsAux = instruccionesAux()
@@ -228,13 +233,13 @@ Insts instrucciones()   :
              |
                 {return sem.no_instr();}
           }
-InstsAux instruccionesAux()   :
+    InstsAux instruccionesAux()   :
           {InstsAux instsAux; Inst inst;}
           {
              inst = instruccion() instsAux = recInstruccion(sem.una_instr(inst))
                 {return instsAux;}
           }
-InstsAux recInstruccion(InstsAux instsAuxh)   :
+    InstsAux recInstruccion(InstsAux instsAuxh)   :
           {InstsAux instsAux; Inst inst;}
           {
              ";" inst = instruccion() instsAux = recInstruccion(sem.muchas_instr(instsAuxh, inst))
@@ -242,7 +247,7 @@ InstsAux recInstruccion(InstsAux instsAuxh)   :
              |
                 {return instsAuxh;}
           }
-Inst instruccion()   :
+    Inst instruccion()   :
           {Exp exp; Bloq bloq1, bloq2; String iden; ParamsR paramsR;}
           {
              "@" exp = expr()
@@ -414,27 +419,41 @@ Inst instruccion()   :
              "[" expr = expr() "]" e = recOp6(sem.index(e7h, expr))
                 {return e;}
              |
-             "." iden = <iden> e = recOp6(sem.acceso(e7h, iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn))
+             "." iden = <iden> e = recOp6((Exp)sem.acceso(e7h, iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn))
                 {return e;}
              |
              "^" e = recOp6(sem.indireccion(e7h))
                 {return e;}
              |
-                {return e7h}
+                {return e7h;}
           }
-    Exp e2()   :
-          {Exp e31, e32;}
+    Exp e7()   :
+          {Exp e0; String iden;}
           {
-             e32 = e3() e32 = facE3(e31) recSuma(e3)
+             "(" e0 = e0() ")"
                 {return e0;}
              |
-                {return e2h;}
+             iden = <iden>
+                {return (Exp)sem.lit_ent(iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
+             |
+             iden = <iden>
+                {return (Exp)sem.lit_real(iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
+             |
+             <TRUE>
+                {return sem.lit_true();}
+             |
+             <FALSE>
+                {return sem.lit_false();}
+             |
+             iden = <iden>
+                {return (Exp)sem.lit_cadena(iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
+             |
+             iden = <iden>
+                {return (Exp)sem.identificador(iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
+             |
+             <NULL>
+                {return sem.vnull();}
           }
-    void e6()   : {} {e6Aux() recOp6()}
-    void recOp6()   : {} {op6() recOp6() | {}}
-    void e6Aux()   : {} {"(" e0() ")" | <literalEntero> | <literalReal> | <TRUE> | <FALSE> | <literalCadena> | <iden> | <NULL>}
-    void op6()   : {} {"[" expr() "]" | "." <iden> | "^"}
-
     String op1()   :
         {}
         {
