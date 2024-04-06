@@ -172,7 +172,7 @@ PARSER_END(ConstructorASTsTiny)
     T recArray(T tipoh)   :
           {Token litEntero; T recArray;}
           {
-             "[" litEntero = <iden> "]" recArray = recArray((T)sem.tipo_array(tipoh, litEntero.image).ponFile(litEntero.beginLine).ponCol(litEntero.beginColumn))
+             "[" litEntero = <iden> "]" recArray = recArray((T)sem.tipo_array(tipoh, litEntero.image).ponFila(litEntero.beginLine).ponCol(litEntero.beginColumn))
                 {return recArray;}
              |
                 {return tipoh;}
@@ -203,7 +203,7 @@ PARSER_END(ConstructorASTsTiny)
              <string>
                 {return sem.tipo_string();}
              iden = <iden>
-                {return (T)sem.tipo_iden(iden.image).ponFile(iden.beginLine).ponCol(iden.beginColumn);}
+                {return (T)sem.tipo_iden(iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
           }
     LCampos listaCampos()   :
           {LCampos lCampos; Campo campo;}
@@ -223,7 +223,7 @@ PARSER_END(ConstructorASTsTiny)
           {T tipo; Token iden;}
           {
              tipo = tipo0() iden = <iden>
-                {return (Campo)sem.campo(tipo, iden.image).ponFile(iden.beginLine).ponCol(iden.beginColumn);}
+                {return (Campo)sem.campo(tipo, iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
           }
     Insts instrucciones()   :
           {InstsAux instsAux;}

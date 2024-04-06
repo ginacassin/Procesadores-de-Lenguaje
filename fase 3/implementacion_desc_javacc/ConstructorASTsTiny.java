@@ -280,7 +280,7 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
         jj_consume_token(42);
         litEntero = jj_consume_token(iden);
         jj_consume_token(43);
-        recArray = recArray((T)sem.tipo_array(tipoh, litEntero.image).ponFile(litEntero.beginLine).ponCol(litEntero.beginColumn));
+        recArray = recArray((T)sem.tipo_array(tipoh, litEntero.image).ponFila(litEntero.beginLine).ponCol(litEntero.beginColumn));
                  {if (true) return recArray;}
         break;
       default:
@@ -341,7 +341,7 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
         jj_consume_token(string);
                  {if (true) return sem.tipo_string();}
         iden = jj_consume_token(iden);
-                 {if (true) return (T)sem.tipo_iden(iden.image).ponFile(iden.beginLine).ponCol(iden.beginColumn);}
+                 {if (true) return (T)sem.tipo_iden(iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
         break;
       default:
         jj_la1[8] = jj_gen;
@@ -394,7 +394,7 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
            T tipo; Token iden;
       tipo = tipo0();
       iden = jj_consume_token(iden);
-                 {if (true) return (Campo)sem.campo(tipo, iden.image).ponFile(iden.beginLine).ponCol(iden.beginColumn);}
+                 {if (true) return (Campo)sem.campo(tipo, iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
     throw new Error("Missing return statement in function");
     } finally {
       trace_return("campo");
