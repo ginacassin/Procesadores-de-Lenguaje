@@ -5,7 +5,7 @@ options  {
 }
 PARSER_BEGIN(ConstructorASTsTiny)
 package implementacion_desc_javacc;
-import asint.ClaseSemanticaEval;
+import asint.ClaseSemanticaTiny;
 import asint.SintaxisAbstractaTiny.Exp;
 import asint.SintaxisAbstractaTiny.ParamsR;
 import asint.SintaxisAbstractaTiny.ParamsRL;
@@ -25,9 +25,8 @@ import asint.SintaxisAbstractaTiny.Bloq;
 import asint.SintaxisAbstractaTiny.Prog;
 //import de StringLocalizado ???
 
-
 public class ConstructorASTsTiny {
-    //protected void newToken(Token t) {}
+    protected void newToken(Token t) {}
     private ClaseSemanticaTiny sem = new ClaseSemanticaTiny();
 }
 PARSER_END(ConstructorASTsTiny)
@@ -75,61 +74,410 @@ PARSER_END(ConstructorASTsTiny)
 
 // ======== REGLAS SINTACTICAS ========
 
-  void programa()   : {} {bloque() <EOF>}
-  void bloque()   : {} {"{" declaraciones() instrucciones() "}"}
+    Prog analiza()   :
+          {Prog prog;}
+          {
+             prog = programa() <EOF>
+                {return prog;}
+          }
+    Prog programa()   :
+          {Bloq bloq;}
+          {
+             bloq = bloque()
+                {return sem.prog(bloq);}
+          }
+    Prog bloque()   :
+          {Decs decs; Insts insts;}
+          {
+             "{" decs = declaraciones() insts = instrucciones() "}"
+                {return sem.bloq(decs, insts);}
+          }
+    Decs declaraciones()   :
+          {DecsAux decsAux;}
+          {
+             decsAux = declaracionesAux() "&&"
+                {return sem.si_decs(decsAux);}
+             |
+                {return sem.no_decs();}
+          }
+    DecsAux declaracionesAux()   :
+          {DecsAux decsAux; Dec dec;}
+          {
+             dec = declaracion() decsAux = recDeclaracion(sem.una_dec(dec))
+                {return decsAux;}
+          }
+    DecsAux recDeclaracion(DecsAux decsAuxh)   :
+          {DecsAux decsAux; Dec dec;}
+          {
+             ";" dec = declaracion() decsAux = recDeclaracion(sem.muchas_decs(decsAuxh, dec))
+                {return decsAux;}
+             |
+                {return decsAuxh;}
+          }
+    Dec declaracion()   :
+          {T tipo; String iden; ParamsF paramsF; Bloq bloq;}
+          {
+             tipo = tipo0() iden = <iden>
+                {return (Dec)sem.dec_var(tipo, iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
+             |
+             <type> tipo = tipo0() iden = <iden>
+                {return (Dec)sem.dec_tipo(tipo, iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
+             |
+             <proc> iden = <iden> paramsF = paramsFormales() bloq = bloque()
+                {return (Dec)sem.dec_proc(iden.image, paramsF, bloq).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
+          }
+    ParamsF paramsFormales()   :
+          {ParamsFL paramsFL;}
+          {
+             "(" paramsFL = paramsFormalesLista() ")"
+                {return sem.si_paramF(paramsFL);}
+             |
+             "()"
+                {return sem.no_paramF();}
+          }
+    ParamsFL paramsFormalesLista()   :
+          {ParamsFL paramsFL; Param param;}
+          {
+             param = param() paramsFL = recParamFormal(sem.un_param(param))
+                {return sem.si_paramF(paramsFL);}
+          }
+    ParamsFL recParamFormal(ParamsFL paramsFLh)   :
+          {ParamsFL paramsFL; Param param;}
+          {
+             "," param = param() paramsFL = recParamFormal(sem.muchos_params(paramsFLh, param))
+                {return paramsFL;}
+             |
+                {return paramsFLh;}
+          }
+    Param param()   :
+          {T tipo0; String iden;}
+          {
+             tipo0 = tipo0() "&" iden = <iden>
+                {return sem.param_ref(tipo0, iden.image);}
+             |
+             tipo0 = tipo0() iden = <iden>
+                {return sem.param(tipo0, iden.image);}
+          }
+T tipo0()   :
+          {T tipo; T recArray;}
+          {
+             tipo = tipo1()   /////////////////////////////////////////////////)
+                {return recArray(tipo);}
+          }
+T recArray(T tipoh)   :
+          {String litEntero; T recArray;}
+          {
+             "[" litEntero = <iden> "]" recArray = recArray(tipoh)
+                {return recArray;}
+             |
+                {return tipoh;}
+          }
+T tipo1()   :
+          {T tipo;}
+          {
+             "^" tipo = tipo1()
+                {return sem.tipo_punt(tipo);}
+             |
+                {return tipo2();}
+          }
+T tipo2()   :
+          {LCampos lCampos; String iden;}
+          {
+             <struct> "{" lCampos = listaCampos() "}"
+                {return sem.tipo_struct(lCampos);}
+             |
+             <INT>
+                {return sem.tipo_int();}
+             |
+             <real>
+                {return sem.tipo_real();}
+             |
+             <bool>
+                {return sem.tipo_bool();}
+             |
+             <string>
+                {return sem.tipo_string();}
+             iden = <iden>
+                {return sem.tipo_iden(iden);}
+          }
+LCampos listaCampos()   :
+          {LCampos lCampos; Campo campo;}
+          {
+             campo = campo() lCampos = recCampo(sem.un_campo(campo))
+                {return lCampos;}
+          }
+LCampos recCampo(Campo campoh)   :
+          {LCampos lCampos; Campo campo;}
+          {
+             "," campo = campo() lCampos = recCampo(sem.muchos_campos(campoh, campo))
+                {return lCampos;}
+             |
+                {return campoh;}
+          }
+Campo campo()   :
+          {T tipo; String iden;}
+          {
+             tipo = tipo0() iden = <iden>
+                {return (Campo)sem.campo(tipo, iden.image).ponFile(iden.beginLine).ponCol(iden.beginColumn);}
+          }
+Insts instrucciones()   :
+          {InstsAux instsAux;}
+          {
+             instsAux = instruccionesAux()
+                {return sem.si_instr(instsAux);}
+             |
+                {return sem.no_instr();}
+          }
+InstsAux instruccionesAux()   :
+          {InstsAux instsAux; Inst inst;}
+          {
+             inst = instruccion() instsAux = recInstruccion(sem.una_instr(inst))
+                {return instsAux;}
+          }
+InstsAux recInstruccion(InstsAux instsAuxh)   :
+          {InstsAux instsAux; Inst inst;}
+          {
+             ";" inst = instruccion() instsAux = recInstruccion(sem.muchas_instr(instsAuxh, inst))
+                {return instsAux;}
+             |
+                {return instsAuxh;}
+          }
+Inst instruccion()   :
+          {Exp exp; Bloq bloq1, bloq2; String iden; ParamsR paramsR;}
+          {
+             "@" exp = expr()
+                {return sem.instr_expr(exp);}
+             |
+             <IF> exp = expr() bloq1 = bloque() bloq2 = factIf(exp, bloq1)
+                {return bloq2;}
+             |
+             <WHILE> exp = expr() bloq1 = bloque()
+                 {return sem.instr_while(exp, bloq1);}
+             |
+             <read> exp = expr()
+                {return sem.instr_read(exp);}
+             |
+             <write> exp = expr()
+                {return sem.instr_write(exp);}
+             |
+                {return sem.instr_nl();}
+             |
+             <NEW> exp = expr()
+                {return sem.instr_new(exp);}
+             |
+             <delete> exp = expr()
+                {return sem.instr_del(exp);}
+             |
+             <call> iden = <iden> paramsR = paramsReales()
+                {return (Inst)sem.instr_call(iden.image, paramsR).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
+             |
+             bloq1 = bloque()
+                {return sem.instr_bloque(bloq1);}
+          }
+    Inst factIf(Exp exph, Bloq bloqh)   :
+          {Bloq bloq;}
+          {
+             <ELSE> bloq = bloque()
+                {return sem.instr_if_else(exph, bloqh, bloq);}
+             |
+                {return sem.instr_if(exph, bloqh);}
+          }
+    ParamsR paramsReales()   :
+          {ParamsRL paramsRL;}
+          {
+             "(" paramsRL = paramsRealesLista() ")"
+                {return sem.si_paramsR(paramsRL);}
+             |
+                {return sem.no_paramsR();}
+          }
+    ParamsRL paramsRealesLista()   :
+          {ParamsRL paramsRL; Exp exp;}
+          {
+             exp = expr() paramsRL = recParamReal(sem.un_paramsR(exp))
+                {return paramsRL;}
+          }
+    ParamsRL recParamReal(ParamsRL paramsRLh)   :
+          {ParamsRL paramsRL; Exp exp;}
+          {
+             "," exp = expr() paramsRL = recParamReal(sem.muchos_paramsR(paramsRLh, exp))
+                {return paramsRL;}
+             |
+                {return paramsRLh;}
+          }
+    Exp expr()   :
+          {Exp eo;}
+          {
+             e0 = e0()
+                {return e0;}
+          }
+    Exp e0()   :
+          {Exp e1; Exp e0;}
+          {
+             e1 = e1() e0 = facE1(e1)
+                {return e0;}
+          }
+    Exp facE1(Exp e1h)   :
+          {Exp e1; Exp e0;}
+          {
+             "=" e1 = e0() e0 = facE1(sem.asig(e1h, e1))
+                {return e0;}
+             |
+                {return e1h;}
+          }
+    Exp e1()   :
+          {Exp e2,e1;}
+          {
+             e2 = e2() e1 = recOp1(e2)
+                {return e1;}
+          }
+    Exp recOp1(Exp e2h)   :
+          {String op1; Exp e2,e1;}
+          {
+             op1 = op1() e2 = e2() e1 = recOp1(sem.mkop1(op1, e2h, e2))
+                {return e1;}
+             |
+                {return e2h;}
+          }
+    Exp e2()   :
+          {Exp e31, e32;}
+          {
+             e32 = e3() e32 = facE3(e31) recSuma(e3)
+                {return e0;}
+             |
+                {return e2h;}
+          }
+    Exp recSuma(Exp e3h)   :
+          {Exp e31, e32;}
+          {
+             e31 = e3() e32 = recSuma(sem.suma(e3h, e31))
+                {return e32;}
+             |
+                {return e3h;}
+          }
+    Exp facE3(Exp e31h)   :
+          {Exp e3;}
+          {
+             "-" e3 = e3()
+                {return sem.resta(e31h, e3);}
+             |
+                {return e31h;}
+          }
+    Exp e3()   :
+          {Exp e4, e;}
+          {
+             e4 = e4() e = facE4(e4)
+                {return e;}
+          }
+    Exp facE4(Exp e4h)   :
+          {Exp e;}
+          {
+             <and> e = e3()
+                {return sem.and(e4h, e);}
+             |
+             <or> e = e4()
+                {return sem.or(e4h, e);}
+             |
+                {return e4h;}
+          }
+    Exp e4()   :
+          {Exp e51, e52;}
+          {
+             e51 = e5() e52 = recOp4(e51)
+                {return e52;}
+          }
+    Exp recOp4(Exp e5h)   :
+          {String op; Exp e51, e52;}
+          {
+             op = op4() e51 = e5() e52 = recOp4(sem.mkop4(op, e5h, e51))
+                {return e52;}
+             |
+                {return e5h;}
+          }
+    Exp e5()   :
+          {String op; Exp e;}
+          {
+             op = op5() e = e5()
+                {return sem.mkop5(op, e);}
+             |
+             e = e6()
+                {return e;}
+          }
+    Exp e6()   :
+          {Exp e7, e;}
+          {
+             e7 = e7() e = recOp6(e7)
+                {return e;}
+          }
+    Exp recOp6(Exp e7h)   :
+          {Exp expr, e; String iden;}
+          {
+             "[" expr = expr() "]" e = recOp6(sem.index(e7h, expr))
+                {return e;}
+             |
+             "." iden = <iden> e = recOp6(sem.acceso(e7h, iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn))
+                {return e;}
+             |
+             "^" e = recOp6(sem.indireccion(e7h))
+                {return e;}
+             |
+                {return e7h}
+          }
+    Exp e2()   :
+          {Exp e31, e32;}
+          {
+             e32 = e3() e32 = facE3(e31) recSuma(e3)
+                {return e0;}
+             |
+                {return e2h;}
+          }
+    void e6()   : {} {e6Aux() recOp6()}
+    void recOp6()   : {} {op6() recOp6() | {}}
+    void e6Aux()   : {} {"(" e0() ")" | <literalEntero> | <literalReal> | <TRUE> | <FALSE> | <literalCadena> | <iden> | <NULL>}
+    void op6()   : {} {"[" expr() "]" | "." <iden> | "^"}
 
-  void declaraciones()   : {} {declaracionesAux() "&&" | {}}
-  void declaracionesAux()   : {} {declaracion() recDeclaracion()}
-  void recDeclaracion()   : {} {";" declaracion() recDeclaracion() | {}}
-  void declaracion()   : {} {declaracionVar() | declaracionTipo() | declaracionProc()}
-  void declaracionVar()   : {} {tipo0() <iden>}
-  void declaracionTipo()   : {} {<type> tipo0() <iden>}
-  void declaracionProc()   : {} {<proc> <iden> paramsFormales() bloque()}
-  void paramsFormales()   : {} {"(" paramsFormalesAux() ")"}
-  void paramsFormalesAux()   : {} {paramsFormalesLista() | {}}
-  void paramsFormalesLista()   : {} {param() recParamFormal()}
-  void recParamFormal()   : {} {"," param() recParamFormal() | {}}
-  void param()   : {} {tipo0() referencia() <iden>}
-  void referencia()   : {} {"&" | {}}
+    String op1()   :
+        {}
+        {
+           "<"
+            {return "<";}
+            |
+            ">"
+            {return ">";}
+            |
+            "<="
+            {return "<=";}
+            |
+            ">="
+            {return ">=";}
+            |
+            "=="
+            {return "==";}
+            |
+            "!="
+            {return "!=";}
+        }
+    String op4()   :
+        {}
+        {
+           "*"
+            {return "*";}
+            |
+            "/"
+            {return "/";}
+            |
+            "%"
+            {return "%";}
+        }
+    String op5()   :
+        {}
+        {
+           "-"
+            {return "-";}
+            |
+            <not>
+            {return "not";}
+        }
 
-  void tipo0()   : {} {tipo1() recArray()}
-  void recArray()   : {} {"[" <literalEntero> "]" recArray() | {}}
-  void tipo1()   : {} {"^" tipo1() | tipo2()}
-  void tipo2()   : {} {<struct> "{" listaCampos() "}" | <INT> | <real> | <bool> | <string> | <iden>}
-  void listaCampos()   : {} {campo() recCampo()}
-  void recCampo()   : {} {"," campo() recCampo() | {}}
-  void campo()   : {} {tipo0() <iden>}
-
-  void instrucciones()   : {} {instruccionesAux() | {}}
-  void instruccionesAux()   : {} {instruccion() recInstruccion()}
-  void recInstruccion()   : {} {";" instruccion() recInstruccion() | {}}
-  void instruccion()   : {} {"@" expr() | <IF> expr() bloque() factIf() | <WHILE> expr() bloque() | <read> expr() | <write> expr() | <nl> | <NEW> expr() | <delete> expr() | <call> <iden> paramsReales() | bloque()}
-  void factIf()   : {} {<ELSE> bloque() | {}}
-  void paramsReales()   : {} {"(" paramsRealesAux() ")"}
-  void paramsRealesAux()   : {} {paramsRealesLista() | {}}
-  void paramsRealesLista()   : {} {expr() recParamReal()}
-  void recParamReal()   : {} {"," expr() recParamReal() | {}}
-
-  void expr()   : {} {e0()}
-  void e0()   : {} {e1() facE1()}
-  void facE1()   : {} {"=" e0() facE1() | {}}
-  void e1()   : {} {e2() recOp1()}
-  void recOp1()   : {} {op1() e2() recOp1() | {}}
-  void e2()   : {} {e3() facE3() recSuma()}
-  void recSuma()   : {} {"+" e3() recSuma() | {}}
-  void facE3()   : {} {"-" e3() | {}}
-  void e3()   : {} {e4() facE4()}
-  void facE4()   : {} {<and> e3() | <or> e4() | {}}
-  void e4()   : {} {e5() recOp4()}
-  void recOp4()   : {} {op4() e5() recOp4() | {}}
-  void e5()   : {} {op5() e5() | e6()}
-  void e6()   : {} {e6Aux() recOp6()}
-  void recOp6()   : {} {op6() recOp6() | {}}
-  void e6Aux()   : {} {"(" e0() ")" | <literalEntero> | <literalReal> | <TRUE> | <FALSE> | <literalCadena> | <iden> | <NULL>}
-  void op1()   : {} {"<" | ">" | "<=" | ">=" | "==" | "!="}
-  void op4()   : {} {"*" | "/" | "%"}
-  void op5()   : {} {"-" | <not>}
-  void op6()   : {} {"[" expr() "]" | "." <iden> | "^"}
 
 
 
