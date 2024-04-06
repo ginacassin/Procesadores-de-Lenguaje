@@ -143,13 +143,13 @@ PARSER_END(ConstructorASTsTiny)
     ParamsFL paramsFormalesLista()   :
           {ParamsFL paramsFL; Param param;}
           {
-             param = param() paramsFL = recParamFormal(sem.un_param(param))
+             param = param() paramsFL = recParamFormal(sem.un_paramF(param))
                 {return sem.si_paramF(paramsFL);}
           }
     ParamsFL recParamFormal(ParamsFL paramsFLh)   :
           {ParamsFL paramsFL; Param param;}
           {
-             "," param = param() paramsFL = recParamFormal(sem.muchos_params(paramsFLh, param))
+             "," param = param() paramsFL = recParamFormal(sem.muchos_paramsR(paramsFLh, param))
                 {return paramsFL;}
              |
                 {return paramsFLh;}
@@ -192,13 +192,13 @@ PARSER_END(ConstructorASTsTiny)
                 {return sem.tipo_struct(lCampos);}
              |
              <INT>
-                {return sem.tipo_int();}
+                {return sem.ent();}
              |
              <real>
-                {return sem.tipo_real();}
+                {return sem.real();}
              |
              <bool>
-                {return sem.tipo_bool();}
+                {return sem.bool();}
              |
              <string>
                 {return sem.tipo_string();}
@@ -440,16 +440,16 @@ PARSER_END(ConstructorASTsTiny)
                 {return (Exp)sem.lit_real(iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
              |
              <TRUE>
-                {return sem.lit_true();}
+                {return sem.btrue();}
              |
              <FALSE>
-                {return sem.lit_false();}
+                {return sem.bfalse();}
              |
              iden = <iden>
                 {return (Exp)sem.lit_cadena(iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
              |
              iden = <iden>
-                {return (Exp)sem.identificador(iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
+                {return (Exp)sem.iden(iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
              |
              <NULL>
                 {return sem.vnull();}
