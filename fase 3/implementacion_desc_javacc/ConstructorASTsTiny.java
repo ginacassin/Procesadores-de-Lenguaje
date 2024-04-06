@@ -200,7 +200,7 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
     try {
            ParamsFL paramsFL; Param param;
       param = param();
-      paramsFL = recParamFormal(sem.un_param(param));
+      paramsFL = recParamFormal(sem.un_paramF(param));
                  {if (true) return sem.si_paramF(paramsFL);}
     throw new Error("Missing return statement in function");
     } finally {
@@ -216,7 +216,7 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
       case 40:
         jj_consume_token(40);
         param = param();
-        paramsFL = recParamFormal(sem.muchos_params(paramsFLh, param));
+        paramsFL = recParamFormal(sem.muchos_paramsR(paramsFLh, param));
                  {if (true) return paramsFL;}
         break;
       default:
@@ -327,15 +327,15 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
         break;
       case INT:
         jj_consume_token(INT);
-                 {if (true) return sem.tipo_int();}
+                 {if (true) return sem.ent();}
         break;
       case real:
         jj_consume_token(real);
-                 {if (true) return sem.tipo_real();}
+                 {if (true) return sem.real();}
         break;
       case bool:
         jj_consume_token(bool);
-                 {if (true) return sem.tipo_bool();}
+                 {if (true) return sem.bool();}
         break;
       case string:
         jj_consume_token(string);
@@ -893,17 +893,17 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
         break;
       case TRUE:
         jj_consume_token(TRUE);
-                 {if (true) return sem.lit_true();}
+                 {if (true) return sem.btrue();}
         break;
       case FALSE:
         jj_consume_token(FALSE);
-                 {if (true) return sem.lit_false();}
+                 {if (true) return sem.bfalse();}
         break;
         iden = jj_consume_token(iden);
                  {if (true) return (Exp)sem.lit_cadena(iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
         break;
         iden = jj_consume_token(iden);
-                 {if (true) return (Exp)sem.identificador(iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
+                 {if (true) return (Exp)sem.iden(iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
         break;
       case NULL:
         jj_consume_token(NULL);
