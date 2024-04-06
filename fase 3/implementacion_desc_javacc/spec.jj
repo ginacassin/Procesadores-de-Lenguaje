@@ -115,7 +115,7 @@ PARSER_END(ConstructorASTsTiny)
                 {return decsAuxh;}
           }
     Dec declaracion()   :
-          {T tipo; String iden; ParamsF paramsF; Bloq bloq;}
+          {T tipo; Token iden; ParamsF paramsF; Bloq bloq;}
           {
              tipo = tipo0() iden = <iden>
                 {return (Dec)sem.dec_var(tipo, iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
@@ -155,7 +155,7 @@ PARSER_END(ConstructorASTsTiny)
                 {return paramsFLh;}
           }
     Param param()   :
-          {T tipo0; String iden;}
+          {T tipo0; Token iden;}
           {
              tipo0 = tipo0() "&" iden = <iden>
                 {return sem.param_ref(tipo0, iden.image);}
@@ -170,7 +170,7 @@ PARSER_END(ConstructorASTsTiny)
                 {return recArray;}
           }
     T recArray(T tipoh)   :
-          {String litEntero; T recArray;}
+          {Token litEntero; T recArray;}
           {
              "[" litEntero = <iden> "]" recArray = recArray((T)sem.tipo_array(tipoh, litEntero.image).ponFile(litEntero.beginLine).ponCol(litEntero.beginColumn))
                 {return recArray;}
@@ -186,7 +186,7 @@ PARSER_END(ConstructorASTsTiny)
                 {return tipo2();}
           }
     T tipo2()   :
-          {LCampos lCampos; String iden;}
+          {LCampos lCampos; Token iden;}
           {
              <struct> "{" lCampos = listaCampos() "}"
                 {return sem.tipo_struct(lCampos);}
@@ -220,7 +220,7 @@ PARSER_END(ConstructorASTsTiny)
                 {return campoh;}
           }
     Campo campo()   :
-          {T tipo; String iden;}
+          {T tipo; Token iden;}
           {
              tipo = tipo0() iden = <iden>
                 {return (Campo)sem.campo(tipo, iden.image).ponFile(iden.beginLine).ponCol(iden.beginColumn);}
@@ -248,7 +248,7 @@ PARSER_END(ConstructorASTsTiny)
                 {return instsAuxh;}
           }
     Inst instruccion()   :
-          {Exp exp; Bloq bloq1, bloq2; String iden; ParamsR paramsR;}
+          {Exp exp; Bloq bloq1, bloq2; Token iden; ParamsR paramsR;}
           {
              "@" exp = expr()
                 {return sem.instr_expr(exp);}
@@ -414,7 +414,7 @@ PARSER_END(ConstructorASTsTiny)
                 {return e;}
           }
     Exp recOp6(Exp e7h)   :
-          {Exp expr, e; String iden;}
+          {Exp expr, e; Token iden;}
           {
              "[" expr = expr() "]" e = recOp6(sem.index(e7h, expr))
                 {return e;}
@@ -428,7 +428,7 @@ PARSER_END(ConstructorASTsTiny)
                 {return e7h;}
           }
     Exp e7()   :
-          {Exp e0; String iden;}
+          {Exp e0; Token iden;}
           {
              "(" e0 = e0() ")"
                 {return e0;}

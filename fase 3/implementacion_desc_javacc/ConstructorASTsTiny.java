@@ -126,7 +126,7 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
   final public Dec declaracion() throws ParseException {
     trace_call("declaracion");
     try {
-           T tipo; String iden; ParamsF paramsF; Bloq bloq;
+           T tipo; Token iden; ParamsF paramsF; Bloq bloq;
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case iden:
       case 42:
@@ -232,7 +232,7 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
   final public Param param() throws ParseException {
     trace_call("param");
     try {
-           T tipo0; String iden;
+           T tipo0; Token iden;
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case 41:
       case 42:
@@ -274,7 +274,7 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
   final public T recArray(T tipoh) throws ParseException {
     trace_call("recArray");
     try {
-           String litEntero; T recArray;
+           Token litEntero; T recArray;
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case 42:
         jj_consume_token(42);
@@ -316,7 +316,7 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
   final public T tipo2() throws ParseException {
     trace_call("tipo2");
     try {
-           LCampos lCampos; String iden;
+           LCampos lCampos; Token iden;
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case struct:
         jj_consume_token(struct);
@@ -391,7 +391,7 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
   final public Campo campo() throws ParseException {
     trace_call("campo");
     try {
-           T tipo; String iden;
+           T tipo; Token iden;
       tipo = tipo0();
       iden = jj_consume_token(iden);
                  {if (true) return (Campo)sem.campo(tipo, iden.image).ponFile(iden.beginLine).ponCol(iden.beginColumn);}
@@ -450,7 +450,7 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
   final public Inst instruccion() throws ParseException {
     trace_call("instruccion");
     try {
-           Exp exp; Bloq bloq1, bloq2; String iden; ParamsR paramsR;
+           Exp exp; Bloq bloq1, bloq2; Token iden; ParamsR paramsR;
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case 45:
         jj_consume_token(45);
@@ -843,7 +843,7 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
   final public Exp recOp6(Exp e7h) throws ParseException {
     trace_call("recOp6");
     try {
-           Exp expr, e; String iden;
+           Exp expr, e; Token iden;
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case 42:
         jj_consume_token(42);
@@ -876,7 +876,7 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
   final public Exp e7() throws ParseException {
     trace_call("e7");
     try {
-           Exp e0; String iden;
+           Exp e0; Token iden;
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case 38:
         jj_consume_token(38);
