@@ -162,11 +162,11 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
   final public ParamsF paramsFormales() throws ParseException {
     trace_call("paramsFormales");
     try {
-           ParamsFL paramsFL;
+           ParamsF paramsF;
       jj_consume_token(38);
-      paramsFL = paramsFormalesAux();
+      paramsF = paramsFormalesAux();
       jj_consume_token(39);
-                 {if (true) return paramsFL;}
+                 {if (true) return paramsF;}
     throw new Error("Missing return statement in function");
     } finally {
       trace_return("paramsFormales");
@@ -201,7 +201,7 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
            ParamsFL paramsFL; Param param;
       param = param();
       paramsFL = recParamFormal(sem.un_paramF(param));
-                 {if (true) return sem.si_paramF(paramsFL);}
+                 {if (true) return paramsFL;}
     throw new Error("Missing return statement in function");
     } finally {
       trace_return("paramsFormalesLista");
@@ -216,7 +216,7 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
       case 40:
         jj_consume_token(40);
         param = param();
-        paramsFL = recParamFormal(sem.muchos_paramsR(paramsFLh, param));
+        paramsFL = recParamFormal(sem.muchos_paramsF(paramsFLh, param));
                  {if (true) return paramsFL;}
         break;
       default:

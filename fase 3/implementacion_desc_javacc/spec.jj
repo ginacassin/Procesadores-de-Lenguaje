@@ -127,10 +127,10 @@ PARSER_END(ConstructorASTsTiny)
                 {return (Dec)sem.dec_proc(id.image, paramsF, bloq).ponFila(id.beginLine).ponCol(id.beginColumn);}
           }
     ParamsF paramsFormales()   :
-          {ParamsFL paramsFL;}
+          {ParamsF paramsF;}
           {
-             "(" paramsFL = paramsFormalesAux() ")"
-                {return paramsFL;}
+             "(" paramsF = paramsFormalesAux() ")"
+                {return paramsF;}
           }
     ParamsF paramsFormalesAux()   :
           {ParamsFL paramsFL;}
@@ -144,12 +144,12 @@ PARSER_END(ConstructorASTsTiny)
           {ParamsFL paramsFL; Param param;}
           {
              param = param() paramsFL = recParamFormal(sem.un_paramF(param))
-                {return sem.si_paramF(paramsFL);}
+                {return paramsFL;}
           }
     ParamsFL recParamFormal(ParamsFL paramsFLh)   :
           {ParamsFL paramsFL; Param param;}
           {
-             "," param = param() paramsFL = recParamFormal(sem.muchos_paramsR(paramsFLh, param))
+             "," param = param() paramsFL = recParamFormal(sem.muchos_paramsF(paramsFLh, param))
                 {return paramsFL;}
              |
                 {return paramsFLh;}
