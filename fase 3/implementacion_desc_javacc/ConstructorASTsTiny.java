@@ -126,27 +126,27 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
   final public Dec declaracion() throws ParseException {
     trace_call("declaracion");
     try {
-           T tipo; Token iden; ParamsF paramsF; Bloq bloq;
+           T tipo; Token id; ParamsF paramsF; Bloq bloq;
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case iden:
       case 42:
       case 44:
         tipo = tipo0();
-        iden = jj_consume_token(iden);
-                 {if (true) return (Dec)sem.dec_var(tipo, iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
+        id = jj_consume_token(iden);
+                 {if (true) return (Dec)sem.dec_var(tipo, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
         break;
       case type:
         jj_consume_token(type);
         tipo = tipo0();
-        iden = jj_consume_token(iden);
-                 {if (true) return (Dec)sem.dec_tipo(tipo, iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
+        id = jj_consume_token(iden);
+                 {if (true) return (Dec)sem.dec_tipo(tipo, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
         break;
       case proc:
         jj_consume_token(proc);
-        iden = jj_consume_token(iden);
+        id = jj_consume_token(iden);
         paramsF = paramsFormales();
         bloq = bloque();
-                 {if (true) return (Dec)sem.dec_proc(iden.image, paramsF, bloq).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
+                 {if (true) return (Dec)sem.dec_proc(id.image, paramsF, bloq).ponFila(id.beginLine).ponCol(id.beginColumn);}
         break;
       default:
         jj_la1[2] = jj_gen;
@@ -232,20 +232,20 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
   final public Param param() throws ParseException {
     trace_call("param");
     try {
-           T tipo0; Token iden;
+           T tipo0; Token id;
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case 41:
       case 42:
       case 44:
         tipo0 = tipo0();
         jj_consume_token(41);
-        iden = jj_consume_token(iden);
-                 {if (true) return sem.param_ref(tipo0, iden.image);}
+        id = jj_consume_token(iden);
+                 {if (true) return sem.param_ref(tipo0, id.image);}
         break;
       case iden:
         tipo0 = tipo0();
-        iden = jj_consume_token(iden);
-                 {if (true) return sem.param(tipo0, iden.image);}
+        id = jj_consume_token(iden);
+                 {if (true) return sem.param(tipo0, id.image);}
         break;
       default:
         jj_la1[5] = jj_gen;
@@ -316,7 +316,7 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
   final public T tipo2() throws ParseException {
     trace_call("tipo2");
     try {
-           LCampos lCampos; Token iden;
+           LCampos lCampos; Token id;
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case struct:
         jj_consume_token(struct);
@@ -340,8 +340,8 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
       case string:
         jj_consume_token(string);
                  {if (true) return sem.tipo_string();}
-        iden = jj_consume_token(iden);
-                 {if (true) return (T)sem.tipo_iden(iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
+        id = jj_consume_token(iden);
+                 {if (true) return (T)sem.tipo_iden(id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
         break;
       default:
         jj_la1[8] = jj_gen;
@@ -391,10 +391,10 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
   final public Campo campo() throws ParseException {
     trace_call("campo");
     try {
-           T tipo; Token iden;
+           T tipo; Token id;
       tipo = tipo0();
-      iden = jj_consume_token(iden);
-                 {if (true) return (Campo)sem.campo(tipo, iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
+      id = jj_consume_token(iden);
+                 {if (true) return (Campo)sem.campo(tipo, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
     throw new Error("Missing return statement in function");
     } finally {
       trace_return("campo");
@@ -450,7 +450,7 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
   final public Inst instruccion() throws ParseException {
     trace_call("instruccion");
     try {
-           Exp exp; Bloq bloq1, bloq2; Token iden; ParamsR paramsR;
+           Exp exp; Bloq bloq1, bloq2; Token id; ParamsR paramsR;
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case 45:
         jj_consume_token(45);
@@ -843,7 +843,7 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
   final public Exp recOp6(Exp e7h) throws ParseException {
     trace_call("recOp6");
     try {
-           Exp expr, e; Token iden;
+           Exp expr, e; Token id;
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case 42:
         jj_consume_token(42);
@@ -854,8 +854,8 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
         break;
       case 48:
         jj_consume_token(48);
-        iden = jj_consume_token(iden);
-        e = recOp6((Exp)sem.acceso(e7h, iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn));
+        id = jj_consume_token(iden);
+        e = recOp6((Exp)sem.acceso(e7h, id.image).ponFila(id.beginLine).ponCol(id.beginColumn));
                  {if (true) return e;}
         break;
       case 44:
@@ -876,7 +876,7 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
   final public Exp e7() throws ParseException {
     trace_call("e7");
     try {
-           Exp e0; Token iden;
+           Exp e0; Token id;
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case 38:
         jj_consume_token(38);
@@ -885,11 +885,11 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
                  {if (true) return e0;}
         break;
       case iden:
-        iden = jj_consume_token(iden);
-                 {if (true) return (Exp)sem.lit_ent(iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
+        id = jj_consume_token(iden);
+                 {if (true) return (Exp)sem.lit_ent(id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
         break;
-        iden = jj_consume_token(iden);
-                 {if (true) return (Exp)sem.lit_real(iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
+        id = jj_consume_token(iden);
+                 {if (true) return (Exp)sem.lit_real(id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
         break;
       case TRUE:
         jj_consume_token(TRUE);
@@ -899,11 +899,11 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
         jj_consume_token(FALSE);
                  {if (true) return sem.bfalse();}
         break;
-        iden = jj_consume_token(iden);
-                 {if (true) return (Exp)sem.lit_cadena(iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
+        id = jj_consume_token(iden);
+                 {if (true) return (Exp)sem.lit_cadena(id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
         break;
-        iden = jj_consume_token(iden);
-                 {if (true) return (Exp)sem.iden(iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
+        id = jj_consume_token(iden);
+                 {if (true) return (Exp)sem.iden(id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
         break;
       case NULL:
         jj_consume_token(NULL);

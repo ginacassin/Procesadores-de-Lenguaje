@@ -115,16 +115,16 @@ PARSER_END(ConstructorASTsTiny)
                 {return decsAuxh;}
           }
     Dec declaracion()   :
-          {T tipo; Token iden; ParamsF paramsF; Bloq bloq;}
+          {T tipo; Token id; ParamsF paramsF; Bloq bloq;}
           {
-             tipo = tipo0() iden = <iden>
-                {return (Dec)sem.dec_var(tipo, iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
+             tipo = tipo0() id = <iden>
+                {return (Dec)sem.dec_var(tipo, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
              |
-             <type> tipo = tipo0() iden = <iden>
-                {return (Dec)sem.dec_tipo(tipo, iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
+             <type> tipo = tipo0() id = <iden>
+                {return (Dec)sem.dec_tipo(tipo, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
              |
-             <proc> iden = <iden> paramsF = paramsFormales() bloq = bloque()
-                {return (Dec)sem.dec_proc(iden.image, paramsF, bloq).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
+             <proc> id = <iden> paramsF = paramsFormales() bloq = bloque()
+                {return (Dec)sem.dec_proc(id.image, paramsF, bloq).ponFila(id.beginLine).ponCol(id.beginColumn);}
           }
     ParamsF paramsFormales()   :
           {ParamsFL paramsFL;}
@@ -155,13 +155,13 @@ PARSER_END(ConstructorASTsTiny)
                 {return paramsFLh;}
           }
     Param param()   :
-          {T tipo0; Token iden;}
+          {T tipo0; Token id;}
           {
-             tipo0 = tipo0() "&" iden = <iden>
-                {return sem.param_ref(tipo0, iden.image);}
+             tipo0 = tipo0() "&" id = <iden>
+                {return sem.param_ref(tipo0, id.image);}
              |
-             tipo0 = tipo0() iden = <iden>
-                {return sem.param(tipo0, iden.image);}
+             tipo0 = tipo0() id = <iden>
+                {return sem.param(tipo0, id.image);}
           }
     T tipo0()   :
           {T tipo; T recArray;}
@@ -186,7 +186,7 @@ PARSER_END(ConstructorASTsTiny)
                 {return tipo2();}
           }
     T tipo2()   :
-          {LCampos lCampos; Token iden;}
+          {LCampos lCampos; Token id;}
           {
              <struct> "{" lCampos = listaCampos() "}"
                 {return sem.tipo_struct(lCampos);}
@@ -202,8 +202,8 @@ PARSER_END(ConstructorASTsTiny)
              |
              <string>
                 {return sem.tipo_string();}
-             iden = <iden>
-                {return (T)sem.tipo_iden(iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
+             id = <iden>
+                {return (T)sem.tipo_iden(id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
           }
     LCampos listaCampos()   :
           {LCampos lCampos; Campo campo;}
@@ -220,10 +220,10 @@ PARSER_END(ConstructorASTsTiny)
                 {return campoh;}
           }
     Campo campo()   :
-          {T tipo; Token iden;}
+          {T tipo; Token id;}
           {
-             tipo = tipo0() iden = <iden>
-                {return (Campo)sem.campo(tipo, iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
+             tipo = tipo0() id = <iden>
+                {return (Campo)sem.campo(tipo, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
           }
     Insts instrucciones()   :
           {InstsAux instsAux;}
@@ -248,7 +248,7 @@ PARSER_END(ConstructorASTsTiny)
                 {return instsAuxh;}
           }
     Inst instruccion()   :
-          {Exp exp; Bloq bloq1, bloq2; Token iden; ParamsR paramsR;}
+          {Exp exp; Bloq bloq1, bloq2; Token id; ParamsR paramsR;}
           {
              "@" exp = expr()
                 {return sem.instr_expr(exp);}
@@ -273,8 +273,8 @@ PARSER_END(ConstructorASTsTiny)
              <delete> exp = expr()
                 {return sem.instr_del(exp);}
              |
-             <call> iden = <iden> paramsR = paramsReales()
-                {return (Inst)sem.instr_call(iden.image, paramsR).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
+             <call> id = <iden> paramsR = paramsReales()
+                {return (Inst)sem.instr_call(id.image, paramsR).ponFila(id.beginLine).ponCol(id.beginColumn);}
              |
              bloq1 = bloque()
                 {return sem.instr_bloque(bloq1);}
@@ -414,12 +414,12 @@ PARSER_END(ConstructorASTsTiny)
                 {return e;}
           }
     Exp recOp6(Exp e7h)   :
-          {Exp expr, e; Token iden;}
+          {Exp expr, e; Token id;}
           {
              "[" expr = expr() "]" e = recOp6(sem.index(e7h, expr))
                 {return e;}
              |
-             "." iden = <iden> e = recOp6((Exp)sem.acceso(e7h, iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn))
+             "." id = <iden> e = recOp6((Exp)sem.acceso(e7h, id.image).ponFila(id.beginLine).ponCol(id.beginColumn))
                 {return e;}
              |
              "^" e = recOp6(sem.indireccion(e7h))
@@ -428,16 +428,16 @@ PARSER_END(ConstructorASTsTiny)
                 {return e7h;}
           }
     Exp e7()   :
-          {Exp e0; Token iden;}
+          {Exp e0; Token id;}
           {
              "(" e0 = e0() ")"
                 {return e0;}
              |
-             iden = <iden>
-                {return (Exp)sem.lit_ent(iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
+             id = <iden>
+                {return (Exp)sem.lit_ent(id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
              |
-             iden = <iden>
-                {return (Exp)sem.lit_real(iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
+             id = <iden>
+                {return (Exp)sem.lit_real(id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
              |
              <TRUE>
                 {return sem.btrue();}
@@ -445,11 +445,11 @@ PARSER_END(ConstructorASTsTiny)
              <FALSE>
                 {return sem.bfalse();}
              |
-             iden = <iden>
-                {return (Exp)sem.lit_cadena(iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
+             id = <iden>
+                {return (Exp)sem.lit_cadena(id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
              |
-             iden = <iden>
-                {return (Exp)sem.iden(iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn);}
+             id = <iden>
+                {return (Exp)sem.iden(id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
              |
              <NULL>
                 {return sem.vnull();}
