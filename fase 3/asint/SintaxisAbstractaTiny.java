@@ -42,6 +42,12 @@ public class SintaxisAbstractaTiny {
             this.opnd0 = opnd0;
             this.opnd1 = opnd1;
         }
+        public Exp getOpnd0() {
+            return opnd0;
+        }
+        public Exp getOpnd1() {
+            return opnd1;
+        }
     }
 
     private static abstract class ExpUn extends Exp {
@@ -49,6 +55,9 @@ public class SintaxisAbstractaTiny {
         public ExpUn(Exp opnd0) {
             super();
             this.opnd0 = opnd0;
+        }
+        public Exp getOpnd0() {
+            return opnd0;
         }
     }
 
@@ -202,6 +211,12 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "index("+opnd+","+index+")";
         }
+        public Exp getIndex() {
+            return index;
+        }
+        public Exp getOpnd() {
+            return opnd;
+        }
     }
 
     public static class Acceso extends Exp {
@@ -215,6 +230,12 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "index("+opnd+","+iden+")";
         }
+        public String getIden() {
+            return iden;
+        }
+        public Exp getOpnd() {
+            return opnd;
+        }
     }
 
 
@@ -227,6 +248,9 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "lit_ent("+num+"["+leeFila()+","+leeCol()+"])";
         }
+        public String getNum() {
+            return num;
+        }
     }
     public static class Lit_real extends Exp {
         private String num;
@@ -236,6 +260,9 @@ public class SintaxisAbstractaTiny {
         }
         public String toString() {
             return "lit_real("+num+"["+leeFila()+","+leeCol()+"])";
+        }
+        public String getNum() {
+            return num;
         }
     }
     public static class True extends Exp {
@@ -263,6 +290,9 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "lit_cadena("+cadena+"["+leeFila()+","+leeCol()+"])";
         }
+        public String getCadena() {
+            return cadena;
+        }
     }
     public static class Iden extends Exp {
         private String id;
@@ -272,6 +302,9 @@ public class SintaxisAbstractaTiny {
         }
         public String toString() {
             return "iden("+id+"["+leeFila()+","+leeCol()+"])";
+        }
+        public String getId() {
+            return id;
         }
     }
     public static class Null extends Exp {
@@ -299,6 +332,9 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "si_paramsR("+paramsrl+")";
         }
+        public ParamsRL getParamsrl() {
+            return paramsrl;
+        }
     }
     public static class No_ParamsR extends ParamsR {
         public No_ParamsR() {
@@ -325,6 +361,12 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "muchos_paramsR("+paramrl+","+exp+")";
         }
+        public Exp getExp() {
+            return exp;
+        }
+        public ParamsRL getParamrl() {
+            return paramrl;
+        }
     }
     public static class Un_ParamsR extends ParamsRL {
         private Exp exp;
@@ -334,6 +376,9 @@ public class SintaxisAbstractaTiny {
         }
         public String toString() {
             return "un_paramsR("+exp+")";
+        }
+        public Exp getExp() {
+            return exp;
         }
     }
 
@@ -350,6 +395,9 @@ public class SintaxisAbstractaTiny {
         }
         public String toString() {
             return "si_instr("+instsAux+")";
+        }
+        public InstsAux getInstsAux() {
+            return instsAux;
         }
     }
     public static class No_Instr extends Insts {
@@ -377,6 +425,12 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "Muchas_Instr("+instsAux+","+inst+")";
         }
+        public Inst getInst() {
+            return inst;
+        }
+        public InstsAux getInstsAux() {
+            return instsAux;
+        }
     }
     public static class Una_Instr extends InstsAux {
         private Inst inst;
@@ -386,6 +440,9 @@ public class SintaxisAbstractaTiny {
         }
         public String toString() {
             return "una_instr("+inst+")";
+        }
+        public Inst getInst() {
+            return inst;
         }
     }
 
@@ -403,6 +460,9 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "instr_expr("+exp+")";
         }
+        public Exp getExp() {
+            return exp;
+        }
     }
     public static class Instr_If extends Inst {
         private Exp exp;
@@ -414,6 +474,12 @@ public class SintaxisAbstractaTiny {
         }
         public String toString() {
             return "instr_if("+exp+","+bloq+")";
+        }
+        public Bloq getBloq() {
+            return bloq;
+        }
+        public Exp getExp() {
+            return exp;
         }
     }
     public static class Instr_If_Else extends Inst {
@@ -430,6 +496,15 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "instr_if_else("+exp+","+bloq1+","+bloq2+")";
         }
+        public Bloq getBloq1() {
+            return bloq1;
+        }
+        public Bloq getBloq2() {
+            return bloq2;
+        }
+        public Exp getExp() {
+            return exp;
+        }
     }
     public static class Instr_While extends Inst {
         private Exp exp;
@@ -442,6 +517,12 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "instr_while("+exp+","+bloq+")";
         }
+        public Bloq getBloq() {
+            return bloq;
+        }
+        public Exp getExp() {
+            return exp;
+        }
     }
     public static class Instr_Read extends Inst {
         private Exp exp;
@@ -452,6 +533,9 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "instr_read("+exp+")";
         }
+        public Exp getExp() {
+            return exp;
+        }
     }
     public static class Instr_Write extends Inst {
         private Exp exp;
@@ -461,6 +545,9 @@ public class SintaxisAbstractaTiny {
         }
         public String toString() {
             return "instr_write("+exp+")";
+        }
+        public Exp getExp() {
+            return exp;
         }
     }
     public static class Instr_Nl extends Inst {
@@ -480,6 +567,9 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "instr_new("+exp+")";
         }
+        public Exp getExp() {
+            return exp;
+        }
     }
     public static class Instr_Del extends Inst {
         private Exp exp;
@@ -489,6 +579,9 @@ public class SintaxisAbstractaTiny {
         }
         public String toString() {
             return "instr_del("+exp+")";
+        }
+        public Exp getExp() {
+            return exp;
         }
     }
     public static class Instr_Call extends Inst {
@@ -502,6 +595,12 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "instr_call("+iden+","+paramsR+")";
         }
+        public String getIden() {
+            return iden;
+        }
+        public ParamsR getParamsR() {
+            return paramsR;
+        }
     }
     public static class Instr_Bloque extends Inst {
         private Bloq bloq;
@@ -511,6 +610,9 @@ public class SintaxisAbstractaTiny {
         }
         public String toString() {
             return "instr_bloque("+bloq+")";
+        }
+        public Bloq getBloq() {
+            return bloq;
         }
     }
 
@@ -524,6 +626,12 @@ public class SintaxisAbstractaTiny {
         }
         public String toString() {
             return "campo("+tipo+","+iden+")";
+        }
+        public String getIden() {
+            return iden;
+        }
+        public T getTipo() {
+            return tipo;
         }
     }
 
@@ -543,6 +651,12 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "muchos_campos("+lCampos+","+campo+")";
         }
+        public Campo getCampo() {
+            return campo;
+        }
+        public LCampos getlCampos() {
+            return lCampos;
+        }
     }
     public static class Un_Campo extends LCampos {
         private Campo campo;
@@ -552,6 +666,9 @@ public class SintaxisAbstractaTiny {
         }
         public String toString() {
             return "un_campo("+campo+")";
+        }
+        public Campo getCampo() {
+            return campo;
         }
     }
 
@@ -572,6 +689,12 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "tipo_array("+tipo+","+litEnt+")";
         }
+        public String getLitEnt() {
+            return litEnt;
+        }
+        public T getTipo() {
+            return tipo;
+        }
     }
     public static class TipoPunt extends T {
         private T tipo;
@@ -582,6 +705,9 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "tipo_punt("+tipo+")";
         }
+        public T getTipo() {
+            return tipo;
+        }
     }
     public static class TipoStruct extends T {
         private LCampos lCampos;
@@ -591,6 +717,9 @@ public class SintaxisAbstractaTiny {
         }
         public String toString() {
             return "tipo_struct("+lCampos+")";
+        }
+        public LCampos getlCampos() {
+            return lCampos;
         }
     }
     public static class TipoInt extends T {
@@ -622,6 +751,9 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "muchos_campos("+iden+")";
         }
+        public String getIden() {
+            return iden;
+        }
     }
 
 
@@ -641,6 +773,12 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "param_ref("+tipo+","+iden+")";
         }
+        public String getIden() {
+            return iden;
+        }
+        public T getTipo() {
+            return tipo;
+        }
     }
     public static class ParamNoRef extends Param {
         private T tipo;
@@ -652,6 +790,12 @@ public class SintaxisAbstractaTiny {
         }
         public String toString() {
             return "param("+tipo+","+iden+")";
+        }
+        public String getIden() {
+            return iden;
+        }
+        public T getTipo() {
+            return tipo;
         }
     }
 
@@ -668,6 +812,9 @@ public class SintaxisAbstractaTiny {
         }
         public String toString() {
             return "si_paramF("+paramsFL+")";
+        }
+        public ParamsFL getParamsFL() {
+            return paramsFL;
         }
     }
     public static class NoParamF extends ParamsF {
@@ -695,6 +842,12 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "muchos_paramsF("+paramsFL+","+param+")";
         }
+        public Param getParam() {
+            return param;
+        }
+        public ParamsFL getParamsFL() {
+            return paramsFL;
+        }
     }
     public static class UnParamF extends ParamsFL {
         private Param param;
@@ -704,6 +857,9 @@ public class SintaxisAbstractaTiny {
         }
         public String toString() {
             return "un_paramF("+param+")";
+        }
+        public Param getParam() {
+            return param;
         }
     }
 
@@ -723,6 +879,12 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "dec_var("+tipo+","+iden+")";
         }
+        public String getIden() {
+            return iden;
+        }
+        public T getTipo() {
+            return tipo;
+        }
     }
     public static class DecTipo extends Dec {
         private T tipo;
@@ -734,6 +896,12 @@ public class SintaxisAbstractaTiny {
         }
         public String toString() {
             return "dec_tipo("+tipo+","+iden+")";
+        }
+        public String getIden() {
+            return iden;
+        }
+        public T getTipo() {
+            return tipo;
         }
     }
     public static class DecProc extends Dec {
@@ -748,6 +916,15 @@ public class SintaxisAbstractaTiny {
         }
         public String toString() {
             return "dec_proc("+iden+","+paramsF+","+bloq+")";
+        }
+        public Bloq getBloq() {
+            return bloq;
+        }
+        public String getIden() {
+            return iden;
+        }
+        public ParamsF getParamsF() {
+            return paramsF;
         }
     }
 
@@ -764,6 +941,9 @@ public class SintaxisAbstractaTiny {
         }
         public String toString() {
             return "si_decs("+decsAux+")";
+        }
+        public DecsAux getDecsAux() {
+            return decsAux;
         }
     }
     public static class NoDecs extends Decs {
@@ -788,6 +968,12 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "muchas_decs("+decsAux+","+dec+")";
         }
+        public Dec getDec() {
+            return dec;
+        }
+        public DecsAux getDecsAux() {
+            return decsAux;
+        }
     }
     public static class UnaDec extends DecsAux {
         private Dec dec;
@@ -797,6 +983,9 @@ public class SintaxisAbstractaTiny {
         }
         public String toString() {
             return "una_dec("+dec+")";
+        }
+        public Dec getDec() {
+            return dec;
         }
     }
 
@@ -811,6 +1000,12 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "bloq("+decs+","+insts+")";
         }
+        public Decs getDecs() {
+            return decs;
+        }
+        public Insts getInsts() {
+            return insts;
+        }
     }
 
     public static class Prog extends Nodo {
@@ -821,6 +1016,9 @@ public class SintaxisAbstractaTiny {
         }
         public String toString() {
             return "prog("+bloq+")";
+        }
+        public Bloq getBloq() {
+            return bloq;
         }
     }
 
