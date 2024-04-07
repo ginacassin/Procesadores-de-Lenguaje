@@ -154,13 +154,19 @@ PARSER_END(ConstructorASTsTiny)
                 {return paramsFLh;}
           }
     Param param()   :
-          {T tipo0; Token id;}
+          {T tipo0; Param param;}
           {
-             tipo0 = tipo0() "&" id = <iden>
-                {return sem.param_ref(tipo0, id.image);}
+             tipo0 = tipo0() param = facParam(tipo0)
+                {return param;}
+          }
+    Param facParam(T tipoh) :
+          {Token id;}
+          {
+             "&" id = <iden>
+                {return (Param)sem.param_ref(tipoh, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
              |
-             tipo0 = tipo0() id = <iden>
-                {return sem.param(tipo0, id.image);}
+             id = <iden>
+                {return (Param)sem.param(tipoh, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
           }
     T tipo0()   :
           {T tipo; T recArray;}
@@ -171,7 +177,7 @@ PARSER_END(ConstructorASTsTiny)
     T recArray(T tipoh)   :
           {Token litEntero; T recArray;}
           {
-             "[" litEntero = <iden> "]" recArray = recArray((T)sem.tipo_array(tipoh, litEntero.image).ponFila(litEntero.beginLine).ponCol(litEntero.beginColumn))
+             "[" litEntero = <literalEntero> "]" recArray = recArray((T)sem.tipo_array(tipoh, litEntero.image).ponFila(litEntero.beginLine).ponCol(litEntero.beginColumn))
                 {return recArray;}
              |
                 {return tipoh;}
@@ -182,7 +188,8 @@ PARSER_END(ConstructorASTsTiny)
              "^" tipo = tipo1()
                 {return sem.tipo_punt(tipo);}
              |
-                {return tipo2();}
+             tipo = tipo2()
+                {return tipo;}
           }
     T tipo2()   :
           {LCampos lCampos; Token id;}
@@ -201,6 +208,7 @@ PARSER_END(ConstructorASTsTiny)
              |
              <string>
                 {return sem.tipo_string();}
+             |
              id = <iden>
                 {return (T)sem.tipo_iden(id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
           }
@@ -344,15 +352,15 @@ PARSER_END(ConstructorASTsTiny)
                 {return e2h;}
           }
     Exp e2()   :
-          {Exp e31, e32;}
+          {Exp e31, e32, e33;}
           {
-             e31 = e3() e32 = recSuma(facE3(e31))
-                {return e32;}
+             e31 = e3() e32 = facE3(e31) e33 = recSuma(e32)
+                {return e33;}
           }
     Exp recSuma(Exp e3h)   :
           {Exp e31, e32;}
           {
-             e31 = e3() e32 = recSuma(sem.suma(e3h, e31))
+             "+" e31 = e3() e32 = recSuma(sem.suma(e3h, e31))
                 {return e32;}
              |
                 {return e3h;}

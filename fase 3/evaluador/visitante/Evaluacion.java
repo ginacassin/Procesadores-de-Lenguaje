@@ -25,7 +25,7 @@ public class Evaluacion extends ProcesamientoDef{
     }
     public float leeResul() {return resul;}
 
-    public void procesa(Suma exp) {
+    /*public void procesa(Suma exp) {
         exp.getOpnd0().procesa(this);
         float val_opnd0 = resul;
         exp.getOpnd1().procesa(this);
@@ -48,7 +48,7 @@ public class Evaluacion extends ProcesamientoDef{
         float val_opnd0 = resul;
         exp.getOpnd1().procesa(this);
         resul = val_opnd0 / resul;
-    }
+    }*/
     public void procesa(Asignacion exp) {
         
     }

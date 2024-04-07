@@ -188,6 +188,10 @@ public class Impresion extends ProcesamientoDef{
         exp.getTipo().procesa(this);
         System.out.print("[" + exp.getLitEnt() + "]");
     }
+    public void procesa(TipoPunt exp) {
+        System.out.println("^");
+        exp.getTipo().procesa(this);
+    }
     public void procesa(TipoStruct exp) {
         System.out.print("struct{");
         exp.getlCampos().procesa(this);
@@ -271,4 +275,5 @@ public class Impresion extends ProcesamientoDef{
     public void procesa(Prog exp) {
         exp.getBloq().procesa(this);
     }
+
 }
