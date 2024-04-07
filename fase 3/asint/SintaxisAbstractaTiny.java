@@ -468,7 +468,7 @@ public class SintaxisAbstractaTiny {
         public void procesa(Procesamiento p) {
             p.procesa(this);
         }
-          
+
         @Override
         public void imprime() {
             imprimeOpnd(opnd,6);
@@ -1450,7 +1450,7 @@ public class SintaxisAbstractaTiny {
             this.iden = iden;
         }
         public String toString() {
-            return "muchos_campos("+iden+")";
+            return "tipo_iden("+iden+")";
         }
         public String getIden() {
             return iden;
