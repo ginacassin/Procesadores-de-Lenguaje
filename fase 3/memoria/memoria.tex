@@ -844,8 +844,10 @@
             
             \item imprime(bloq(Decs, Insts)):
                 \subitem print “\{”
+                \subitem nl
                 \subitem imprime(Decs)
                 \subitem imprime(Insts)
+                \subitem nl
                 \subitem print “\}”
             
             \item imprime(si\_decs(DecsAux)):
@@ -857,6 +859,7 @@
             \item imprime(muchas\_decs(DecsAux, Dec)):
                 \subitem imprime(DecsAux)
                 \subitem print “;”
+                \subitem nl
                 \subitem imprime(Dec)
             
             \item imprime(una\_dec(Dec)):
