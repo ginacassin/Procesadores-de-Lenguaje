@@ -1,223 +1,242 @@
 package evaluador;
 
-import asint.SintaxisAbstractaTiny.*;
-import asint.SintaxisAbstractaTiny;
-
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.Map;
-import java.util.HashMap;
-
 public class EvaluadorRecursivo extends Evaluador {
-    private EvaluadorRecursivo entornoPadre;
-    private Set<Object> env;
-
-    private class TStruct { // Clase usada para guardar structs en el env
-        private Set<String> idens;
-        private Map<String, TStruct> masStructs;
-        private String name;
-        public TStruct() {
-            super();
-        }
-        public Set<String> getIdens() {
-            return idens;
-        }
-        public Map<String, TStruct> getMasStructs() {
-            return masStructs;
-        }
-        public void addIden(String iden) { idens.add(iden);}
-        public void addStruct(String iden, TStruct struct) { masStructs.put(iden, struct);}
-        public void setName(String name) {
-            this.name = name;
-        }
+    private void imprime(String str) {
+        System.out.print(str);
     }
-    private class TProc { // Clase usada para representar un procedimiento
-        private Set<String> idens;
-        private String name;
-        public TProc() {
-            super();
-        }
-        public Set<String> getIdens() {
-            return idens;
-        }
-        public String getName() {
-            return name;
-        }
-        public void addIden(String iden) {
-            this.idens.add(iden);
-        }
-        public void setName(String name) {
-            this.name = name;
-        }
+    private void imprimeNL() {
+        System.out.println();
     }
 
-    public class ECteNoDefinida extends RuntimeException {
-        public ECteNoDefinida(String msg) {
-            super(msg);
-        }
-    }
-    public class ECteDuplicada extends RuntimeException {
-        public ECteDuplicada(String msg) {
-            super(msg);
-        }
-    }
-
-    public EvaluadorRecursivo(EvaluadorRecursivo padre) {
-        this.env = new TreeSet<>();
-        this.entornoPadre = padre;
-    }
 
     // funcion que se llama solo externamente
-    public void evalua(Prog n) {
-        procesaBloque(n.getBloq());
+    public void muestraPrograma(Prog n) {
+        muestraBloque(n.getBloq());
     }
 
-    private void procesaBloque(Bloq bloq) {
-        EvaluadorRecursivo hijo = new EvaluadorRecursivo(this); // creamos un nuevo hijo con un nuevo scope
-        hijo.consEnv(bloq.getDecs()); // procesa declaraciones
-        hijo.procesaInstr(bloq.getInsts()); // procesa instrucciones
+    private void muestraBloque(Bloq bloq) {
+        imprime("{"); imprimeNL();
+        muestraDecs(bloq.getDecs()); // muestra declaraciones
+        muestraInstr(bloq.getInsts()); // muestra instrucciones
+        imprimeNL(); imprime("}");
     }
-    private void consEnv(Decs decs) {
+    private void muestraDecs(Decs decs) {
         if(claseDe(decs,SiDecs.class)) {
-           consEnv(decs.getDecsAux());
+           muestraDecs(decs.getDecsAux());
+           imprime("&&");
         }
         // else, no hacemos nada con el NoDecs
     }
-    private void consEnv(DecsAux decs) {
+    private void muestraDecs(DecsAux decs) {
         if(claseDe(decs,MuchasDecs.class)) {
-            consEnv(decs.getDecsAux());
-            consEnv(decs.getDec());
+            muestraDecs(decs.getDecsAux());
+            imprime(";"); imprimeNL();
+            muestraDecs(decs.getDec());
         }
         else if (claseDe(decs, UnaDec.class)) {
-            consEnv(decs.getDec());
+            muestraDecs(decs.getDec());
         }
     }
-    private void consEnv(Dec dec) {
-        if(env.contains(dec.getIden())) {
-            throw new ECteDuplicada("Cte duplicada: "+dec.getIden()+
-                                     " fila:"+dec.leeFila()+" col:"+dec.leeCol()); 
-        }
+    private void muestraDecs(Dec dec) {
         if (claseDe(dec, DecVar.class)) {
-            env.add(dec.getIden());
+            muestraT(dec.getTipo());
+            imprime(dec.getIden());
         }
         else if (claseDe(dec, DecTipo.class)) {
-            if (claseDe(dec.getTipo(), TipoStruct.class)) {
-                TStruct struct = procesaDecStruct(dec.getTipo().getlCampos());
-                struct.setName(dec.getIden());
-                env.add(struct);
-                // TODO imprimir?
-            }
-            // TODO otros tipos ademas de structs... Por ejemplo: type int[5] t5ints;
+            imprime("type");
+            muestraT(dec.getTipo());
+            imprime(dec.getIden());
         }
         else { // DecProc
-            TProc proc = procesaDecProc(dec.getParamsF());
-            proc.setName(dec.getIden());
-            env.add(proc);
-            procesaBloque(dec.getBloq());
-        }
-    }
-
-    /*
-     * Procesamiento de Structs
-     */
-    // Recibe los campos de un struct y devuelve un TStruct
-    private TStruct procesaDecStruct(LCampos campos) {
-        TStruct output = new TStruct();
-        procesaCampos(campos, output);
-
-        return output;
-    }
-
-    // Recibe la lista de campos de un struct y procesa uno a uno
-    private void procesaCampos(LCampos lcampos, TStruct struct) {
-        if(claseDe(lcampos,Muchos_Campos.class)) {
-            procesaCampos(lcampos.getlCampos(), struct);
-            procesaCampos(lcampos.getCampo(), struct);
-        }
-        else if (claseDe(lcampos, Un_Campo.class)) {
-            procesaCampos(lcampos.getCampo(), struct);
-        }
-    }
-
-    // Procesa un campo en particular agregandolo al struct pasado por argumento
-    private void procesaCampos(Campo campo, TStruct struct) {
-        T t = campo.getTipo();
-        while (claseDe(campo.getTipo(), TipoArray.class) || claseDe(campo.getTipo(), TipoPunt.class)) {
-            t = t.getTipo(); // "Desenvolvemos" al tipo
-            // TODO imprimir?
-        }
-
-        if (claseDe(t, TipoStruct.class)) {
-            struct.addStruct(campo.getIden(), procesaDecStruct(t.getlCampos()));
-            // TODO imprimir?
-        }
-        else { // tipos Iden, real, int, bool, string
-            struct.addIden(campo.getIden());
-            // TODO imprimir?
+            imprime("proc");
+            imprime(dec.getIden());
+            imprime("(");
+            muestraParamsF(dec.getParamsF());
+            imprime(")");
+            muestraBloque(dec.getBloq());
         }
     }
 
     /*
      * Procesamiento de Procedimientos
      */
-    private TProc procesaDecProc(ParamsF params) {
-        TProc output = new TProc();
+    private void muestraParamsF(ParamsF params) {
         if (claseDe(params, SiParamF.class)) {
-            procesaParametros(params.getParamsFL(), output);
+            muestraParametros(params.getParamsFL());
         }
-
-        return output;
     }
 
-    private void procesaParametros(ParamsFL paramsfl, TProc proc) {
+    private void muestraParametros(ParamsFL paramsfl) {
         if (claseDe(paramsfl,MuchosParamsF.class)) {
-            procesaParametros(paramsfl.getParamsFL(), proc);
-            procesaParametros(paramsfl.getParam(), proc);
+            muestraParametros(paramsfl.getParamsFL());
+            imprime(",");
+            muestraParametros(paramsfl.getParam());
         }
         else if (claseDe(paramsfl, UnParamF.class)) {
-            procesaParametros(paramsfl.getParam(), proc);
+            muestraParametros(paramsfl.getParam());
         }
     }
     
-    private void procesaParametros(Param param, TProc proc) {
-        if (claseDe(param, ParamNoRef.class)) {
-            
+    private void muestraParametros(Param param) {
+        if (claseDe(param, ParamRef.class)) {
+            muestraT(param.getTipo());
+            imprime("&");
+            imprime(param.getIden());
         }
-        else {
-
+        else { // ParamNoRef
+            muestraT(param.getTipo());
+            imprime(param.getIden());
         }
     }
 
-    // private float eval(Exp exp) {
-    //     if(claseDe(exp,Lit_ent.class) || claseDe(exp,Lit_real.class)) {
-    //         return Float.valueOf(exp.valor()).floatValue();
-    //     }
-    //     else if(claseDe(exp,Iden.class)) {
-    //         if(! env.containsKey(exp.iden())) {
-    //             throw new ECteNoDefinida("Cte indefinida: "+exp.iden()+
-    //                                     " fila:"+exp.leeFila()+" col:"+exp.leeCol()); 
-    //         }
-    //         else {
-    //             return env.get(exp.iden());
-    //         }
-    //     }
-    //     else {
-    //         float v1 = eval(exp.opnd0());
-    //         float v2 = eval(exp.opnd1());
-    //         if(claseDe(exp,Suma.class)) {
-    //             return v1+v2;
-    //         }
-    //         else if(claseDe(exp,Resta.class)) {
-    //             return v1-v2;
-    //         }
-    //         else if(claseDe(exp,Mul.class)) {
-    //             return v1*v2;
-    //         }
-    //         else {
-    //             return v1/v2;
-    //         }
-    //     }
-    // } 
+    // Tipos
+    private void muestraT(T tipo) {
+        if (claseDe(tipo, TipoArray.class)) {
+            muestraT(tipo.getTipo());
+            imprime("[");
+            imprime(tipo.getLitEnt());
+            imprime("]");
+        }
+        else if (claseDe(tipo, TipoPunt.class)) {
+            imprime("^");
+            muestraT(tipo.getTipo());
+        }
+        else if (claseDe(tipo, TipoStruct.class)) {
+            imprime("struct");
+            imprime("{");
+            muestraCampos(tipo.getlCampos());
+            imprime("}");
+        }
+        else if (claseDe(tipo, TipoInt.class)) {
+            imprime("int");
+        }
+        else if (claseDe(tipo, TipoReal.class)) {
+            imprime("real");
+        }
+        else if (claseDe(tipo, TipoBool.class)) {
+            imprime("bool");
+        }
+        else if (claseDe(tipo, TipoString.class)) {
+            imprime("string");
+        }
+        else if (claseDe(tipo, Identificador.class)) {
+            imprime(tipo.getIden());
+        }
+    }
+
+    /*
+     * Procesamiento de Structs
+     */
+    private void muestraCampos(LCampos lcampos) {
+        if(claseDe(lcampos,Muchos_Campos.class)) {
+            muestraCampos(lcampos.getlCampos());
+            imprime(",");
+            muestraCampos(lcampos.getCampo());
+        }
+        else if (claseDe(lcampos, Un_Campo.class)) {
+            muestraCampos(lcampos.getCampo());
+        }
+    }
+
+    private void muestraCampos(Campo campo) {
+        muestraT(campo.getTipo());
+        imprime(campo.getIden());
+    }
+
+    /*
+     * Procesamiento de instrucciones
+    */
+    private void muestraInstr(Insts insts) {
+        if (claseDe(insts, Si_Instr.class)) {
+            muestraInstr(insts.getInstsAux());
+        }
+    }
+
+    private void muestraInstr(InstsAux insts) {
+        if(claseDe(insts, Muchas_Instr.class)) {
+            muestraInstr(insts.getInstsAux());
+            imprime(";");
+            muestraInstr(insts.getInst());
+        }
+        else if (claseDe(insts, Una_Instr.class)) {
+            muestraInstr(insts.getInst());
+        }
+    }
+
+    private void muestraInstr(Inst inst) {
+        if (claseDe(inst, Instr_Expr.class)) {
+            imprime("@");
+            muestraExp(inst.getExp());
+        }
+        else if (claseDe(inst, Instr_If.class)) {
+            imprime("if");
+            muestraExp(inst.getExp());
+            muestraBloque(inst.getBloq());
+        }
+        else if (claseDe(inst, Instr_If_Else.class)) {
+            imprime("if");
+            muestraExp(inst.getExp());
+            muestraBloque(inst.getBloq1());
+            imprime("else");
+            muestraBloque(inst.getBloq2());
+        }
+        else if (claseDe(inst, Instr_While.class)) {
+            imprime("while");
+            muestraExp(inst.getExp());
+            muestraBloque(inst.getBloq());
+        }
+        else if (claseDe(inst, Instr_Read.class)) {
+            imprime("read");
+            muestraExp(inst.getExp());
+        }
+        else if (claseDe(inst, Instr_Write.class)) {
+            imprime("write");
+            muestraExp(inst.getExp());
+        }
+        else if (claseDe(inst, Instr_Nl.class)) {
+            imprimeNL();
+        }
+        else if (claseDe(inst, Instr_New.class)) {
+            imprime("new");
+            muestraExp(inst.getExp());
+        }
+        else if (claseDe(inst, Instr_Del.class)) {
+            imprime("delete");
+            muestraExp(inst.getExp());
+        }
+        else if (claseDe(inst, Instr_Call.class)) {
+            imprime("call");
+            imprime(inst.getIden());
+            imprime("(");
+            muestraParamsR(inst.getParamsR());
+            imprime(")");
+        }
+        else if (claseDe(inst, Instr_Bloque.class)) {
+            muestraBloque(inst.getBloq());
+        }
+    }
+
+    private void muestraParamsR(ParamsR paramsR) {
+        if (claseDe(paramsR, Si_ParamsR.class)) {
+            muestraParamsR(paramsR.getParamrl());
+        }
+    }
+
+    private void muestraParamsR(ParamsRL paramsRL) {
+        if (claseDe(paramsRL, MuchosParamsF.class)) {
+            muestraParamsR(paramsRL.getParamrl());
+            imprime(",");
+            muestraExp(paramsRL.getExp());
+        }
+        else if (claseDe(paramsRL, Un_ParamsR.class)) {
+            muestraExp(paramsRL.getExp());
+        }
+    }
+
+    private void muestraExp(Exp exp) {
+
+    }
+    
     
     private boolean claseDe(Object o, Class c) {
         return o.getClass() == c;
