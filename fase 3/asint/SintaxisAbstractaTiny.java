@@ -49,7 +49,7 @@ public class SintaxisAbstractaTiny {
         // Función auxiliar para generar vínculo al texto fuente de tipo
         // $f:num fila,c: num col$
         public String getFilaColInfo() {
-            return "$f:" + leeFila() + ",c:" + leeCol() + "$";
+            return "$f:" + (leeFila() + 1) + ",c:" + leeCol() + "$";
         }
     }
 
