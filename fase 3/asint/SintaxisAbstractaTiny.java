@@ -54,6 +54,9 @@ public class SintaxisAbstractaTiny {
         public String valor() {throw new UnsupportedOperationException();}
         public Exp getOpnd0() {throw new UnsupportedOperationException();}
         public Exp getOpnd1() {throw new UnsupportedOperationException();}
+        public String getNum() {throw new UnsupportedOperationException();}
+        public String getCadena() {throw new UnsupportedOperationException();}
+        public String getId() {throw new UnsupportedOperationException();}
         public abstract int prioridad();
     }
 

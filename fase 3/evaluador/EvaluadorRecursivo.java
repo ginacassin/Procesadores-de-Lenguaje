@@ -234,9 +234,111 @@ public class EvaluadorRecursivo extends Evaluador {
     }
 
     private void muestraExp(Exp exp) {
+        if (claseDe(exp, Asignacion.class)) {
+            muestraExpBin(exp.getOpnd0(), "=", exp.getOpnd1(), 1, 0);
+        }
+        else if (claseDe(exp, Menor.class)) {
+            muestraExpBin(exp.getOpnd0(), "<", exp.getOpnd1(), 1, 2);
+        }
+        else if (claseDe(exp, Mayor.class)) {
+            muestraExpBin(exp.getOpnd0(), ">", exp.getOpnd1(), 1, 2);
+            
+        }
+        else if (claseDe(exp, MenorIgual.class)) {
+            muestraExpBin(exp.getOpnd0(), "<=", exp.getOpnd1(), 1, 2);
+        }
+        else if (claseDe(exp, MayorIgual.class)) {
+            muestraExpBin(exp.getOpnd0(), ">=", exp.getOpnd1(), 1, 2);
+            
+        }
+        else if (claseDe(exp, Igual.class)) {
+            muestraExpBin(exp.getOpnd0(), "==", exp.getOpnd1(), 1, 2);
+        }
+        else if (claseDe(exp, NoIgual.class)) {
+            muestraExpBin(exp.getOpnd0(), "!=", exp.getOpnd1(), 1, 2);
+        }
+        else if (claseDe(exp, Suma.class)) {
+            muestraExpBin(exp.getOpnd0(), "+", exp.getOpnd1(), 2, 3);
+        }
+        else if (claseDe(exp, Resta.class)) {
+            muestraExpBin(exp.getOpnd0(), "-", exp.getOpnd1(), 3, 3);
+        }
+        else if (claseDe(exp, And.class)) {
+            muestraExpBin(exp.getOpnd0(), "and", exp.getOpnd1(), 4, 3);
+        }
+        else if (claseDe(exp, Or.class)) {
+            muestraExpBin(exp.getOpnd0(), "or", exp.getOpnd1(), 4, 4);
+        }
+        else if (claseDe(exp, Mul.class)) {
+            muestraExpBin(exp.getOpnd0(), "*", exp.getOpnd1(), 4, 5);
+        }
+        else if (claseDe(exp, Div.class)) {
+            muestraExpBin(exp.getOpnd0(), "/", exp.getOpnd1(), 4, 5);
+        }
+        else if (claseDe(exp, Mod.class)) {
+            muestraExpBin(exp.getOpnd0(), "%", exp.getOpnd1(), 4, 5);
+        }
+        else if (claseDe(exp, Negativo.class)) {
+            muestraExpUn(exp.getOpnd0(), "-", 5);
+        }
+        else if (claseDe(exp, Not.class)) {
+            muestraExpUn(exp.getOpnd0(), "not", 5);
+        }
+        else if (claseDe(exp, Index.class)) {
+            muestraOpnd(exp.getOpnd0(), 6);
+            imprime("[");
+            muestraExp(exp.getOpnd1());
+            imprime("]");
+        }
+        else if (claseDe(exp, Acceso.class)) {
+            muestraOpnd(exp.getOpnd0(), 6);
+            imprime(".");
+            imprime(exp.getIden());
+        }
+        else if (claseDe(exp, Indireccion.class)) {
+            muestraOpnd(exp.getOpnd0(), 6);
+            imprime("^");
+        }
+        else if (claseDe(exp, Lit_ent.class)) {
+            imprime(exp.getNum());
+        }
+        else if (claseDe(exp, Lit_real.class)) {
+            imprime(exp.getNum());
+        }
+        else if (claseDe(exp, True.class)) {
+            imprime("true");
+        }
+        else if (claseDe(exp, False.class)) {
+            imprime("false");
+        }
+        else if (claseDe(exp, Lit_cadena.class)) {
+            imprime(exp.getCadena());
+        }
+        else if (claseDe(exp, Iden.class)) {
+            imprime(exp.getId());
+        }
+        else if (claseDe(exp, Null.class)) {
+            imprime("null");
+        }
+    }
 
+    private void muestraExpBin(Exp exp1, String operacion, Exp exp2, int p1, int p2) {
+        muestraOpnd(exp1, p1);
+        imprime(operacion);
+        muestraOpnd(exp2, p2);
+    }
+
+    private void muestraExpUn(Exp exp1, String operacion, int p1) {
+        imprime(operacion); 
+	    muestraOpnd(exp1, p1);
     }
     
+    private void muestraOpnd(Exp opnd, int np) {
+        if (opnd.prioridad() < np) imprime("(");
+        muestraExp(opnd);
+        if (opnd.prioridad() < np) imprime(")");
+    }
+
     
     private boolean claseDe(Object o, Class c) {
         return o.getClass() == c;
