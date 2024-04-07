@@ -2,10 +2,13 @@ package evaluador;
 
 public class EvaluadorRecursivo extends Evaluador {
     private void imprime(String str) {
-        System.out.print(str);
+        System.out.println(str);
     }
     private void imprimeNL() {
-        System.out.println();
+        // System.out.println();
+    }
+    private String getFilaColInfo(Nodo n) {
+        return "$f:"+(n.leeFila() + 1)+",c:"+n.leeCol()+"$";
     }
 
 
@@ -40,16 +43,16 @@ public class EvaluadorRecursivo extends Evaluador {
     private void muestraDecs(Dec dec) {
         if (claseDe(dec, DecVar.class)) {
             muestraT(dec.getTipo());
-            imprime(dec.getIden());
+            imprime(dec.getIden() + getFilaColInfo(dec));
         }
         else if (claseDe(dec, DecTipo.class)) {
-            imprime("type ");
+            imprime("<type>");
             muestraT(dec.getTipo());
-            imprime(dec.getIden());
+            imprime(dec.getIden() + getFilaColInfo(dec));
         }
         else { // DecProc
-            imprime("proc ");
-            imprime(dec.getIden());
+            imprime("<proc>");
+            imprime(dec.getIden() + getFilaColInfo(dec));
             imprime("(");
             muestraParamsF(dec.getParamsF());
             imprime(")");
@@ -69,7 +72,7 @@ public class EvaluadorRecursivo extends Evaluador {
     private void muestraParametros(ParamsFL paramsfl) {
         if (claseDe(paramsfl,MuchosParamsF.class)) {
             muestraParametros(paramsfl.getParamsFL());
-            imprime(", ");
+            imprime(",");
             muestraParametros(paramsfl.getParam());
         }
         else if (claseDe(paramsfl, UnParamF.class)) {
@@ -81,11 +84,11 @@ public class EvaluadorRecursivo extends Evaluador {
         if (claseDe(param, ParamRef.class)) {
             muestraT(param.getTipo());
             imprime("&");
-            imprime(param.getIden());
+            imprime(param.getIden() + getFilaColInfo(param));
         }
         else { // ParamNoRef
             muestraT(param.getTipo());
-            imprime(param.getIden());
+            imprime(param.getIden() + getFilaColInfo(param));
         }
     }
 
@@ -95,29 +98,29 @@ public class EvaluadorRecursivo extends Evaluador {
             muestraT(tipo.getTipo());
             imprime("[");
             imprime(tipo.getLitEnt());
-            imprime("]");
+            imprime("]" + getFilaColInfo(tipo));
         }
         else if (claseDe(tipo, TipoPunt.class)) {
             imprime("^");
             muestraT(tipo.getTipo());
         }
         else if (claseDe(tipo, TipoStruct.class)) {
-            imprime("struct");
+            imprime("<struct>");
             imprime("{");
             muestraCampos(tipo.getlCampos());
             imprime("}");
         }
         else if (claseDe(tipo, TipoInt.class)) {
-            imprime("int");
+            imprime("<int>");
         }
         else if (claseDe(tipo, TipoReal.class)) {
-            imprime("real");
+            imprime("<real>");
         }
         else if (claseDe(tipo, TipoBool.class)) {
-            imprime("bool");
+            imprime("<bool>");
         }
         else if (claseDe(tipo, TipoString.class)) {
-            imprime("string");
+            imprime("<string>");
         }
         else if (claseDe(tipo, Identificador.class)) {
             imprime(tipo.getIden());
@@ -140,7 +143,7 @@ public class EvaluadorRecursivo extends Evaluador {
 
     private void muestraCampos(Campo campo) {
         muestraT(campo.getTipo());
-        imprime(campo.getIden());
+        imprime(campo.getIden() + getFilaColInfo(campo));
     }
 
     /*
@@ -165,47 +168,47 @@ public class EvaluadorRecursivo extends Evaluador {
 
     private void muestraInstr(Inst inst) {
         if (claseDe(inst, Instr_Expr.class)) {
-            imprime("@ ");
+            imprime("@");
             muestraExp(inst.getExp());
         }
         else if (claseDe(inst, Instr_If.class)) {
-            imprime("if ");
+            imprime("<if>");
             muestraExp(inst.getExp());
             muestraBloque(inst.getBloq());
         }
         else if (claseDe(inst, Instr_If_Else.class)) {
-            imprime("if ");
+            imprime("<if>");
             muestraExp(inst.getExp());
             muestraBloque(inst.getBloq1());
-            imprime("else ");
+            imprime("<else>");
             muestraBloque(inst.getBloq2());
         }
         else if (claseDe(inst, Instr_While.class)) {
-            imprime("while ");
+            imprime("<while>");
             muestraExp(inst.getExp());
             muestraBloque(inst.getBloq());
         }
         else if (claseDe(inst, Instr_Read.class)) {
-            imprime("read ");
+            imprime("<read>");
             muestraExp(inst.getExp());
         }
         else if (claseDe(inst, Instr_Write.class)) {
-            imprime("write ");
+            imprime("<write>");
             muestraExp(inst.getExp());
         }
         else if (claseDe(inst, Instr_Nl.class)) {
             imprimeNL();
         }
         else if (claseDe(inst, Instr_New.class)) {
-            imprime("new ");
+            imprime("<new>");
             muestraExp(inst.getExp());
         }
         else if (claseDe(inst, Instr_Del.class)) {
-            imprime("delete ");
+            imprime("<delete>");
             muestraExp(inst.getExp());
         }
         else if (claseDe(inst, Instr_Call.class)) {
-            imprime("call ");
+            imprime("<call>");
             imprime(inst.getIden());
             imprime("(");
             muestraParamsR(inst.getParamsR());
@@ -218,14 +221,14 @@ public class EvaluadorRecursivo extends Evaluador {
 
     private void muestraParamsR(ParamsR paramsR) {
         if (claseDe(paramsR, Si_ParamsR.class)) {
-            muestraParamsR(paramsR.getParamrl());
+            muestraParamsR(paramsR.getParamsrl());
         }
     }
 
     private void muestraParamsR(ParamsRL paramsRL) {
         if (claseDe(paramsRL, MuchosParamsF.class)) {
             muestraParamsR(paramsRL.getParamrl());
-            imprime(", ");
+            imprime(",");
             muestraExp(paramsRL.getExp());
         }
         else if (claseDe(paramsRL, Un_ParamsR.class)) {
@@ -235,63 +238,61 @@ public class EvaluadorRecursivo extends Evaluador {
 
     private void muestraExp(Exp exp) {
         if (claseDe(exp, Asignacion.class)) {
-            muestraExpBin(exp.getOpnd0(), " = ", exp.getOpnd1(), 1, 0);
+            muestraExpBin(exp.getOpnd0(), "=", exp.getOpnd1(), 1, 0);
         }
         else if (claseDe(exp, Menor.class)) {
-            muestraExpBin(exp.getOpnd0(), " < ", exp.getOpnd1(), 1, 2);
+            muestraExpBin(exp.getOpnd0(), "<", exp.getOpnd1(), 1, 2);
         }
         else if (claseDe(exp, Mayor.class)) {
-            muestraExpBin(exp.getOpnd0(), " > ", exp.getOpnd1(), 1, 2);
-            
+            muestraExpBin(exp.getOpnd0(), ">", exp.getOpnd1(), 1, 2);
         }
         else if (claseDe(exp, MenorIgual.class)) {
-            muestraExpBin(exp.getOpnd0(), " <= ", exp.getOpnd1(), 1, 2);
+            muestraExpBin(exp.getOpnd0(), "<=", exp.getOpnd1(), 1, 2);
         }
         else if (claseDe(exp, MayorIgual.class)) {
-            muestraExpBin(exp.getOpnd0(), " >= ", exp.getOpnd1(), 1, 2);
-            
+            muestraExpBin(exp.getOpnd0(), ">=", exp.getOpnd1(), 1, 2);
         }
         else if (claseDe(exp, Igual.class)) {
-            muestraExpBin(exp.getOpnd0(), " == ", exp.getOpnd1(), 1, 2);
+            muestraExpBin(exp.getOpnd0(), "==", exp.getOpnd1(), 1, 2);
         }
         else if (claseDe(exp, NoIgual.class)) {
-            muestraExpBin(exp.getOpnd0(), " != ", exp.getOpnd1(), 1, 2);
+            muestraExpBin(exp.getOpnd0(), "!=", exp.getOpnd1(), 1, 2);
         }
         else if (claseDe(exp, Suma.class)) {
-            muestraExpBin(exp.getOpnd0(), " + ", exp.getOpnd1(), 2, 3);
+            muestraExpBin(exp.getOpnd0(), "+", exp.getOpnd1(), 2, 3);
         }
         else if (claseDe(exp, Resta.class)) {
-            muestraExpBin(exp.getOpnd0(), " - ", exp.getOpnd1(), 3, 3);
+            muestraExpBin(exp.getOpnd0(), "-", exp.getOpnd1(), 3, 3);
         }
         else if (claseDe(exp, And.class)) {
-            muestraExpBin(exp.getOpnd0(), " and ", exp.getOpnd1(), 4, 3);
+            muestraExpBin(exp.getOpnd0(), "<and>", exp.getOpnd1(), 4, 3);
         }
         else if (claseDe(exp, Or.class)) {
-            muestraExpBin(exp.getOpnd0(), " or ", exp.getOpnd1(), 4, 4);
+            muestraExpBin(exp.getOpnd0(), "<or>", exp.getOpnd1(), 4, 4);
         }
         else if (claseDe(exp, Mul.class)) {
-            muestraExpBin(exp.getOpnd0(), " * ", exp.getOpnd1(), 4, 5);
+            muestraExpBin(exp.getOpnd0(), "*", exp.getOpnd1(), 4, 5);
         }
         else if (claseDe(exp, Div.class)) {
-            muestraExpBin(exp.getOpnd0(), " / ", exp.getOpnd1(), 4, 5);
+            muestraExpBin(exp.getOpnd0(), "/", exp.getOpnd1(), 4, 5);
         }
         else if (claseDe(exp, Mod.class)) {
-            muestraExpBin(exp.getOpnd0(), " % ", exp.getOpnd1(), 4, 5);
+            muestraExpBin(exp.getOpnd0(), "%", exp.getOpnd1(), 4, 5);
         }
         else if (claseDe(exp, Negativo.class)) {
             muestraExpUn(exp.getOpnd0(), "-", 5);
         }
         else if (claseDe(exp, Not.class)) {
-            muestraExpUn(exp.getOpnd0(), " not ", 5);
+            muestraExpUn(exp.getOpnd0(), "<not>", 5);
         }
         else if (claseDe(exp, Index.class)) {
-            muestraOpnd(exp.getOpnd0(), 6);
+            muestraOpnd(exp.getOpnd(), 6);
             imprime("[");
-            muestraExp(exp.getOpnd1());
+            muestraExp(exp.getIndex());
             imprime("]");
         }
         else if (claseDe(exp, Acceso.class)) {
-            muestraOpnd(exp.getOpnd0(), 6);
+            muestraOpnd(exp.getOpnd(), 6);
             imprime(".");
             imprime(exp.getIden());
         }
@@ -300,25 +301,25 @@ public class EvaluadorRecursivo extends Evaluador {
             imprime("^");
         }
         else if (claseDe(exp, Lit_ent.class)) {
-            imprime(exp.getNum());
+            imprime(exp.getNum() + getFilaColInfo(exp));
         }
         else if (claseDe(exp, Lit_real.class)) {
-            imprime(exp.getNum());
+            imprime(exp.getNum() + getFilaColInfo(exp));
         }
         else if (claseDe(exp, True.class)) {
-            imprime("true");
+            imprime("<true>" + getFilaColInfo(exp));
         }
         else if (claseDe(exp, False.class)) {
-            imprime("false");
+            imprime("<false>" + getFilaColInfo(exp));
         }
         else if (claseDe(exp, Lit_cadena.class)) {
-            imprime(exp.getCadena());
+            imprime(exp.getCadena() + getFilaColInfo(exp));
         }
         else if (claseDe(exp, Iden.class)) {
-            imprime(exp.getId());
+            imprime(exp.getId() + getFilaColInfo(exp));
         }
         else if (claseDe(exp, Null.class)) {
-            imprime("null");
+            imprime("<null>" + getFilaColInfo(exp));
         }
     }
 

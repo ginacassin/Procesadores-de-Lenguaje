@@ -46,8 +46,12 @@ public class SintaxisAbstractaTiny {
 
         public abstract void imprime();
 
+        // Función auxiliar para generar vínculo al texto fuente de tipo
+        // $f:num fila,c: num col$
+        public String getFilaColInfo() {
+            return "$f:" + (leeFila() + 1) + ",c:" + leeCol() + "$";
+        }
     }
-
 
     public static abstract class Exp extends Nodo {
         public Exp() {
@@ -60,6 +64,8 @@ public class SintaxisAbstractaTiny {
         public String getNum() {throw new UnsupportedOperationException();}
         public String getCadena() {throw new UnsupportedOperationException();}
         public String getId() {throw new UnsupportedOperationException();}
+        public Exp getIndex() {throw new UnsupportedOperationException();}
+        public Exp getOpnd() {throw new UnsupportedOperationException();}
         public abstract int prioridad();
     }
 
@@ -439,7 +445,7 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             imprimeOpnd(opnd0,6);
-            System.out.println("^");
+            System.out.println("^" + getFilaColInfo());
         }
         @Override
         public int prioridad() {
@@ -472,7 +478,7 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             imprimeOpnd(opnd,6);
-            System.out.println("[");
+            System.out.println("[" + getFilaColInfo());
             index.imprime();
             System.out.println("]");
         }
@@ -512,7 +518,7 @@ public class SintaxisAbstractaTiny {
         public void imprime() {
             imprimeOpnd(opnd,6);
             System.out.println(".");
-            System.out.println(iden);
+            System.out.println(iden + getFilaColInfo());
 
         }
     }
@@ -536,7 +542,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            System.out.println(num);
+            System.out.println(num + getFilaColInfo());
         }
         @Override
         public int prioridad() {
@@ -562,7 +568,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            System.out.println(num);
+            System.out.println(num + getFilaColInfo());
         }
         @Override
         public int prioridad() {
@@ -587,7 +593,7 @@ public class SintaxisAbstractaTiny {
         }
         @Override
         public void imprime() {
-            System.out.println("<true>");
+            System.out.println("<true>" + getFilaColInfo());
 
         }
     }
@@ -608,7 +614,7 @@ public class SintaxisAbstractaTiny {
         }
         @Override
         public void imprime() {
-            System.out.println("<false>");
+            System.out.println("<false>" + getFilaColInfo());
         }
 
 
@@ -631,7 +637,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            System.out.println(cadena);
+            System.out.println(cadena + getFilaColInfo());
         }
         @Override
         public int prioridad() {
@@ -657,7 +663,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            System.out.println(id);
+            System.out.println(id + getFilaColInfo());
         }
         @Override
         public int prioridad() {
@@ -682,7 +688,7 @@ public class SintaxisAbstractaTiny {
         }
         @Override
         public void imprime() {
-            System.out.println("<null>");
+            System.out.println("<null>" + getFilaColInfo());
 
         }
     }
@@ -692,7 +698,7 @@ public class SintaxisAbstractaTiny {
         public ParamsR() {
             super();
         }
-        public ParamsRL getParamrl() { throw new UnsupportedOperationException();}
+        public ParamsRL getParamsrl() { throw new UnsupportedOperationException();}
     }
     public static class Si_ParamsR extends ParamsR {
         private ParamsRL paramsrl;
@@ -1172,7 +1178,7 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             System.out.println("<call>");
-            System.out.println(iden);
+            System.out.println(iden + getFilaColInfo());
             System.out.println("(");
             paramsR.imprime();
             System.out.println(")");
@@ -1227,7 +1233,7 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             tipo.imprime();
-            System.out.println(iden);
+            System.out.println(iden + getFilaColInfo());
 
         }
     }
@@ -1330,7 +1336,7 @@ public class SintaxisAbstractaTiny {
             tipo.imprime();
             System.out.println("[");
             System.out.println(litEnt);
-            System.out.println("]");
+            System.out.println("]" + getFilaColInfo());
 
         }
     }
@@ -1463,7 +1469,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            System.out.println(iden);
+            System.out.println(iden + getFilaColInfo());
 
         }
     }
@@ -1502,7 +1508,7 @@ public class SintaxisAbstractaTiny {
         public void imprime() {
             tipo.imprime();
             System.out.println("&");
-            System.out.println(iden);
+            System.out.println(iden + getFilaColInfo());
 
         }
     }
@@ -1531,7 +1537,7 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             tipo.imprime();
-            System.out.println(iden);
+            System.out.println(iden + getFilaColInfo());
 
         }
     }
@@ -1677,7 +1683,7 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             tipo.imprime();
-            System.out.println(iden);
+            System.out.println(iden + getFilaColInfo());
 
         }
     }
@@ -1707,7 +1713,7 @@ public class SintaxisAbstractaTiny {
         public void imprime() {
             System.out.println("<type>");
             tipo.imprime();
-            System.out.println(iden);
+            System.out.println(iden+getFilaColInfo());
 
         }
     }
@@ -1741,7 +1747,7 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             System.out.println("<proc>");
-            System.out.println(iden);
+            System.out.println(iden + getFilaColInfo());
             System.out.println("(");
             paramsF.imprime();
             System.out.println(")");

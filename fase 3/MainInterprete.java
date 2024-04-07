@@ -1,9 +1,9 @@
 import asint.SintaxisAbstractaTiny.*;
 import c_ast_ascendente.AnalizadorLexicoTiny;
-import c_ast_ascendente.GestionErroresTiny;
-import c_ast_descendente.ConstructorASTsTiny;
+import c_ast_descendente.ConstructorASTsTinyDJ;
 
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
@@ -19,9 +19,10 @@ public class MainInterprete {
             Prog prog = (Prog)asint.parse().value;
             prog.imprime();
         }
-        else {
-            c_ast_descendente.ConstructorASTsTiny asint = new ConstructorASTsTiny(new FileInputStream(args[1]));
-            asint.disable_tracing();
+        else if (args[0].equals("desc")){
+            Reader input = new InputStreamReader(new FileInputStream(args[1]));
+            c_ast_descendente.ConstructorASTsTiny asint = new ConstructorASTsTinyDJ(input);
+            //asint.disable_tracing();
             asint.programa();
 
             asint.analiza().imprime();
