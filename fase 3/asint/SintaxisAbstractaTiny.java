@@ -330,6 +330,7 @@ public class SintaxisAbstractaTiny {
         }
         public void procesa(Procesamiento p) {
             p.procesa(this);
+        }
 
         @Override
         public void imprime() {
