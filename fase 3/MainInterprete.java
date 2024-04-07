@@ -14,15 +14,7 @@ public class MainInterprete {
             AnalizadorLexicoTiny alex = new AnalizadorLexicoTiny(input);
             c_ast_ascendente.ConstructorASTTiny asint = new c_ast_ascendente.ConstructorASTTinyDJ(alex);
 
-            try {
-                asint.debug_parse();
-            }
-            catch(GestionErroresTiny.ErrorLexico e) {
-                System.out.println("ERROR_LEXICO");
-            }
-            catch(GestionErroresTiny.ErrorSintactico e) {
-                System.out.println("ERROR_SINTACTICO");
-            }
+            // asint.debug_parse();
 
             Prog prog = (Prog)asint.parse().value;
             prog.imprime();
