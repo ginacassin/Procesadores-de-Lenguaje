@@ -310,7 +310,7 @@ PARSER_END(ConstructorASTsTiny)
                 {return paramsRLh;}
           }
     Exp expr()   :
-          {Exp eo;}
+          {Exp e0;}
           {
              e0 = e0()
                 {return e0;}

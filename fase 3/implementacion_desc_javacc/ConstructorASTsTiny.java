@@ -568,7 +568,7 @@ public class ConstructorASTsTiny implements ConstructorASTsTinyConstants {
   final public Exp expr() throws ParseException {
     trace_call("expr");
     try {
-           Exp eo;
+           Exp e0;
       e0 = e0();
                  {if (true) return e0;}
     throw new Error("Missing return statement in function");
