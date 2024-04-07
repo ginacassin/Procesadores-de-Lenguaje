@@ -211,13 +211,13 @@ PARSER_END(ConstructorASTsTiny)
              campo = campo() lCampos = recCampo(sem.un_campo(campo))
                 {return lCampos;}
           }
-    LCampos recCampo(Campo campoh)   :
+    LCampos recCampo(LCampos camposh)   :
           {LCampos lCampos; Campo campo;}
           {
-             "," campo = campo() lCampos = recCampo(sem.muchos_campos(campoh, campo))
+             "," campo = campo() lCampos = recCampo(sem.muchos_campos(camposh, campo))
                 {return lCampos;}
              |
-                {return campoh;}
+                {return camposh;}
           }
     Campo campo()   :
           {T tipo; Token id;}
@@ -248,13 +248,13 @@ PARSER_END(ConstructorASTsTiny)
                 {return instsAuxh;}
           }
     Inst instruccion()   :
-          {Exp exp; Bloq bloq1, bloq2; Token id; ParamsR paramsR;}
+          {Exp exp; Bloq bloq1; Token id; ParamsR paramsR; Inst inst;}
           {
              "@" exp = expr()
                 {return sem.instr_expr(exp);}
              |
-             <IF> exp = expr() bloq1 = bloque() bloq2 = factIf(exp, bloq1)
-                {return bloq2;}
+             <IF> exp = expr() bloq1 = bloque() inst = factIf(exp, bloq1)
+                {return inst;}
              |
              <WHILE> exp = expr() bloq1 = bloque()
                  {return sem.instr_while(exp, bloq1);}
@@ -265,6 +265,7 @@ PARSER_END(ConstructorASTsTiny)
              <write> exp = expr()
                 {return sem.instr_write(exp);}
              |
+             <nl>
                 {return sem.instr_nl();}
              |
              <NEW> exp = expr()
@@ -346,10 +347,8 @@ PARSER_END(ConstructorASTsTiny)
     Exp e2()   :
           {Exp e31, e32;}
           {
-             e32 = e3() e32 = facE3(e31) recSuma(e3)
-                {return e0;}
-             |
-                {return e2h;}
+             e31 = e3() e32 = recSuma(facE3(e31))
+                {return e32;}
           }
     Exp recSuma(Exp e3h)   :
           {Exp e31, e32;}
@@ -433,10 +432,10 @@ PARSER_END(ConstructorASTsTiny)
              "(" e0 = e0() ")"
                 {return e0;}
              |
-             id = <iden>
+             id = <literalEntero>
                 {return (Exp)sem.lit_ent(id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
              |
-             id = <iden>
+             id = <literalReal>
                 {return (Exp)sem.lit_real(id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
              |
              <TRUE>
@@ -445,7 +444,7 @@ PARSER_END(ConstructorASTsTiny)
              <FALSE>
                 {return sem.bfalse();}
              |
-             id = <iden>
+             id = <literalCadena>
                 {return (Exp)sem.lit_cadena(id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
              |
              id = <iden>
