@@ -844,10 +844,8 @@
             
             \item imprime(bloq(Decs, Insts)):
                 \subitem print “\{”
-                \subitem nl
                 \subitem imprime(Decs)
                 \subitem imprime(Insts)
-                \subitem nl
                 \subitem print “\}”
             
             \item imprime(si\_decs(DecsAux)):
@@ -859,7 +857,6 @@
             \item imprime(muchas\_decs(DecsAux, Dec)):
                 \subitem imprime(DecsAux)
                 \subitem print “;”
-                \subitem nl
                 \subitem imprime(Dec)
             
             \item imprime(una\_dec(Dec)):
@@ -1066,15 +1063,15 @@
                 \subitem imprimeExpBin(Exp1, “\%”, Exp2, 4, 5)
             
             \item imprime(negativo(Exp)):
-                \subitem imprimeExpUnarioPrefijo(“-”, 5)
+                \subitem imprimeExpUnarioPrefijo(Exp,“-”, 5)
             
             \item imprime(not(Exp)):
-                \subitem imprimeExpUnarioPrefijo(“not”, 5)
+                \subitem imprimeExpUnarioPrefijo(Exp,“not”, 5)
             
             \item imprime(index(Exp1, Exp2)):
                 \subitem imprimeOpnd(Exp1,6)
                 \subitem print “[“
-                \subitem imprime(Exp)
+                \subitem imprime(Exp2)
                 \subitem print “]”
             
             \item imprime(acceso(Exp, Iden)):
@@ -1143,6 +1140,13 @@
             \item prioridad(index(\_,\_)): return 6
             \item prioridad(acceso(\_,\_)): return 6
             \item prioridad(indireccion(\_)): return 6
+            \item prioridad(lit\_ent(\_)): return 7
+            \item prioridad(lit\_real(\_)): return 7
+            \item prioridad(lit\_cadena(\_)): return 7
+            \item prioridad(true()): return 7
+            \item prioridad(false()): return 7
+            \item prioridad(iden(\_)): return 7
+            \item prioridad(null()): return 7
         \end{itemize}
     
 
