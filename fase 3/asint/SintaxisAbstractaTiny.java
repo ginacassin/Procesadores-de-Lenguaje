@@ -64,6 +64,8 @@ public class SintaxisAbstractaTiny {
         public String getNum() {throw new UnsupportedOperationException();}
         public String getCadena() {throw new UnsupportedOperationException();}
         public String getId() {throw new UnsupportedOperationException();}
+        public Exp getIndex() {throw new UnsupportedOperationException();}
+        public Exp getOpnd() {throw new UnsupportedOperationException();}
         public abstract int prioridad();
     }
 
@@ -696,7 +698,7 @@ public class SintaxisAbstractaTiny {
         public ParamsR() {
             super();
         }
-        public ParamsRL getParamrl() { throw new UnsupportedOperationException();}
+        public ParamsRL getParamsrl() { throw new UnsupportedOperationException();}
     }
     public static class Si_ParamsR extends ParamsR {
         private ParamsRL paramsrl;
