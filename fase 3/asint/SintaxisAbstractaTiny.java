@@ -14,7 +14,7 @@ public class SintaxisAbstractaTiny {
     }
 
     private static void imprimeExpUnarioPrefijo(Exp opnd, String op, int np) {
-        System.out.println(op + " ");
+        System.out.println(op);
         imprimeOpnd(opnd,np);
     }
 
@@ -1827,7 +1827,6 @@ public class SintaxisAbstractaTiny {
         public void imprime() {
             decsAux.imprime();
             System.out.println(";");
-            System.out.println();
             dec.imprime();
 
         }
