@@ -3,6 +3,22 @@ package asint;
 
 public class SintaxisAbstractaTiny {
 
+    private static void imprimeOpnd(Exp opnd, int np) {
+        if (opnd.prioridad() < np) {System.out.print("(");};
+        opnd.imprime();
+        if (opnd.prioridad() < np) {System.out.print(")");};
+    }
+    private static void imprimeExpBin(Exp opnd0, String op, Exp opnd1, int np0, int np1) {
+        imprimeOpnd(opnd0,np0);
+        System.out.print(" "+op+" ");
+        imprimeOpnd(opnd1,np1);
+    }
+
+    private static void imprimeExpUnarioPrefijo(Exp opnd, String op, int np) {
+        System.out.print(op + " ");
+        imprimeOpnd(opnd,np);
+    }
+
     // clase que permite consultar las coordenadas del nodo en el texto
     // fuente para comunicar errores o consultar identificadores
     public static abstract class Nodo  {
@@ -25,6 +41,8 @@ public class SintaxisAbstractaTiny {
         public int leeCol() {
             return col;
         }
+
+        public abstract void imprime();
     }
 
 
@@ -36,6 +54,7 @@ public class SintaxisAbstractaTiny {
         public String valor() {throw new UnsupportedOperationException();}
         public Exp getOpnd0() {throw new UnsupportedOperationException();}
         public Exp getOpnd1() {throw new UnsupportedOperationException();}
+        public abstract int prioridad();
     }
 
     private static abstract class ExpBin extends Exp {
@@ -72,6 +91,14 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "suma("+opnd0+","+opnd1+")";
         }
+        @Override
+        public void imprime() {
+            imprimeExpBin(opnd0,"+",opnd1,2,3);
+        }
+        @Override
+        public int prioridad() {
+            return 2;
+        }
     }
     public static class Resta extends ExpBin {
         public Resta(Exp opnd0, Exp opnd1) {
@@ -79,6 +106,14 @@ public class SintaxisAbstractaTiny {
         }
         public String toString() {
             return "resta("+opnd0+","+opnd1+")";
+        }
+        @Override
+        public void imprime() {
+            imprimeExpBin(opnd0,"-",opnd1,3,3);
+        }
+        @Override
+        public int prioridad() {
+            return 2;
         }
     }
     public static class Mul extends ExpBin {
@@ -88,6 +123,14 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "mul("+opnd0+","+opnd1+")";
         }
+        @Override
+        public void imprime() {
+            imprimeExpBin(opnd0,"*",opnd1,4,5);
+        }
+        @Override
+        public int prioridad() {
+            return 4;
+        }
     }
     public static class Div extends ExpBin {
         public Div(Exp opnd0, Exp opnd1) {
@@ -95,6 +138,14 @@ public class SintaxisAbstractaTiny {
         }
         public String toString() {
             return "div("+opnd0+","+opnd1+")";
+        }
+        @Override
+        public void imprime() {
+            imprimeExpBin(opnd0,"/",opnd1,4,5);
+        }
+        @Override
+        public int prioridad() {
+            return 4;
         }
     }
     public static class Asignacion extends ExpBin {
@@ -104,6 +155,14 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "asig("+opnd0+","+opnd1+")";
         }
+        @Override
+        public void imprime() {
+            imprimeExpBin(opnd0,"=",opnd1,1,0);
+        }
+        @Override
+        public int prioridad() {
+            return 0;
+        }
     }
     public static class Menor extends ExpBin {
         public Menor(Exp opnd0, Exp opnd1) {
@@ -111,6 +170,14 @@ public class SintaxisAbstractaTiny {
         }
         public String toString() {
             return "menor("+opnd0+","+opnd1+")";
+        }
+        @Override
+        public void imprime() {
+            imprimeExpBin(opnd0,"<",opnd1,1,2);
+        }
+        @Override
+        public int prioridad() {
+            return 1;
         }
     }
     public static class Mayor extends ExpBin {
@@ -120,6 +187,14 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "mayor("+opnd0+","+opnd1+")";
         }
+        @Override
+        public void imprime() {
+            imprimeExpBin(opnd0,">",opnd1,1,2);
+        }
+        @Override
+        public int prioridad() {
+            return 1;
+        }
     }
     public static class MenorIgual extends ExpBin {
         public MenorIgual(Exp opnd0, Exp opnd1) {
@@ -127,6 +202,14 @@ public class SintaxisAbstractaTiny {
         }
         public String toString() {
             return "menor_igual("+opnd0+","+opnd1+")";
+        }
+        @Override
+        public void imprime() {
+            imprimeExpBin(opnd0,"<=",opnd1,1,2);
+        }
+        @Override
+        public int prioridad() {
+            return 1;
         }
     }
     public static class MayorIgual extends ExpBin {
@@ -136,6 +219,14 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "mayor_igual("+opnd0+","+opnd1+")";
         }
+        @Override
+        public void imprime() {
+            imprimeExpBin(opnd0,">=",opnd1,1,2);
+        }
+        @Override
+        public int prioridad() {
+            return 1;
+        }
     }
     public static class Igual extends ExpBin {
         public Igual(Exp opnd0, Exp opnd1) {
@@ -143,6 +234,14 @@ public class SintaxisAbstractaTiny {
         }
         public String toString() {
             return "igual("+opnd0+","+opnd1+")";
+        }
+        @Override
+        public void imprime() {
+            imprimeExpBin(opnd0,"==",opnd1,1,2);
+        }
+        @Override
+        public int prioridad() {
+            return 1;
         }
     }
     public static class NoIgual extends ExpBin {
@@ -152,6 +251,14 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "no_igual("+opnd0+","+opnd1+")";
         }
+        @Override
+        public void imprime() {
+            imprimeExpBin(opnd0,"!=",opnd1,1,2);
+        }
+        @Override
+        public int prioridad() {
+            return 1;
+        }
     }
     public static class And extends ExpBin {
         public And(Exp opnd0, Exp opnd1) {
@@ -159,6 +266,14 @@ public class SintaxisAbstractaTiny {
         }
         public String toString() {
             return "and("+opnd0+","+opnd1+")";
+        }
+        @Override
+        public void imprime() {
+            imprimeExpBin(opnd0,"and",opnd1,4,3);
+        }
+        @Override
+        public int prioridad() {
+            return 3;
         }
     }
     public static class Or extends ExpBin {
@@ -168,6 +283,14 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "or("+opnd0+","+opnd1+")";
         }
+        @Override
+        public void imprime() {
+            imprimeExpBin(opnd0,"or",opnd1,4,4);
+        }
+        @Override
+        public int prioridad() {
+            return 3;
+        }
     }
     public static class Mod extends ExpBin {
         public Mod(Exp opnd0, Exp opnd1) {
@@ -175,6 +298,14 @@ public class SintaxisAbstractaTiny {
         }
         public String toString() {
             return "mod("+opnd0+","+opnd1+")";
+        }
+        @Override
+        public void imprime() {
+            imprimeExpBin(opnd0,"%",opnd1,4,5);
+        }
+        @Override
+        public int prioridad() {
+            return 4;
         }
     }
 
@@ -186,6 +317,14 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "negativo("+opnd0+")";
         }
+        @Override
+        public void imprime() {
+            imprimeExpUnarioPrefijo(opnd0,"-",5);
+        }
+        @Override
+        public int prioridad() {
+            return 5;
+        }
     }
     public static class Not extends ExpUn {
         public Not(Exp opnd0) {
@@ -194,6 +333,14 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "not("+opnd0+")";
         }
+        @Override
+        public void imprime() {
+            imprimeExpUnarioPrefijo(opnd0,"not",5);
+        }
+        @Override
+        public int prioridad() {
+            return 5;
+        }
     }
     public static class Indireccion extends ExpUn {
         public Indireccion(Exp opnd0) {
@@ -201,6 +348,15 @@ public class SintaxisAbstractaTiny {
         }
         public String toString() {
             return "indireccion("+opnd0+")";
+        }
+        @Override
+        public void imprime() {
+            imprimeOpnd(opnd0,6);
+            System.out.print("^");
+        }
+        @Override
+        public int prioridad() {
+            return 6;
         }
     }
 
@@ -221,6 +377,17 @@ public class SintaxisAbstractaTiny {
         public Exp getOpnd() {
             return opnd;
         }
+        @Override
+        public void imprime() {
+            imprimeOpnd(opnd,6);
+            System.out.print("[");
+            index.imprime();
+            System.out.print("]");
+        }
+        @Override
+        public int prioridad() {
+            return 6;
+        }
     }
 
     public static class Acceso extends Exp {
@@ -237,8 +404,17 @@ public class SintaxisAbstractaTiny {
         public String getIden() {
             return iden;
         }
+        @Override
+        public int prioridad() {
+            return 6;
+        }
         public Exp getOpnd() {
             return opnd;
+        }
+        @Override
+        public void imprime() {
+            imprimeOpnd(opnd,6);
+            System.out.print("." + iden);
         }
     }
 
@@ -255,6 +431,14 @@ public class SintaxisAbstractaTiny {
         public String getNum() {
             return num;
         }
+        @Override
+        public void imprime() {
+            System.out.print(num);
+        }
+        @Override
+        public int prioridad() {
+            return 7;
+        }
     }
     public static class Lit_real extends Exp {
         private String num;
@@ -268,6 +452,14 @@ public class SintaxisAbstractaTiny {
         public String getNum() {
             return num;
         }
+        @Override
+        public void imprime() {
+            System.out.print(num);
+        }
+        @Override
+        public int prioridad() {
+            return 7;
+        }
     }
     public static class True extends Exp {
         public True() {
@@ -275,6 +467,14 @@ public class SintaxisAbstractaTiny {
         }
         public String toString() {
             return "true(["+leeFila()+","+leeCol()+"])";
+        }
+        @Override
+        public int prioridad() {
+            return 7;
+        }
+        @Override
+        public void imprime() {
+            System.out.print("true");
         }
     }
     public static class False extends Exp {
@@ -284,6 +484,15 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "false(["+leeFila()+","+leeCol()+"])";
         }
+        @Override
+        public int prioridad() {
+            return 7;
+        }
+        @Override
+        public void imprime() {
+            System.out.print("false");
+        }
+
     }
     public static class Lit_cadena extends Exp {
         private String cadena;
@@ -296,6 +505,14 @@ public class SintaxisAbstractaTiny {
         }
         public String getCadena() {
             return cadena;
+        }
+        @Override
+        public void imprime() {
+            System.out.print(cadena);
+        }
+        @Override
+        public int prioridad() {
+            return 7;
         }
     }
     public static class Iden extends Exp {
@@ -310,6 +527,14 @@ public class SintaxisAbstractaTiny {
         public String getId() {
             return id;
         }
+        @Override
+        public void imprime() {
+            System.out.print(id);
+        }
+        @Override
+        public int prioridad() {
+            return 7;
+        }
     }
     public static class Null extends Exp {
         public Null() {
@@ -318,8 +543,15 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "null(["+leeFila()+","+leeCol()+"])";
         }
+        @Override
+        public int prioridad() {
+            return 7;
+        }
+        @Override
+        public void imprime() {
+            System.out.print("null");
+        }
     }
-
 
 
     public static abstract class ParamsR extends Nodo {
@@ -339,11 +571,20 @@ public class SintaxisAbstractaTiny {
         public ParamsRL getParamsrl() {
             return paramsrl;
         }
+
+        @Override
+        public void imprime() {
+            paramsrl.imprime();
+        }
     }
     public static class No_ParamsR extends ParamsR {
         public No_ParamsR() {
             super();
         }
+
+        @Override
+        public void imprime() { }
+
         public String toString() {
             return "no_paramsR()";
         }
@@ -371,6 +612,13 @@ public class SintaxisAbstractaTiny {
         public ParamsRL getParamrl() {
             return paramrl;
         }
+
+        @Override
+        public void imprime() {
+            paramrl.imprime();
+            System.out.print(",");
+            exp.imprime();
+        }
     }
     public static class Un_ParamsR extends ParamsRL {
         private Exp exp;
@@ -383,6 +631,11 @@ public class SintaxisAbstractaTiny {
         }
         public Exp getExp() {
             return exp;
+        }
+
+        @Override
+        public void imprime() {
+            exp.imprime();
         }
     }
 
@@ -403,11 +656,19 @@ public class SintaxisAbstractaTiny {
         public InstsAux getInstsAux() {
             return instsAux;
         }
+        @Override
+        public void imprime() {
+            instsAux.imprime();
+        }
     }
     public static class No_Instr extends Insts {
         public No_Instr() {
             super();
         }
+
+        @Override
+        public void imprime() { }
+
         public String toString() {
             return "no_instr()";
         }
@@ -435,6 +696,13 @@ public class SintaxisAbstractaTiny {
         public InstsAux getInstsAux() {
             return instsAux;
         }
+
+        @Override
+        public void imprime() {
+            instsAux.imprime();
+            System.out.print(";");
+            inst.imprime();
+        }
     }
     public static class Una_Instr extends InstsAux {
         private Inst inst;
@@ -447,6 +715,11 @@ public class SintaxisAbstractaTiny {
         }
         public Inst getInst() {
             return inst;
+        }
+
+        @Override
+        public void imprime() {
+            inst.imprime();
         }
     }
 
@@ -467,6 +740,11 @@ public class SintaxisAbstractaTiny {
         public Exp getExp() {
             return exp;
         }
+        @Override
+        public void imprime() {
+            System.out.print("@");
+            exp.imprime();
+        }
     }
     public static class Instr_If extends Inst {
         private Exp exp;
@@ -484,6 +762,12 @@ public class SintaxisAbstractaTiny {
         }
         public Exp getExp() {
             return exp;
+        }
+        @Override
+        public void imprime() {
+            System.out.print("if");
+            exp.imprime();
+            bloq.imprime();
         }
     }
     public static class Instr_If_Else extends Inst {
@@ -509,6 +793,15 @@ public class SintaxisAbstractaTiny {
         public Exp getExp() {
             return exp;
         }
+
+        @Override
+        public void imprime() {
+            System.out.print("if");
+            exp.imprime();
+            bloq1.imprime();
+            System.out.print("else");
+            bloq2.imprime();
+        }
     }
     public static class Instr_While extends Inst {
         private Exp exp;
@@ -527,6 +820,12 @@ public class SintaxisAbstractaTiny {
         public Exp getExp() {
             return exp;
         }
+        @Override
+        public void imprime() {
+            System.out.print("while");
+            exp.imprime();
+            bloq.imprime();
+        }
     }
     public static class Instr_Read extends Inst {
         private Exp exp;
@@ -539,6 +838,11 @@ public class SintaxisAbstractaTiny {
         }
         public Exp getExp() {
             return exp;
+        }
+        @Override
+        public void imprime() {
+            System.out.print("read");
+            exp.imprime();
         }
     }
     public static class Instr_Write extends Inst {
@@ -553,11 +857,22 @@ public class SintaxisAbstractaTiny {
         public Exp getExp() {
             return exp;
         }
+        @Override
+        public void imprime() {
+            System.out.print("write");
+            exp.imprime();
+        }
     }
     public static class Instr_Nl extends Inst {
         public Instr_Nl() {
             super();
         }
+
+        @Override
+        public void imprime() {
+            System.out.print("nl");
+        }
+
         public String toString() {
             return "instr_nl()";
         }
@@ -574,6 +889,12 @@ public class SintaxisAbstractaTiny {
         public Exp getExp() {
             return exp;
         }
+
+        @Override
+        public void imprime() {
+            System.out.print("new");
+            exp.imprime();
+        }
     }
     public static class Instr_Del extends Inst {
         private Exp exp;
@@ -586,6 +907,12 @@ public class SintaxisAbstractaTiny {
         }
         public Exp getExp() {
             return exp;
+        }
+
+        @Override
+        public void imprime() {
+            System.out.print("delete");
+            exp.imprime();
         }
     }
     public static class Instr_Call extends Inst {
@@ -605,6 +932,15 @@ public class SintaxisAbstractaTiny {
         public ParamsR getParamsR() {
             return paramsR;
         }
+
+        @Override
+        public void imprime() {
+            System.out.print("call");
+            System.out.print(iden);
+            System.out.print("(");
+            paramsR.imprime();
+            System.out.print(")");
+        }
     }
     public static class Instr_Bloque extends Inst {
         private Bloq bloq;
@@ -617,6 +953,11 @@ public class SintaxisAbstractaTiny {
         }
         public Bloq getBloq() {
             return bloq;
+        }
+
+        @Override
+        public void imprime() {
+            bloq.imprime();
         }
     }
 
@@ -636,6 +977,11 @@ public class SintaxisAbstractaTiny {
         }
         public T getTipo() {
             return tipo;
+        }
+        @Override
+        public void imprime() {
+            tipo.imprime();
+            System.out.print(iden);
         }
     }
 
@@ -663,6 +1009,12 @@ public class SintaxisAbstractaTiny {
         public LCampos getlCampos() {
             return lCampos;
         }
+        @Override
+        public void imprime() {
+            lCampos.imprime();
+            System.out.print(",");
+            campo.imprime();
+        }
     }
     public static class Un_Campo extends LCampos {
         private Campo campo;
@@ -675,6 +1027,10 @@ public class SintaxisAbstractaTiny {
         }
         public Campo getCampo() {
             return campo;
+        }
+        @Override
+        public void imprime() {
+            campo.imprime();
         }
     }
 
@@ -703,6 +1059,13 @@ public class SintaxisAbstractaTiny {
         public T getTipo() {
             return tipo;
         }
+        @Override
+        public void imprime() {
+            tipo.imprime();
+            System.out.print("[");
+            System.out.print(litEnt);
+            System.out.print("]");
+        }
     }
     public static class TipoPunt extends T {
         private T tipo;
@@ -715,6 +1078,11 @@ public class SintaxisAbstractaTiny {
         }
         public T getTipo() {
             return tipo;
+        }
+        @Override
+        public void imprime() {
+            System.out.print("^");
+            tipo.imprime();
         }
     }
     public static class TipoStruct extends T {
@@ -729,25 +1097,47 @@ public class SintaxisAbstractaTiny {
         public LCampos getlCampos() {
             return lCampos;
         }
+        @Override
+        public void imprime() {
+            System.out.print("struct{");
+            lCampos.imprime();
+            System.out.print("}");
+        }
     }
     public static class TipoInt extends T {
         public TipoInt() {
             super();
+        }
+        @Override
+        public void imprime() {
+            System.out.print("int");
         }
     }
     public static class TipoReal extends T {
         public TipoReal() {
             super();
         }
+        @Override
+        public void imprime() {
+            System.out.print("real");
+        }
     }
     public static class TipoBool extends T {
         public TipoBool() {
             super();
         }
+        @Override
+        public void imprime() {
+            System.out.print("bool");
+        }
     }
     public static class TipoString extends T {
         public TipoString() {
             super();
+        }
+        @Override
+        public void imprime() {
+            System.out.print("string");
         }
     }
     public static class Identificador extends T {
@@ -761,6 +1151,10 @@ public class SintaxisAbstractaTiny {
         }
         public String getIden() {
             return iden;
+        }
+        @Override
+        public void imprime() {
+            System.out.print(iden);
         }
     }
 
@@ -789,6 +1183,12 @@ public class SintaxisAbstractaTiny {
         public T getTipo() {
             return tipo;
         }
+        @Override
+        public void imprime() {
+            tipo.imprime();
+            System.out.print("&");
+            System.out.print(iden);
+        }
     }
     public static class ParamNoRef extends Param {
         private T tipo;
@@ -806,6 +1206,11 @@ public class SintaxisAbstractaTiny {
         }
         public T getTipo() {
             return tipo;
+        }
+        @Override
+        public void imprime() {
+            tipo.imprime();
+            System.out.print(iden);
         }
     }
 
@@ -827,6 +1232,10 @@ public class SintaxisAbstractaTiny {
         public ParamsFL getParamsFL() {
             return paramsFL;
         }
+        @Override
+        public void imprime() {
+            paramsFL.imprime();
+        }
     }
     public static class NoParamF extends ParamsF {
         public NoParamF() {
@@ -835,6 +1244,8 @@ public class SintaxisAbstractaTiny {
         public String toString() {
             return "no_paramF()";
         }
+        @Override
+        public void imprime() { }
     }
 
     public static abstract class ParamsFL extends Nodo {
@@ -861,6 +1272,12 @@ public class SintaxisAbstractaTiny {
         public ParamsFL getParamsFL() {
             return paramsFL;
         }
+        @Override
+        public void imprime() {
+            paramsFL.imprime();
+            System.out.print(",");
+            param.imprime();
+        }
     }
     public static class UnParamF extends ParamsFL {
         private Param param;
@@ -873,6 +1290,10 @@ public class SintaxisAbstractaTiny {
         }
         public Param getParam() {
             return param;
+        }
+        @Override
+        public void imprime() {
+            param.imprime();
         }
     }
 
@@ -902,6 +1323,11 @@ public class SintaxisAbstractaTiny {
         public T getTipo() {
             return tipo;
         }
+        @Override
+        public void imprime() {
+            tipo.imprime();
+            System.out.print(iden);
+        }
     }
     public static class DecTipo extends Dec {
         private T tipo;
@@ -919,6 +1345,12 @@ public class SintaxisAbstractaTiny {
         }
         public T getTipo() {
             return tipo;
+        }
+        @Override
+        public void imprime() {
+            System.out.print("type ");
+            tipo.imprime();
+            System.out.print(iden);
         }
     }
     public static class DecProc extends Dec {
@@ -943,6 +1375,15 @@ public class SintaxisAbstractaTiny {
         public ParamsF getParamsF() {
             return paramsF;
         }
+        @Override
+        public void imprime() {
+            System.out.print("proc ");
+            System.out.print(iden);
+            System.out.print("(");
+            paramsF.imprime();
+            System.out.print(")");
+            bloq.imprime();
+        }
     }
 
     public static abstract class Decs extends Nodo {
@@ -963,11 +1404,19 @@ public class SintaxisAbstractaTiny {
         public DecsAux getDecsAux() {
             return decsAux;
         }
+        @Override
+        public void imprime() {
+            decsAux.imprime();
+            System.out.print("&&");
+        }
     }
     public static class NoDecs extends Decs {
         public NoDecs() {
             super();
         }
+
+        @Override
+        public void imprime() { }
     }
 
     public static abstract class DecsAux extends Nodo {
@@ -994,6 +1443,13 @@ public class SintaxisAbstractaTiny {
         public DecsAux getDecsAux() {
             return decsAux;
         }
+        @Override
+        public void imprime() {
+            decsAux.imprime();
+            System.out.print(";");
+            System.out.println();
+            dec.imprime();
+        }
     }
     public static class UnaDec extends DecsAux {
         private Dec dec;
@@ -1006,6 +1462,10 @@ public class SintaxisAbstractaTiny {
         }
         public Dec getDec() {
             return dec;
+        }
+        @Override
+        public void imprime() {
+            dec.imprime();
         }
     }
 
@@ -1026,6 +1486,16 @@ public class SintaxisAbstractaTiny {
         public Insts getInsts() {
             return insts;
         }
+
+        @Override
+        public void imprime() {
+            System.out.print("{");
+            System.out.println();
+            decs.imprime();
+            insts.imprime();
+            System.out.println();
+            System.out.print("}");
+        }
     }
 
     public static class Prog extends Nodo {
@@ -1039,6 +1509,10 @@ public class SintaxisAbstractaTiny {
         }
         public Bloq getBloq() {
             return bloq;
+        }
+        @Override
+        public void imprime() {
+            bloq.imprime();
         }
     }
 
