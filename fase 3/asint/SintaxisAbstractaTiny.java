@@ -326,6 +326,7 @@ public class SintaxisAbstractaTiny {
         public ParamsR() {
             super();
         }
+        public ParamsRL getParamrl() { throw new UnsupportedOperationException();}
     }
     public static class Si_ParamsR extends ParamsR {
         private ParamsRL paramsrl;
@@ -353,6 +354,8 @@ public class SintaxisAbstractaTiny {
         public ParamsRL() {
             super();
         }
+        public Exp getExp() { throw new UnsupportedOperationException();}
+        public ParamsRL getParamrl() { throw new UnsupportedOperationException();}
     }
     public static class Muchos_ParamsR extends ParamsRL {
         private ParamsRL paramrl;
@@ -390,6 +393,7 @@ public class SintaxisAbstractaTiny {
         public Insts() {
             super();
         }
+        public InstsAux getInstsAux() { throw new UnsupportedOperationException();}
     }
     public static class Si_Instr extends Insts {
         private InstsAux instsAux;
@@ -417,6 +421,8 @@ public class SintaxisAbstractaTiny {
         public InstsAux() {
             super();
         }
+        public Inst getInst() { throw new UnsupportedOperationException();}
+        public InstsAux getInstsAux() { throw new UnsupportedOperationException();}
     }
     public static class Muchas_Instr extends InstsAux {
         private InstsAux instsAux;
@@ -454,6 +460,12 @@ public class SintaxisAbstractaTiny {
         public Inst() {
             super();
         }
+        public Exp getExp() { throw new UnsupportedOperationException();}
+        public Bloq getBloq() { throw new UnsupportedOperationException();}
+        public Bloq getBloq1() { throw new UnsupportedOperationException();}
+        public Bloq getBloq2() { throw new UnsupportedOperationException();}
+        public String getIden() { throw new UnsupportedOperationException();}
+        public ParamsR getParamsR() { throw new UnsupportedOperationException();}
     }
     public static class Instr_Expr extends Inst {
         private Exp exp;
@@ -685,6 +697,8 @@ public class SintaxisAbstractaTiny {
         }
         public LCampos getlCampos() { throw new UnsupportedOperationException();}
         public T getTipo() { throw new UnsupportedOperationException();}
+        public String getLitEnt() { throw new UnsupportedOperationException();}
+        public String getIden() { throw new UnsupportedOperationException();}
     }
     public static class TipoArray extends T {
         private T tipo;
