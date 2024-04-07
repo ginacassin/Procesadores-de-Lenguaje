@@ -49,7 +49,7 @@ public class SintaxisAbstractaTiny {
         // Función auxiliar para generar vínculo al texto fuente de tipo
         // $f:num fila,c: num col$
         public String getFilaColInfo() {
-            return "$f:" + leeFila() + ",c:" + leeCol() + "$";
+            return "$f:" + (leeFila() + 1) + ",c:" + leeCol() + "$";
         }
     }
 
@@ -445,7 +445,7 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             imprimeOpnd(opnd0,6);
-            System.out.println("^");
+            System.out.println("^" + getFilaColInfo());
         }
         @Override
         public int prioridad() {
@@ -478,7 +478,7 @@ public class SintaxisAbstractaTiny {
         @Override
         public void imprime() {
             imprimeOpnd(opnd,6);
-            System.out.println("[");
+            System.out.println("[" + getFilaColInfo());
             index.imprime();
             System.out.println("]");
         }
@@ -542,7 +542,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            System.out.println(num);
+            System.out.println(num + getFilaColInfo());
         }
         @Override
         public int prioridad() {
@@ -568,7 +568,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            System.out.println(num);
+            System.out.println(num + getFilaColInfo());
         }
         @Override
         public int prioridad() {
@@ -593,7 +593,7 @@ public class SintaxisAbstractaTiny {
         }
         @Override
         public void imprime() {
-            System.out.println("<true>");
+            System.out.println("<true>" + getFilaColInfo());
 
         }
     }
@@ -614,7 +614,7 @@ public class SintaxisAbstractaTiny {
         }
         @Override
         public void imprime() {
-            System.out.println("<false>");
+            System.out.println("<false>" + getFilaColInfo());
         }
 
 
@@ -637,7 +637,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            System.out.println(cadena);
+            System.out.println(cadena + getFilaColInfo());
         }
         @Override
         public int prioridad() {
@@ -663,7 +663,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            System.out.println(id);
+            System.out.println(id + getFilaColInfo());
         }
         @Override
         public int prioridad() {
@@ -688,7 +688,7 @@ public class SintaxisAbstractaTiny {
         }
         @Override
         public void imprime() {
-            System.out.println("<null>");
+            System.out.println("<null>" + getFilaColInfo());
 
         }
     }
