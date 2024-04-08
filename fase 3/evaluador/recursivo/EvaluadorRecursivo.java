@@ -1,4 +1,4 @@
-package evaluador;
+package evaluador.recursivo;
 
 public class EvaluadorRecursivo extends Evaluador {
     private void imprime(String str) {
@@ -8,7 +8,7 @@ public class EvaluadorRecursivo extends Evaluador {
         // System.out.println();
     }
     private String getFilaColInfo(Nodo n) {
-        return "$f:"+(n.leeFila() + 1)+",c:"+n.leeCol()+"$";
+        return "$f:"+(n.leeFila())+",c:"+n.leeCol()+"$";
     }
 
 
@@ -123,7 +123,7 @@ public class EvaluadorRecursivo extends Evaluador {
             imprime("<string>");
         }
         else if (claseDe(tipo, Identificador.class)) {
-            imprime(tipo.getIden());
+            imprime(tipo.getIden() + getFilaColInfo(tipo));
         }
     }
 
@@ -226,7 +226,7 @@ public class EvaluadorRecursivo extends Evaluador {
     }
 
     private void muestraParamsR(ParamsRL paramsRL) {
-        if (claseDe(paramsRL, MuchosParamsF.class)) {
+        if (claseDe(paramsRL, Muchos_ParamsR.class)) {
             muestraParamsR(paramsRL.getParamrl());
             imprime(",");
             muestraExp(paramsRL.getExp());
@@ -238,52 +238,52 @@ public class EvaluadorRecursivo extends Evaluador {
 
     private void muestraExp(Exp exp) {
         if (claseDe(exp, Asignacion.class)) {
-            muestraExpBin(exp.getOpnd0(), "=", exp.getOpnd1(), 1, 0);
+            muestraExpBin(exp.getOpnd0(), "=" + getFilaColInfo(exp), exp.getOpnd1(), 1, 0);
         }
         else if (claseDe(exp, Menor.class)) {
-            muestraExpBin(exp.getOpnd0(), "<", exp.getOpnd1(), 1, 2);
+            muestraExpBin(exp.getOpnd0(), "<" + getFilaColInfo(exp), exp.getOpnd1(), 1, 2);
         }
         else if (claseDe(exp, Mayor.class)) {
-            muestraExpBin(exp.getOpnd0(), ">", exp.getOpnd1(), 1, 2);
+            muestraExpBin(exp.getOpnd0(), ">" + getFilaColInfo(exp), exp.getOpnd1(), 1, 2);
         }
         else if (claseDe(exp, MenorIgual.class)) {
-            muestraExpBin(exp.getOpnd0(), "<=", exp.getOpnd1(), 1, 2);
+            muestraExpBin(exp.getOpnd0(), "<=" + getFilaColInfo(exp), exp.getOpnd1(), 1, 2);
         }
         else if (claseDe(exp, MayorIgual.class)) {
-            muestraExpBin(exp.getOpnd0(), ">=", exp.getOpnd1(), 1, 2);
+            muestraExpBin(exp.getOpnd0(), ">=" + getFilaColInfo(exp), exp.getOpnd1(), 1, 2);
         }
         else if (claseDe(exp, Igual.class)) {
-            muestraExpBin(exp.getOpnd0(), "==", exp.getOpnd1(), 1, 2);
+            muestraExpBin(exp.getOpnd0(), "==" + getFilaColInfo(exp), exp.getOpnd1(), 1, 2);
         }
         else if (claseDe(exp, NoIgual.class)) {
-            muestraExpBin(exp.getOpnd0(), "!=", exp.getOpnd1(), 1, 2);
+            muestraExpBin(exp.getOpnd0(), "!=" + getFilaColInfo(exp), exp.getOpnd1(), 1, 2);
         }
         else if (claseDe(exp, Suma.class)) {
-            muestraExpBin(exp.getOpnd0(), "+", exp.getOpnd1(), 2, 3);
+            muestraExpBin(exp.getOpnd0(), "+" + getFilaColInfo(exp), exp.getOpnd1(), 2, 3);
         }
         else if (claseDe(exp, Resta.class)) {
-            muestraExpBin(exp.getOpnd0(), "-", exp.getOpnd1(), 3, 3);
+            muestraExpBin(exp.getOpnd0(), "-" + getFilaColInfo(exp), exp.getOpnd1(), 3, 3);
         }
         else if (claseDe(exp, And.class)) {
-            muestraExpBin(exp.getOpnd0(), "<and>", exp.getOpnd1(), 4, 3);
+            muestraExpBin(exp.getOpnd0(), "<and>" + getFilaColInfo(exp), exp.getOpnd1(), 4, 3);
         }
         else if (claseDe(exp, Or.class)) {
-            muestraExpBin(exp.getOpnd0(), "<or>", exp.getOpnd1(), 4, 4);
+            muestraExpBin(exp.getOpnd0(), "<or>" + getFilaColInfo(exp), exp.getOpnd1(), 4, 4);
         }
         else if (claseDe(exp, Mul.class)) {
-            muestraExpBin(exp.getOpnd0(), "*", exp.getOpnd1(), 4, 5);
+            muestraExpBin(exp.getOpnd0(), "*" + getFilaColInfo(exp), exp.getOpnd1(), 4, 5);
         }
         else if (claseDe(exp, Div.class)) {
-            muestraExpBin(exp.getOpnd0(), "/", exp.getOpnd1(), 4, 5);
+            muestraExpBin(exp.getOpnd0(), "/" + getFilaColInfo(exp), exp.getOpnd1(), 4, 5);
         }
         else if (claseDe(exp, Mod.class)) {
-            muestraExpBin(exp.getOpnd0(), "%", exp.getOpnd1(), 4, 5);
+            muestraExpBin(exp.getOpnd0(), "%" + getFilaColInfo(exp), exp.getOpnd1(), 4, 5);
         }
         else if (claseDe(exp, Negativo.class)) {
-            muestraExpUn(exp.getOpnd0(), "-", 5);
+            muestraExpUn(exp.getOpnd0(), "-" + getFilaColInfo(exp), 5);
         }
         else if (claseDe(exp, Not.class)) {
-            muestraExpUn(exp.getOpnd0(), "<not>", 5);
+            muestraExpUn(exp.getOpnd0(), "<not>" + getFilaColInfo(exp), 5);
         }
         else if (claseDe(exp, Index.class)) {
             muestraOpnd(exp.getOpnd(), 6);

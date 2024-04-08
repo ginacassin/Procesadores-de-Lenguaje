@@ -1,4 +1,4 @@
-package evaluador;
+package evaluador.recursivo;
 
 import asint.SintaxisAbstractaTiny;
 
