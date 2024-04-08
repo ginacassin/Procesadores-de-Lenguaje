@@ -144,14 +144,14 @@ T tipo; Token id; ParamsF paramsF; Bloq bloq;
       case 44:{
         tipo = tipo0();
         id = jj_consume_token(iden);
-{if ("" != null) return (Dec)sem.dec_var(tipo, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+{if ("" != null) return (Dec)sem.dec_var(tipo, id.image).ponFila(id.beginLine + 1).ponCol(id.beginColumn);}
         break;
         }
       case type:{
         jj_consume_token(type);
         tipo = tipo0();
         id = jj_consume_token(iden);
-{if ("" != null) return (Dec)sem.dec_tipo(tipo, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+{if ("" != null) return (Dec)sem.dec_tipo(tipo, id.image).ponFila(id.beginLine + 1).ponCol(id.beginColumn);}
         break;
         }
       case proc:{
@@ -159,7 +159,7 @@ T tipo; Token id; ParamsF paramsF; Bloq bloq;
         id = jj_consume_token(iden);
         paramsF = paramsFormales();
         bloq = bloque();
-{if ("" != null) return (Dec)sem.dec_proc(id.image, paramsF, bloq).ponFila(id.beginLine).ponCol(id.beginColumn);}
+{if ("" != null) return (Dec)sem.dec_proc(id.image, paramsF, bloq).ponFila(id.beginLine + 1).ponCol(id.beginColumn);}
         break;
         }
       default:
@@ -269,12 +269,12 @@ Token id;
       case 41:{
         jj_consume_token(41);
         id = jj_consume_token(iden);
-{if ("" != null) return (Param)sem.param_ref(tipoh, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+{if ("" != null) return (Param)sem.param_ref(tipoh, id.image).ponFila(id.beginLine + 1).ponCol(id.beginColumn);}
         break;
         }
       case iden:{
         id = jj_consume_token(iden);
-{if ("" != null) return (Param)sem.param(tipoh, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+{if ("" != null) return (Param)sem.param(tipoh, id.image).ponFila(id.beginLine + 1).ponCol(id.beginColumn);}
         break;
         }
       default:
@@ -310,7 +310,7 @@ Token litEntero; T recArray;
         jj_consume_token(42);
         litEntero = jj_consume_token(literalEntero);
         jj_consume_token(43);
-        recArray = recArray((T)sem.tipo_array(tipoh, litEntero.image).ponFila(litEntero.beginLine).ponCol(litEntero.beginColumn));
+        recArray = recArray((T)sem.tipo_array(tipoh, litEntero.image).ponFila(litEntero.beginLine + 1).ponCol(litEntero.beginColumn));
 {if ("" != null) return recArray;}
         break;
         }
@@ -391,7 +391,7 @@ LCampos lCampos; Token id;
         }
       case iden:{
         id = jj_consume_token(iden);
-{if ("" != null) return (T)sem.tipo_iden(id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+{if ("" != null) return (T)sem.tipo_iden(id.image).ponFila(id.beginLine + 1).ponCol(id.beginColumn);}
         break;
         }
       default:
@@ -446,7 +446,7 @@ LCampos lCampos; Campo campo;
 T tipo; Token id;
       tipo = tipo0();
       id = jj_consume_token(iden);
-{if ("" != null) return (Campo)sem.campo(tipo, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+{if ("" != null) return (Campo)sem.campo(tipo, id.image).ponFila(id.beginLine + 1).ponCol(id.beginColumn);}
     throw new Error("Missing return statement in function");
     } finally {
       trace_return("campo");
@@ -576,7 +576,7 @@ Exp exp; Bloq bloq1; Token id; ParamsR paramsR; Inst inst;
         jj_consume_token(call);
         id = jj_consume_token(iden);
         paramsR = paramsReales();
-{if ("" != null) return (Inst)sem.instr_call(id.image, paramsR).ponFila(id.beginLine).ponCol(id.beginColumn);}
+{if ("" != null) return (Inst)sem.instr_call(id.image, paramsR).ponFila(id.beginLine + 1).ponCol(id.beginColumn);}
         break;
         }
       case 34:{
@@ -958,7 +958,7 @@ Exp expr, e; Token id;
       case 49:{
         jj_consume_token(49);
         id = jj_consume_token(iden);
-        e = recOp6((Exp)sem.acceso(e7h, id.image).ponFila(id.beginLine).ponCol(id.beginColumn));
+        e = recOp6((Exp)sem.acceso(e7h, id.image).ponFila(id.beginLine + 1).ponCol(id.beginColumn));
 {if ("" != null) return e;}
         break;
         }
@@ -992,12 +992,12 @@ Exp e0; Token id;
         }
       case literalEntero:{
         id = jj_consume_token(literalEntero);
-{if ("" != null) return (Exp)sem.lit_ent(id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+{if ("" != null) return (Exp)sem.lit_ent(id.image).ponFila(id.beginLine + 1).ponCol(id.beginColumn);}
         break;
         }
       case literalReal:{
         id = jj_consume_token(literalReal);
-{if ("" != null) return (Exp)sem.lit_real(id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+{if ("" != null) return (Exp)sem.lit_real(id.image).ponFila(id.beginLine + 1).ponCol(id.beginColumn);}
         break;
         }
       case TRUE:{
@@ -1012,12 +1012,12 @@ Exp e0; Token id;
         }
       case literalCadena:{
         id = jj_consume_token(literalCadena);
-{if ("" != null) return (Exp)sem.lit_cadena(id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+{if ("" != null) return (Exp)sem.lit_cadena(id.image).ponFila(id.beginLine + 1).ponCol(id.beginColumn);}
         break;
         }
       case iden:{
         id = jj_consume_token(iden);
-{if ("" != null) return (Exp)sem.iden(id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+{if ("" != null) return (Exp)sem.iden(id.image).ponFila(id.beginLine + 1).ponCol(id.beginColumn);}
         break;
         }
       case NULL:{

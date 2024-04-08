@@ -100,7 +100,7 @@ public class Impresion extends ProcesamientoDef{
         System.out.println(exp.getId() + exp.getFilaColInfo());
     }
     public void procesa(Null exp) {
-        System.out.println("<null>" + exp.getFilaColInfo());
+        System.out.println("<null>");
     }
     public void procesa(Si_ParamsR exp) {
         exp.getParamsrl().procesa(this);

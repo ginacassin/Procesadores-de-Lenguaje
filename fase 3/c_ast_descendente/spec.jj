@@ -117,13 +117,13 @@ PARSER_END(ConstructorASTsTiny)
           {T tipo; Token id; ParamsF paramsF; Bloq bloq;}
           {
              tipo = tipo0() id = <iden>
-                {return (Dec)sem.dec_var(tipo, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+                {return (Dec)sem.dec_var(tipo, id.image).ponFila(id.beginLine + 1).ponCol(id.beginColumn);}
              |
              <type> tipo = tipo0() id = <iden>
-                {return (Dec)sem.dec_tipo(tipo, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+                {return (Dec)sem.dec_tipo(tipo, id.image).ponFila(id.beginLine + 1).ponCol(id.beginColumn);}
              |
              <proc> id = <iden> paramsF = paramsFormales() bloq = bloque()
-                {return (Dec)sem.dec_proc(id.image, paramsF, bloq).ponFila(id.beginLine).ponCol(id.beginColumn);}
+                {return (Dec)sem.dec_proc(id.image, paramsF, bloq).ponFila(id.beginLine + 1).ponCol(id.beginColumn);}
           }
     ParamsF paramsFormales()   :
           {ParamsF paramsF;}
@@ -163,10 +163,10 @@ PARSER_END(ConstructorASTsTiny)
           {Token id;}
           {
              "&" id = <iden>
-                {return (Param)sem.param_ref(tipoh, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+                {return (Param)sem.param_ref(tipoh, id.image).ponFila(id.beginLine + 1).ponCol(id.beginColumn);}
              |
              id = <iden>
-                {return (Param)sem.param(tipoh, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+                {return (Param)sem.param(tipoh, id.image).ponFila(id.beginLine + 1).ponCol(id.beginColumn);}
           }
     T tipo0()   :
           {T tipo; T recArray;}
@@ -177,7 +177,7 @@ PARSER_END(ConstructorASTsTiny)
     T recArray(T tipoh)   :
           {Token litEntero; T recArray;}
           {
-             "[" litEntero = <literalEntero> "]" recArray = recArray((T)sem.tipo_array(tipoh, litEntero.image).ponFila(litEntero.beginLine).ponCol(litEntero.beginColumn))
+             "[" litEntero = <literalEntero> "]" recArray = recArray((T)sem.tipo_array(tipoh, litEntero.image).ponFila(litEntero.beginLine + 1).ponCol(litEntero.beginColumn))
                 {return recArray;}
              |
                 {return tipoh;}
@@ -210,7 +210,7 @@ PARSER_END(ConstructorASTsTiny)
                 {return sem.tipo_string();}
              |
              id = <iden>
-                {return (T)sem.tipo_iden(id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+                {return (T)sem.tipo_iden(id.image).ponFila(id.beginLine + 1).ponCol(id.beginColumn);}
           }
     LCampos listaCampos()   :
           {LCampos lCampos; Campo campo;}
@@ -230,7 +230,7 @@ PARSER_END(ConstructorASTsTiny)
           {T tipo; Token id;}
           {
              tipo = tipo0() id = <iden>
-                {return (Campo)sem.campo(tipo, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+                {return (Campo)sem.campo(tipo, id.image).ponFila(id.beginLine + 1).ponCol(id.beginColumn);}
           }
     Insts instrucciones()   :
           {InstsAux instsAux;}
@@ -282,7 +282,7 @@ PARSER_END(ConstructorASTsTiny)
                 {return sem.instr_del(exp);}
              |
              <call> id = <iden> paramsR = paramsReales()
-                {return (Inst)sem.instr_call(id.image, paramsR).ponFila(id.beginLine).ponCol(id.beginColumn);}
+                {return (Inst)sem.instr_call(id.image, paramsR).ponFila(id.beginLine + 1).ponCol(id.beginColumn);}
              |
              bloq1 = bloque()
                 {return sem.instr_bloque(bloq1);}
@@ -425,7 +425,7 @@ PARSER_END(ConstructorASTsTiny)
              "[" expr = expr() "]" e = recOp6(sem.index(e7h, expr))
                 {return e;}
              |
-             "." id = <iden> e = recOp6((Exp)sem.acceso(e7h, id.image).ponFila(id.beginLine).ponCol(id.beginColumn))
+             "." id = <iden> e = recOp6((Exp)sem.acceso(e7h, id.image).ponFila(id.beginLine + 1).ponCol(id.beginColumn))
                 {return e;}
              |
              "^" e = recOp6(sem.indireccion(e7h))
@@ -440,10 +440,10 @@ PARSER_END(ConstructorASTsTiny)
                 {return e0;}
              |
              id = <literalEntero>
-                {return (Exp)sem.lit_ent(id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+                {return (Exp)sem.lit_ent(id.image).ponFila(id.beginLine + 1).ponCol(id.beginColumn);}
              |
              id = <literalReal>
-                {return (Exp)sem.lit_real(id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+                {return (Exp)sem.lit_real(id.image).ponFila(id.beginLine + 1).ponCol(id.beginColumn);}
              |
              <TRUE>
                 {return sem.btrue();}
@@ -452,10 +452,10 @@ PARSER_END(ConstructorASTsTiny)
                 {return sem.bfalse();}
              |
              id = <literalCadena>
-                {return (Exp)sem.lit_cadena(id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+                {return (Exp)sem.lit_cadena(id.image).ponFila(id.beginLine + 1).ponCol(id.beginColumn);}
              |
              id = <iden>
-                {return (Exp)sem.iden(id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+                {return (Exp)sem.iden(id.image).ponFila(id.beginLine + 1).ponCol(id.beginColumn);}
              |
              <NULL>
                 {return sem.vnull();}

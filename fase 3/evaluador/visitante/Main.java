@@ -21,6 +21,7 @@ public class Main {
         else {
             ConstructorASTsTiny asint = new ConstructorASTsTiny(new FileReader(args[1]));
             asint.disable_tracing();
+            System.out.println("EMPIEZA PROCESADO=====================================");
             asint.analiza().procesa(new Impresion());
         }
     }
