@@ -197,7 +197,7 @@ public class EvaluadorRecursivo extends Evaluador {
             muestraExp(inst.getExp());
         }
         else if (claseDe(inst, Instr_Nl.class)) {
-            imprimeNL();
+            imprime("<nl>");
         }
         else if (claseDe(inst, Instr_New.class)) {
             imprime("<new>");
