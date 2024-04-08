@@ -11,7 +11,7 @@ public class Impresion extends ProcesamientoDef{
     }
     private void imprimeExpBin(Exp opnd0, String op, Exp opnd1, int np0, int np1) {
         imprimeOpnd(opnd0,np0);
-        System.out.println(" "+op+" ");
+        System.out.println(op+" ");
         imprimeOpnd(opnd1,np1);
     }
     private void imprimeExpUni(Exp opnd, String op, int np) {
@@ -67,38 +67,40 @@ public class Impresion extends ProcesamientoDef{
         imprimeExpUni(exp.getOpnd0(), "not", 5);
     }
     public void procesa(Indireccion exp) {
-        imprimeExpUni(exp.getOpnd0(), "^", 6);
+        System.out.println("^" + exp.getFilaColInfo());
+        imprimeOpnd(exp.getOpnd0(),exp.prioridad());
     }
     public void procesa(Index exp) {
         imprimeOpnd(exp.getOpnd(), exp.prioridad());
-        System.out.println("[");
-        System.out.println(exp.getIndex());
-        System.out.println("]");
+        System.out.print("[" + exp.getFilaColInfo());
+        System.out.print(exp.getIndex());
+        System.out.print("]" + exp.getFilaColInfo());
     }
     public void procesa(Acceso exp) {
         imprimeOpnd(exp.getOpnd(), exp.prioridad());
-        System.out.println("." + exp.getIden());
+        System.out.println(".");
+        System.out.println(exp.getIden() + exp.getFilaColInfo());
     }
     public void procesa(Lit_ent exp) {
-        System.out.println(exp.getNum());
+        System.out.println(exp.getNum() + exp.getFilaColInfo());
     }
     public void procesa(Lit_real exp) {
-        System.out.println(exp.getNum());
+        System.out.println(exp.getNum() + exp.getFilaColInfo());
     }
     public void procesa(True exp) {
-        System.out.println("true");
+        System.out.println("<true>" + exp.getFilaColInfo());
     }
     public void procesa(False exp) {
-        System.out.println("false");
+        System.out.println("<false>" + exp.getFilaColInfo());
     }
     public void procesa(Lit_cadena exp) {
-        System.out.println(exp.getCadena());
+        System.out.println(exp.getCadena() + exp.getFilaColInfo());
     }
     public void procesa(Iden exp) {
-        System.out.println(exp.getId());
+        System.out.println(exp.getId() + exp.getFilaColInfo());
     }
     public void procesa(Null exp) {
-        System.out.println("null");
+        System.out.println("<null>" + exp.getFilaColInfo());
     }
     public void procesa(Si_ParamsR exp) {
         exp.getParamsrl().procesa(this);
@@ -129,43 +131,45 @@ public class Impresion extends ProcesamientoDef{
         exp.getExp().procesa(this);
     }
     public void procesa(Instr_If exp) {
-        System.out.println("if");
+        System.out.println("<if>");
         exp.getExp().procesa(this);
         exp.getBloq().procesa(this);
     }
     public void procesa(Instr_If_Else exp) {
-        System.out.println("if");
+        System.out.println("<if>");
         exp.getExp().procesa(this);
         exp.getBloq1().procesa(this);
-        System.out.println("else");
+        System.out.println("<else>");
         exp.getBloq2().procesa(this);
     }
     public void procesa(Instr_While exp) {
-        System.out.println("while");
+        System.out.println("<while>");
         exp.getExp().procesa(this);
         exp.getBloq().procesa(this);
     }
     public void procesa(Instr_Read exp) {
-        System.out.println("read");
+        System.out.println("<read>");
         exp.getExp().procesa(this);
     }
     public void procesa(Instr_Write exp) {
-        System.out.println("write");
+        System.out.println("<write>");
         exp.getExp().procesa(this);
     }
     public void procesa(Instr_Nl exp) {
-        System.out.println("nl");
+        System.out.println("<nl>");
     }
     public void procesa(Instr_New exp) {
-        System.out.println("new");
+        System.out.println("<new>");
         exp.getExp().procesa(this);
     }
     public void procesa(Instr_Del exp) {
-        System.out.println("delete");
+        System.out.println("<delete>");
         exp.getExp().procesa(this);
     }
     public void procesa(Instr_Call exp) {
-        System.out.println("call " + exp.getIden() + "(");
+        System.out.println("<call> ");
+        System.out.println(exp.getIden() + exp.getFilaColInfo());
+        System.out.println("(");
         exp.getParamsR().procesa(this);
         System.out.println(")");
     }
@@ -174,7 +178,7 @@ public class Impresion extends ProcesamientoDef{
     }
     public void procesa(Campo exp) {
         exp.getTipo().procesa(this);
-        System.out.println(exp.getIden());
+        System.out.println(exp.getIden() + exp.getFilaColInfo());
     }
     public void procesa(Muchos_Campos exp) {
         exp.getlCampos().procesa(this);
@@ -186,40 +190,43 @@ public class Impresion extends ProcesamientoDef{
     }
     public void procesa(TipoArray exp) {
         exp.getTipo().procesa(this);
-        System.out.println("[" + exp.getLitEnt() + "]");
+        System.out.println("[");
+        System.out.println(exp.getLitEnt());
+        System.out.println("[" + exp.getFilaColInfo());
     }
     public void procesa(TipoPunt exp) {
         System.out.println("^");
         exp.getTipo().procesa(this);
     }
     public void procesa(TipoStruct exp) {
-        System.out.println("struct{");
+        System.out.println("<struct>");
+        System.out.println("{");
         exp.getlCampos().procesa(this);
         System.out.println("}");
     }
     public void procesa(TipoInt exp) {
-        System.out.println("int");
+        System.out.println("<int>");
     }
     public void procesa(TipoReal exp) {
-        System.out.println("real");
+        System.out.println("<real>");
     }
     public void procesa(TipoBool exp) {
-        System.out.println("bool");
+        System.out.println("<bool>");
     }
     public void procesa(TipoString exp) {
-        System.out.println("string");
+        System.out.println("<string>");
     }
     public void procesa(Identificador exp) {
-        System.out.println(exp.getIden());
+        System.out.print(exp.getIden());
     }
     public void procesa(ParamRef exp) {
         exp.getTipo().procesa(this);
         System.out.println("&");
-        System.out.println(exp.getIden());
+        System.out.print(exp.getIden() + exp.getFilaColInfo());
     }
     public void procesa(ParamNoRef exp) {
         exp.getTipo().procesa(this);
-        System.out.println(exp.getIden());
+        System.out.print(exp.getIden() + exp.getFilaColInfo());
     }
     public void procesa(SiParamF exp) {
         exp.getParamsFL().procesa(this);
@@ -235,16 +242,16 @@ public class Impresion extends ProcesamientoDef{
     }
     public void procesa(DecVar exp) {
         exp.getTipo().procesa(this);
-        System.out.println(exp.getIden());
+        System.out.println(exp.getIden() + exp.getFilaColInfo());
     }
     public void procesa(DecTipo exp) {
-        System.out.println("type ");
+        System.out.println("<type> ");
         exp.getTipo().procesa(this);
-        System.out.println(exp.getIden());
+        System.out.print(exp.getIden() + exp.getFilaColInfo());
     }
     public void procesa(DecProc exp) {
-        System.out.println("proc ");
-        System.out.println(exp.getIden());
+        System.out.println("<proc> ");
+        System.out.print(exp.getIden() + exp.getFilaColInfo());
         System.out.println("(");
         exp.getParamsF().procesa(this);
         System.out.println(")");
@@ -258,7 +265,6 @@ public class Impresion extends ProcesamientoDef{
     public void procesa(MuchasDecs exp) {
         exp.getDecsAux().procesa(this);
         System.out.println(";");
-        System.out.println();
         exp.getDec().procesa(this);
     }
     public void procesa(UnaDec exp) {
@@ -266,10 +272,8 @@ public class Impresion extends ProcesamientoDef{
     }
     public void procesa(Bloq exp) {
         System.out.println("{");
-        System.out.println();
         exp.getDecs().procesa(this);
         exp.getInsts().procesa(this);
-        System.out.println();
         System.out.println("}");
     }
     public void procesa(Prog exp) {
