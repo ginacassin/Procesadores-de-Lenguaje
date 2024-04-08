@@ -21,13 +21,13 @@ action code {:
   ClaseSemanticaTiny sem = new ClaseSemanticaTiny();
 :}
 
-terminal SUMA, RESTA, MUL, DIV, PABRIR, PCERRAR, BABRIR, BCERRAR, TABRIR, TCERRAR,
-         FINDEC, ASIG, MENOR, MAYOR, MENORIGUAL, MAYORIGUAL, IGUAL, NOIGUAL, AND,
-         OR, NOT, TRUE, FALSE, MOD, PUNTERO, BITAND, ENTERO, REAL, BOOL, STRING,
+terminal PABRIR, PCERRAR, BABRIR, BCERRAR, TCERRAR,
+         FINDEC, TRUE, FALSE, BITAND, ENTERO, REAL, BOOL, STRING,
          NULL, PROC, IF, ELSE, WHILE, STRUCT, NEW, DELETE, READ, WRITE, NL, TYPE,
          CALL, EVAL, PUNTO, COMA, PUNTOCOMA;
 
-terminal StringLocalizado IDEN, LITREAL, LITCADENA, LITENT;
+terminal StringLocalizado IDEN, LITREAL, LITCADENA, LITENT, TABRIR, PUNTERO,
+            AND, OR, SUMA, RESTA, MOD, MUL, DIV, ASIG, MENOR, MAYOR, MENORIGUAL, MAYORIGUAL, IGUAL, NOIGUAL, NOT;
 
 non terminal Prog programa;
 non terminal Bloq bloque;
@@ -46,7 +46,7 @@ non terminal Inst instruccion;
 non terminal ParamsR paramsReales, paramsRealesAux;
 non terminal ParamsRL paramsRealesLista;
 non terminal Exp expr, e0, e1, e2, e3, e4, e5, e6, e7;
-non terminal String op1, op4 , op5;
+non terminal Op op1, op4, op5;
 
 
 
@@ -114,7 +114,7 @@ tipo2 ::= BOOL
 tipo2 ::= STRING
     {: RESULT = sem.tipo_string() ; :};
 tipo2 ::= IDEN: id
-    {: RESULT = (T) sem.tipo_iden(id.str()).ponFila(id.fila()).ponCol(id.col()) ; :};
+    {: RESULT = (T) sem.tipo_iden(id.str()).ponFila(id.fila()).ponCol(id.col()); :};
 
 instrucciones ::= instruccionesAux: instsAux
     {: RESULT = sem.si_instr(instsAux) ; :};
@@ -143,7 +143,7 @@ instruccion ::= NEW expr: exp
 instruccion ::= DELETE expr: exp
     {: RESULT = sem.instr_del(exp) ; :};
 instruccion ::= CALL IDEN: id paramsReales: paramsR
-    {: RESULT = (Inst) sem.instr_call(id.str(), paramsR).ponFila(id.fila()).ponCol(id.col()) ; :};
+    {: RESULT = (Inst) sem.instr_call(id.str(), paramsR).ponFila(id.fila()).ponCol(id.col()); :};
 instruccion ::= bloque: bloq
     {: RESULT = sem.instr_bloque(bloq) ; :};
 paramsReales ::= PABRIR paramsRealesAux: paramsRAux PCERRAR
@@ -159,40 +159,40 @@ paramsRealesLista ::= expr: exp
 
 expr ::= e0: exp
     {: RESULT = exp ; :};
-e0 ::= e1: exp1 ASIG e0: exp2
-    {: RESULT = sem.asig(exp1, exp2) ; :};
+e0 ::= e1: exp1 ASIG: signo e0: exp2
+    {: RESULT = (Exp) sem.asig(exp1, exp2).ponFila(signo.fila()).ponCol(signo.col()); :};
 e0 ::= e1: exp
     {: RESULT = exp ; :};
 e1 ::= e1: exp1 op1: op1 e2: exp2
-    {: RESULT = sem.mkop1(op1, exp1, exp2) ; :};
+    {: RESULT = (Exp) sem.mkop1(op1.getOp(), exp1, exp2).ponFila(op1.leeFila()).ponCol(op1.leeCol()); :};
 e1 ::= e2: exp
     {: RESULT = exp ; :};
-e2 ::= e2: exp1 SUMA e3: exp2
-    {: RESULT = sem.suma(exp1, exp2) ; :};
-e2 ::= e3: exp1 RESTA e3: exp2
-    {: RESULT = sem.resta(exp1, exp2) ; :};
+e2 ::= e2: exp1 SUMA: signo e3: exp2
+    {: RESULT = (Exp) sem.suma(exp1, exp2).ponFila(signo.fila()).ponCol(signo.col()); :};
+e2 ::= e3: exp1 RESTA: signo e3: exp2
+    {: RESULT = (Exp) sem.suma(exp1, exp2).ponFila(signo.fila()).ponCol(signo.col()); :};
 e2 ::= e3: exp
     {: RESULT = exp ; :};
-e3 ::= e4: exp1 AND e3: exp2
-    {: RESULT = sem.and(exp1, exp2) ; :};
-e3 ::= e4: exp1 OR e4: exp2
-    {: RESULT = sem.or(exp1, exp2) ; :};
+e3 ::= e4: exp1 AND: signo e3: exp2
+    {: RESULT = (Exp) sem.and(exp1, exp2).ponFila(signo.fila()).ponCol(signo.col()); :};
+e3 ::= e4: exp1 OR: signo e4: exp2
+    {: RESULT = (Exp) sem.or(exp1, exp2).ponFila(signo.fila()).ponCol(signo.col()); :};
 e3 ::= e4: exp
     {: RESULT = exp ; :};
 e4 ::= e4: exp1 op4: op4 e5: exp2
-    {: RESULT = sem.mkop4(op4, exp1, exp2) ; :};
+    {: RESULT = (Exp) sem.mkop4(op4.getOp(), exp1, exp2).ponFila(op4.leeFila()).ponCol(op4.leeCol()); :};
 e4 ::= e5: exp
     {: RESULT = exp ; :};
 e5 ::= op5: op5 e5: exp
-    {: RESULT = sem.mkop5(op5, exp); :};
+    {: RESULT = (Exp) sem.mkop5(op5.getOp(), exp).ponFila(op5.leeFila()).ponCol(op5.leeCol()); :};
 e5 ::= e6: exp
     {: RESULT = exp ; :};
-e6 ::= e6: exp1 TABRIR expr: exp2 TCERRAR
-    {: RESULT = sem.index(exp1, exp2) ; :};
+e6 ::= e6: exp1 TABRIR: signo expr: exp2 TCERRAR
+    {: RESULT = (Exp) sem.index(exp1, exp2).ponFila(signo.fila()).ponCol(signo.col()); :};
 e6 ::= e6: exp PUNTO IDEN: id
     {: RESULT = (Exp) sem.acceso(exp, id.str()).ponFila(id.fila()).ponCol(id.col()) ; :};
-e6 ::= e6: exp PUNTERO
-    {: RESULT = sem.indireccion(exp) ; :};
+e6 ::= e6: exp PUNTERO: signo
+    {: RESULT = (Exp) sem.indireccion(exp).ponFila(signo.fila()).ponCol(signo.col()) ; :};
 e6 ::= e7: exp
     {: RESULT = exp ; :};
 e7 ::= PABRIR e0: exp PCERRAR
@@ -211,26 +211,26 @@ e7 ::= IDEN: id
    {: RESULT = (Exp) sem.iden(id.str()).ponFila(id.fila()).ponCol(id.col()); :};
 e7 ::= NULL
     {: RESULT = sem.vnull() ; :};
-op1 ::= MENOR
-    {: RESULT = "<" ; :};
-op1 ::= MAYOR
-    {: RESULT = ">" ; :};
-op1 ::= MENORIGUAL
-    {: RESULT = "<=" ; :};
-op1 ::= MAYORIGUAL
-    {: RESULT = ">=" ; :};
-op1 ::= IGUAL
-    {: RESULT = "==" ; :};
-op1 ::= NOIGUAL
-    {: RESULT = "!=" ; :};
-op4 ::= MUL
-    {: RESULT = "*" ; :};
-op4 ::= DIV
-    {: RESULT = "/" ; :};
-op4 ::= MOD
-    {: RESULT = "%" ; :};
-op5 ::= RESTA
-    {: RESULT = "-" ; :};
-op5 ::= NOT
-    {: RESULT = "not" ; :};
+op1 ::= MENOR: signo
+    {: RESULT = (Op) sem.op("<").ponFila(signo.fila()).ponCol(signo.col()); :};
+op1 ::= MAYOR: signo
+    {: RESULT = (Op) sem.op(">").ponFila(signo.fila()).ponCol(signo.col()); :};
+op1 ::= MENORIGUAL: signo
+    {: RESULT = (Op) sem.op("<=").ponFila(signo.fila()).ponCol(signo.col()); :};
+op1 ::= MAYORIGUAL: signo
+    {: RESULT = (Op) sem.op(">=").ponFila(signo.fila()).ponCol(signo.col()); :};
+op1 ::= IGUAL: signo
+    {: RESULT = (Op) sem.op("==").ponFila(signo.fila()).ponCol(signo.col()); :};
+op1 ::= NOIGUAL: signo
+    {: RESULT = (Op) sem.op("!=").ponFila(signo.fila()).ponCol(signo.col()); :};
+op4 ::= MUL: signo
+    {: RESULT = (Op) sem.op("*").ponFila(signo.fila()).ponCol(signo.col()); :};
+op4 ::= DIV: signo
+    {: RESULT = (Op) sem.op("/").ponFila(signo.fila()).ponCol(signo.col()); :};
+op4 ::= MOD: signo
+    {: RESULT = (Op) sem.op("%").ponFila(signo.fila()).ponCol(signo.col()); :};
+op5 ::= RESTA: signo
+    {: RESULT = (Op) sem.op("-").ponFila(signo.fila()).ponCol(signo.col()); :};
+op5 ::= NOT: signo
+    {: RESULT = (Op) sem.op("not").ponFila(signo.fila()).ponCol(signo.col()); :};
 

@@ -2,12 +2,15 @@ import asint.SintaxisAbstractaTiny.*;
 import c_ast_ascendente.AnalizadorLexicoTiny;
 import c_ast_ascendente.GestionErroresTiny;
 import c_ast_descendente.ConstructorASTsTiny;
+import c_ast_descendente.ConstructorASTsTinyDJ;
+import evaluador.EvaluadorRecursivo;
+import evaluador.visitante.Impresion;
 
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
-public class MainInterprete {
+public class MainPrincipal {
     public static void main(String[] args) throws Exception {
         FileInputStream fis = new FileInputStream(args[0]);
         char c = (char) fis.read();
@@ -20,10 +23,14 @@ public class MainInterprete {
             System.out.println("CONSTRUCCION AST ASCENDENTE");
             Prog prog = (Prog)asint.debug_parse().value;
             System.out.println("IMPRESION RECURSIVA");
+            new EvaluadorRecursivo().muestraPrograma(prog);
+            System.out.println("IMPRESION VISITANTE");
+            prog.procesa(new Impresion());
+            System.out.println("IMPRESION INTERPRETE");
             prog.imprime();
         }
         else {
-            c_ast_descendente.ConstructorASTsTiny asint = new ConstructorASTsTiny(fis);
+            c_ast_descendente.ConstructorASTsTiny asint = new ConstructorASTsTinyDJ(new InputStreamReader(fis));
             asint.disable_tracing();
             System.out.println("CONSTRUCCION AST DESCENDENTE");
             Prog p = asint.analiza();

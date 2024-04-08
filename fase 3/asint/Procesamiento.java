@@ -90,4 +90,6 @@ public interface Procesamiento {
     public void procesa(SintaxisAbstractaTiny.UnaDec exp);
     public void procesa(Bloq exp);
     public void procesa(Prog exp);
+
+    void procesa(SintaxisAbstractaTiny.Op op);
 }

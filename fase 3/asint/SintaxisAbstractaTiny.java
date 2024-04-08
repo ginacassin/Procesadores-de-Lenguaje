@@ -49,9 +49,10 @@ public class SintaxisAbstractaTiny {
         // Función auxiliar para generar vínculo al texto fuente de tipo
         // $f:num fila,c: num col$
         public String getFilaColInfo() {
-            return "$f:" + (leeFila() + 1) + ",c:" + leeCol() + "$";
+            return "$f:" + (leeFila()) + ",c:" + leeCol() + "$";
         }
     }
+
 
     public static abstract class Exp extends Nodo {
         public Exp() {
@@ -109,7 +110,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            imprimeExpBin(opnd0,"+",opnd1,2,3);
+            imprimeExpBin(opnd0,"+" + getFilaColInfo(),opnd1,2,3);
         }
         @Override
         public int prioridad() {
@@ -130,7 +131,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            imprimeExpBin(opnd0,"-",opnd1,3,3);
+            imprimeExpBin(opnd0,"-" + getFilaColInfo(),opnd1,3,3);
         }
         @Override
         public int prioridad() {
@@ -151,7 +152,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            imprimeExpBin(opnd0,"*",opnd1,4,5);
+            imprimeExpBin(opnd0,"*" + getFilaColInfo(),opnd1,4,5);
         }
         @Override
         public int prioridad() {
@@ -172,7 +173,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            imprimeExpBin(opnd0,"/",opnd1,4,5);
+            imprimeExpBin(opnd0,"/" + getFilaColInfo(),opnd1,4,5);
         }
         @Override
         public int prioridad() {
@@ -193,7 +194,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            imprimeExpBin(opnd0,"=",opnd1,1,0);
+            imprimeExpBin(opnd0,"=" + getFilaColInfo(),opnd1,1,0);
         }
         @Override
         public int prioridad() {
@@ -214,7 +215,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            imprimeExpBin(opnd0,"<",opnd1,1,2);
+            imprimeExpBin(opnd0,"<" + getFilaColInfo(),opnd1,1,2);
         }
         @Override
         public int prioridad() {
@@ -235,7 +236,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            imprimeExpBin(opnd0,">",opnd1,1,2);
+            imprimeExpBin(opnd0,">" + getFilaColInfo(),opnd1,1,2);
         }
         @Override
         public int prioridad() {
@@ -256,7 +257,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            imprimeExpBin(opnd0,"<=",opnd1,1,2);
+            imprimeExpBin(opnd0,"<=" + getFilaColInfo(),opnd1,1,2);
         }
         @Override
         public int prioridad() {
@@ -277,7 +278,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            imprimeExpBin(opnd0,">=",opnd1,1,2);
+            imprimeExpBin(opnd0,">=" + getFilaColInfo(),opnd1,1,2);
         }
         @Override
         public int prioridad() {
@@ -298,7 +299,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            imprimeExpBin(opnd0,"==",opnd1,1,2);
+            imprimeExpBin(opnd0,"==" + getFilaColInfo(),opnd1,1,2);
         }
         @Override
         public int prioridad() {
@@ -319,7 +320,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            imprimeExpBin(opnd0,"!=",opnd1,1,2);
+            imprimeExpBin(opnd0,"!=" + getFilaColInfo(),opnd1,1,2);
         }
         @Override
         public int prioridad() {
@@ -340,7 +341,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            imprimeExpBin(opnd0,"and",opnd1,4,3);
+            imprimeExpBin(opnd0,"and" + getFilaColInfo(),opnd1,4,3);
         }
         @Override
         public int prioridad() {
@@ -361,7 +362,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            imprimeExpBin(opnd0,"or",opnd1,4,4);
+            imprimeExpBin(opnd0,"or" + getFilaColInfo(),opnd1,4,4);
         }
         @Override
         public int prioridad() {
@@ -382,7 +383,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            imprimeExpBin(opnd0,"%",opnd1,4,5);
+            imprimeExpBin(opnd0,"%" + getFilaColInfo(),opnd1,4,5);
         }
         @Override
         public int prioridad() {
@@ -688,7 +689,7 @@ public class SintaxisAbstractaTiny {
         }
         @Override
         public void imprime() {
-            System.out.println("<null>" + getFilaColInfo());
+            System.out.println("<null>");
 
         }
     }
@@ -1916,6 +1917,29 @@ public class SintaxisAbstractaTiny {
         }
     }
 
+    public static class Op extends Nodo {
+        private String oper;
+        public Op(String op) {
+            super();
+            this.oper = op;
+        }
+        public String toString() {
+            return oper;
+        }
+        public String getOp() {
+            return oper;
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.print(oper + getFilaColInfo());
+        }
+    }
+
 
     // Constructoras
     public Prog prog(Bloq bloq) {
@@ -2130,5 +2154,9 @@ public class SintaxisAbstractaTiny {
     }
     public Exp vnull() {
         return new Null();
+    }
+
+    public Op op(String oper)  {
+        return new Op(oper);
     }
 }

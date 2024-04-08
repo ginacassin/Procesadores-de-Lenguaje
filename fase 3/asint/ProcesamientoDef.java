@@ -90,6 +90,11 @@ public class ProcesamientoDef implements Procesamiento {
     public void procesa(SintaxisAbstractaTiny.UnaDec exp){}
     public void procesa(Bloq exp){}
     public void procesa(Prog exp){}
+
+    @Override
+    public void procesa(SintaxisAbstractaTiny.Op op) {
+
+    }
 }
 
 

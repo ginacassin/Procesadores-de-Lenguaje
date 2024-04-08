@@ -209,7 +209,7 @@ public class EvaluadorRecursivo extends Evaluador {
         }
         else if (claseDe(inst, Instr_Call.class)) {
             imprime("<call>");
-            imprime(inst.getIden());
+            imprime(inst.getIden() + getFilaColInfo(inst));
             imprime("(");
             muestraParamsR(inst.getParamsR());
             imprime(")");
@@ -287,18 +287,18 @@ public class EvaluadorRecursivo extends Evaluador {
         }
         else if (claseDe(exp, Index.class)) {
             muestraOpnd(exp.getOpnd(), 6);
-            imprime("[");
+            imprime("[" + getFilaColInfo(exp));
             muestraExp(exp.getIndex());
             imprime("]");
         }
         else if (claseDe(exp, Acceso.class)) {
             muestraOpnd(exp.getOpnd(), 6);
             imprime(".");
-            imprime(exp.getIden());
+            imprime(exp.getIden() + getFilaColInfo(exp));
         }
         else if (claseDe(exp, Indireccion.class)) {
             muestraOpnd(exp.getOpnd0(), 6);
-            imprime("^");
+            imprime("^" + getFilaColInfo(exp));
         }
         else if (claseDe(exp, Lit_ent.class)) {
             imprime(exp.getNum() + getFilaColInfo(exp));
