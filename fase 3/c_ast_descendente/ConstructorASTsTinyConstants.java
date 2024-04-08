@@ -72,6 +72,34 @@ public interface ConstructorASTsTinyConstants {
   int literalReal = 32;
   /** RegularExpression Id. */
   int literalCadena = 33;
+  /** RegularExpression Id. */
+  int suma = 34;
+  /** RegularExpression Id. */
+  int resta = 35;
+  /** RegularExpression Id. */
+  int mod = 36;
+  /** RegularExpression Id. */
+  int mul = 37;
+  /** RegularExpression Id. */
+  int div = 38;
+  /** RegularExpression Id. */
+  int asignar = 39;
+  /** RegularExpression Id. */
+  int menor = 40;
+  /** RegularExpression Id. */
+  int mayor = 41;
+  /** RegularExpression Id. */
+  int menorIgual = 42;
+  /** RegularExpression Id. */
+  int mayorIgual = 43;
+  /** RegularExpression Id. */
+  int igual = 44;
+  /** RegularExpression Id. */
+  int noIgual = 45;
+  /** RegularExpression Id. */
+  int abrirCorchete = 46;
+  /** RegularExpression Id. */
+  int indir = 47;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -112,6 +140,20 @@ public interface ConstructorASTsTinyConstants {
     "<literalEntero>",
     "<literalReal>",
     "<literalCadena>",
+    "\"+\"",
+    "\"-\"",
+    "\"%\"",
+    "\"*\"",
+    "\"/\"",
+    "\"=\"",
+    "\"<\"",
+    "\">\"",
+    "\"<=\"",
+    "\">=\"",
+    "\"==\"",
+    "\"!=\"",
+    "\"[\"",
+    "\"^\"",
     "\"{\"",
     "\"}\"",
     "\"&&\"",
@@ -120,23 +162,9 @@ public interface ConstructorASTsTinyConstants {
     "\")\"",
     "\",\"",
     "\"&\"",
-    "\"[\"",
     "\"]\"",
-    "\"^\"",
     "\"@\"",
-    "\"=\"",
-    "\"+\"",
-    "\"-\"",
     "\".\"",
-    "\"<\"",
-    "\">\"",
-    "\"<=\"",
-    "\">=\"",
-    "\"==\"",
-    "\"!=\"",
-    "\"*\"",
-    "\"/\"",
-    "\"%\"",
   };
 
 }

@@ -55,10 +55,10 @@ Bloq bloq;
     trace_call("bloque");
     try {
 Decs decs; Insts insts;
-      jj_consume_token(34);
+      jj_consume_token(48);
       decs = declaraciones();
       insts = instrucciones();
-      jj_consume_token(35);
+      jj_consume_token(49);
 {if ("" != null) return sem.bloq(decs, insts);}
     throw new Error("Missing return statement in function");
     } finally {
@@ -79,9 +79,9 @@ DecsAux decsAux;
       case struct:
       case type:
       case iden:
-      case 44:{
+      case indir:{
         decsAux = declaracionesAux();
-        jj_consume_token(36);
+        jj_consume_token(50);
 {if ("" != null) return sem.si_decs(decsAux);}
         break;
         }
@@ -113,8 +113,8 @@ DecsAux decsAux; Dec dec;
     try {
 DecsAux decsAux; Dec dec;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 37:{
-        jj_consume_token(37);
+      case 51:{
+        jj_consume_token(51);
         dec = declaracion();
         decsAux = recDeclaracion(sem.muchas_decs(decsAuxh, dec));
 {if ("" != null) return decsAux;}
@@ -141,7 +141,7 @@ T tipo; Token id; ParamsF paramsF; Bloq bloq;
       case string:
       case struct:
       case iden:
-      case 44:{
+      case indir:{
         tipo = tipo0();
         id = jj_consume_token(iden);
 {if ("" != null) return (Dec)sem.dec_var(tipo, id.image).ponFila(id.beginLine + 1).ponCol(id.beginColumn);}
@@ -177,9 +177,9 @@ T tipo; Token id; ParamsF paramsF; Bloq bloq;
     trace_call("paramsFormales");
     try {
 ParamsF paramsF;
-      jj_consume_token(38);
+      jj_consume_token(52);
       paramsF = paramsFormalesAux();
-      jj_consume_token(39);
+      jj_consume_token(53);
 {if ("" != null) return paramsF;}
     throw new Error("Missing return statement in function");
     } finally {
@@ -198,7 +198,7 @@ ParamsFL paramsFL;
       case string:
       case struct:
       case iden:
-      case 44:{
+      case indir:{
         paramsFL = paramsFormalesLista();
 {if ("" != null) return sem.si_paramF(paramsFL);}
         break;
@@ -231,8 +231,8 @@ ParamsFL paramsFL; Param param;
     try {
 ParamsFL paramsFL; Param param;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 40:{
-        jj_consume_token(40);
+      case 54:{
+        jj_consume_token(54);
         param = param();
         paramsFL = recParamFormal(sem.muchos_paramsF(paramsFLh, param));
 {if ("" != null) return paramsFL;}
@@ -266,8 +266,8 @@ T tipo0; Param param;
     try {
 Token id;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 41:{
-        jj_consume_token(41);
+      case 55:{
+        jj_consume_token(55);
         id = jj_consume_token(iden);
 {if ("" != null) return (Param)sem.param_ref(tipoh, id.image).ponFila(id.beginLine + 1).ponCol(id.beginColumn);}
         break;
@@ -306,10 +306,10 @@ T tipo; T recArray;
     try {
 Token litEntero; T recArray;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 42:{
-        jj_consume_token(42);
+      case abrirCorchete:{
+        jj_consume_token(abrirCorchete);
         litEntero = jj_consume_token(literalEntero);
-        jj_consume_token(43);
+        jj_consume_token(56);
         recArray = recArray((T)sem.tipo_array(tipoh, litEntero.image).ponFila(litEntero.beginLine + 1).ponCol(litEntero.beginColumn));
 {if ("" != null) return recArray;}
         break;
@@ -329,8 +329,8 @@ Token litEntero; T recArray;
     try {
 T tipo;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 44:{
-        jj_consume_token(44);
+      case indir:{
+        jj_consume_token(indir);
         tipo = tipo1();
 {if ("" != null) return sem.tipo_punt(tipo);}
         break;
@@ -363,9 +363,9 @@ LCampos lCampos; Token id;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case struct:{
         jj_consume_token(struct);
-        jj_consume_token(34);
+        jj_consume_token(48);
         lCampos = listaCampos();
-        jj_consume_token(35);
+        jj_consume_token(49);
 {if ("" != null) return sem.tipo_struct(lCampos);}
         break;
         }
@@ -423,8 +423,8 @@ LCampos lCampos; Campo campo;
     try {
 LCampos lCampos; Campo campo;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 40:{
-        jj_consume_token(40);
+      case 54:{
+        jj_consume_token(54);
         campo = campo();
         lCampos = recCampo(sem.muchos_campos(camposh, campo));
 {if ("" != null) return lCampos;}
@@ -466,8 +466,8 @@ InstsAux instsAux;
       case write:
       case nl:
       case call:
-      case 34:
-      case 45:{
+      case 48:
+      case 57:{
         instsAux = instruccionesAux();
 {if ("" != null) return sem.si_instr(instsAux);}
         break;
@@ -500,8 +500,8 @@ InstsAux instsAux; Inst inst;
     try {
 InstsAux instsAux; Inst inst;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 37:{
-        jj_consume_token(37);
+      case 51:{
+        jj_consume_token(51);
         inst = instruccion();
         instsAux = recInstruccion(sem.muchas_instr(instsAuxh, inst));
 {if ("" != null) return instsAux;}
@@ -522,8 +522,8 @@ InstsAux instsAux; Inst inst;
     try {
 Exp exp; Bloq bloq1; Token id; ParamsR paramsR; Inst inst;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 45:{
-        jj_consume_token(45);
+      case 57:{
+        jj_consume_token(57);
         exp = expr();
 {if ("" != null) return sem.instr_expr(exp);}
         break;
@@ -579,7 +579,7 @@ Exp exp; Bloq bloq1; Token id; ParamsR paramsR; Inst inst;
 {if ("" != null) return (Inst)sem.instr_call(id.image, paramsR).ponFila(id.beginLine + 1).ponCol(id.beginColumn);}
         break;
         }
-      case 34:{
+      case 48:{
         bloq1 = bloque();
 {if ("" != null) return sem.instr_bloque(bloq1);}
         break;
@@ -621,10 +621,10 @@ Bloq bloq;
     try {
 ParamsRL paramsRL;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 38:{
-        jj_consume_token(38);
+      case 52:{
+        jj_consume_token(52);
         paramsRL = paramsRealesLista();
-        jj_consume_token(39);
+        jj_consume_token(53);
 {if ("" != null) return sem.si_paramsR(paramsRL);}
         break;
         }
@@ -656,8 +656,8 @@ ParamsRL paramsRL; Exp exp;
     try {
 ParamsRL paramsRL; Exp exp;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 40:{
-        jj_consume_token(40);
+      case 54:{
+        jj_consume_token(54);
         exp = expr();
         paramsRL = recParamReal(sem.muchos_paramsR(paramsRLh, exp));
 {if ("" != null) return paramsRL;}
@@ -701,12 +701,12 @@ Exp e1; Exp e0;
   final public Exp facE1(Exp e1h) throws ParseException {
     trace_call("facE1");
     try {
-Exp e1; Exp e0;
+Exp e1; Exp e0; Token asign;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 46:{
-        jj_consume_token(46);
+      case asignar:{
+        asign = jj_consume_token(asignar);
         e1 = e0();
-        e0 = facE1(sem.asig(e1h, e1));
+        e0 = facE1((Exp) sem.asig(e1h, e1).ponFila(asign.beginLine + 1).ponCol(asign.beginColumn));
 {if ("" != null) return e0;}
         break;
         }
@@ -736,17 +736,17 @@ Exp e2,e1;
   final public Exp recOp1(Exp e2h) throws ParseException {
     trace_call("recOp1");
     try {
-String op1; Exp e2,e1;
+Token op1; Exp e2,e1;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 50:
-      case 51:
-      case 52:
-      case 53:
-      case 54:
-      case 55:{
+      case menor:
+      case mayor:
+      case menorIgual:
+      case mayorIgual:
+      case igual:
+      case noIgual:{
         op1 = op1();
         e2 = e2();
-        e1 = recOp1(sem.mkop1(op1, e2h, e2));
+        e1 = recOp1((Exp) sem.mkop1Token(op1, e2h, e2).ponFila(op1.beginLine + 1).ponCol(op1.beginColumn));
 {if ("" != null) return e1;}
         break;
         }
@@ -777,12 +777,12 @@ Exp e31, e32, e33;
   final public Exp recSuma(Exp e3h) throws ParseException {
     trace_call("recSuma");
     try {
-Exp e31, e32;
+Exp e31, e32; Token sum;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 47:{
-        jj_consume_token(47);
+      case suma:{
+        sum = jj_consume_token(suma);
         e31 = e3();
-        e32 = recSuma(sem.suma(e3h, e31));
+        e32 = recSuma((Exp) sem.suma(e3h, e31).ponFila(sum.beginLine + 1).ponCol(sum.beginColumn));
 {if ("" != null) return e32;}
         break;
         }
@@ -799,12 +799,12 @@ Exp e31, e32;
   final public Exp facE3(Exp e31h) throws ParseException {
     trace_call("facE3");
     try {
-Exp e3;
+Exp e3; Token subs;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 48:{
-        jj_consume_token(48);
+      case resta:{
+        subs = jj_consume_token(resta);
         e3 = e3();
-{if ("" != null) return sem.resta(e31h, e3);}
+{if ("" != null) return (Exp) sem.resta(e31h, e3).ponFila(subs.beginLine + 1).ponCol(subs.beginColumn);}
         break;
         }
       default:
@@ -833,18 +833,18 @@ Exp e4, e;
   final public Exp facE4(Exp e4h) throws ParseException {
     trace_call("facE4");
     try {
-Exp e;
+Exp e; Token t;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case and:{
-        jj_consume_token(and);
+        t = jj_consume_token(and);
         e = e3();
-{if ("" != null) return sem.and(e4h, e);}
+{if ("" != null) return (Exp) sem.and(e4h, e).ponFila(t.beginLine + 1).ponCol(t.beginColumn);}
         break;
         }
       case or:{
-        jj_consume_token(or);
+        t = jj_consume_token(or);
         e = e4();
-{if ("" != null) return sem.or(e4h, e);}
+{if ("" != null) return (Exp) sem.or(e4h, e).ponFila(t.beginLine + 1).ponCol(t.beginColumn);}
         break;
         }
       default:
@@ -873,14 +873,14 @@ Exp e51, e52;
   final public Exp recOp4(Exp e5h) throws ParseException {
     trace_call("recOp4");
     try {
-String op; Exp e51, e52;
+Token op; Exp e51, e52;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 56:
-      case 57:
-      case 58:{
+      case mod:
+      case mul:
+      case div:{
         op = op4();
         e51 = e5();
-        e52 = recOp4(sem.mkop4(op, e5h, e51));
+        e52 = recOp4((Exp) sem.mkop4Token(op, e5h, e51).ponFila(op.beginLine + 1).ponCol(op.beginColumn));
 {if ("" != null) return e52;}
         break;
         }
@@ -897,13 +897,13 @@ String op; Exp e51, e52;
   final public Exp e5() throws ParseException {
     trace_call("e5");
     try {
-String op; Exp e;
+Token op; Exp e;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case not:
-      case 48:{
+      case resta:{
         op = op5();
         e = e5();
-{if ("" != null) return sem.mkop5(op, e);}
+{if ("" != null) return (Exp)sem.mkop5Token(op, e).ponFila(op.beginLine + 1).ponCol(op.beginColumn);}
         break;
         }
       case TRUE:
@@ -913,7 +913,7 @@ String op; Exp e;
       case literalEntero:
       case literalReal:
       case literalCadena:
-      case 38:{
+      case 52:{
         e = e6();
 {if ("" != null) return e;}
         break;
@@ -945,26 +945,26 @@ Exp e7, e;
   final public Exp recOp6(Exp e7h) throws ParseException {
     trace_call("recOp6");
     try {
-Exp expr, e; Token id;
+Exp expr, e; Token id; Token t;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 42:{
-        jj_consume_token(42);
+      case abrirCorchete:{
+        t = jj_consume_token(abrirCorchete);
         expr = expr();
-        jj_consume_token(43);
-        e = recOp6(sem.index(e7h, expr));
+        jj_consume_token(56);
+        e = recOp6((Exp) sem.index(e7h, expr).ponFila(t.beginLine + 1).ponCol(t.beginColumn));
 {if ("" != null) return e;}
         break;
         }
-      case 49:{
-        jj_consume_token(49);
+      case 58:{
+        jj_consume_token(58);
         id = jj_consume_token(iden);
         e = recOp6((Exp)sem.acceso(e7h, id.image).ponFila(id.beginLine + 1).ponCol(id.beginColumn));
 {if ("" != null) return e;}
         break;
         }
-      case 44:{
-        jj_consume_token(44);
-        e = recOp6(sem.indireccion(e7h));
+      case indir:{
+        t = jj_consume_token(indir);
+        e = recOp6((Exp) sem.indireccion(e7h).ponFila(t.beginLine + 1).ponCol(t.beginColumn));
 {if ("" != null) return e;}
         break;
         }
@@ -983,10 +983,10 @@ Exp expr, e; Token id;
     try {
 Exp e0; Token id;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 38:{
-        jj_consume_token(38);
+      case 52:{
+        jj_consume_token(52);
         e0 = e0();
-        jj_consume_token(39);
+        jj_consume_token(53);
 {if ("" != null) return e0;}
         break;
         }
@@ -1036,39 +1036,39 @@ Exp e0; Token id;
     }
 }
 
-  final public String op1() throws ParseException {
+  final public Token op1() throws ParseException {
     trace_call("op1");
     try {
-
+Token t;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 50:{
-        jj_consume_token(50);
-{if ("" != null) return "<";}
+      case menor:{
+        t = jj_consume_token(menor);
+{if ("" != null) return t;}
         break;
         }
-      case 51:{
-        jj_consume_token(51);
-{if ("" != null) return ">";}
+      case mayor:{
+        t = jj_consume_token(mayor);
+{if ("" != null) return t;}
         break;
         }
-      case 52:{
-        jj_consume_token(52);
-{if ("" != null) return "<=";}
+      case menorIgual:{
+        t = jj_consume_token(menorIgual);
+{if ("" != null) return t;}
         break;
         }
-      case 53:{
-        jj_consume_token(53);
-{if ("" != null) return ">=";}
+      case mayorIgual:{
+        t = jj_consume_token(mayorIgual);
+{if ("" != null) return t;}
         break;
         }
-      case 54:{
-        jj_consume_token(54);
-{if ("" != null) return "==";}
+      case igual:{
+        t = jj_consume_token(igual);
+{if ("" != null) return t;}
         break;
         }
-      case 55:{
-        jj_consume_token(55);
-{if ("" != null) return "!=";}
+      case noIgual:{
+        t = jj_consume_token(noIgual);
+{if ("" != null) return t;}
         break;
         }
       default:
@@ -1082,24 +1082,24 @@ Exp e0; Token id;
     }
 }
 
-  final public String op4() throws ParseException {
+  final public Token op4() throws ParseException {
     trace_call("op4");
     try {
-
+Token t;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 56:{
-        jj_consume_token(56);
-{if ("" != null) return "*";}
+      case mul:{
+        t = jj_consume_token(mul);
+{if ("" != null) return t;}
         break;
         }
-      case 57:{
-        jj_consume_token(57);
-{if ("" != null) return "/";}
+      case div:{
+        t = jj_consume_token(div);
+{if ("" != null) return t;}
         break;
         }
-      case 58:{
-        jj_consume_token(58);
-{if ("" != null) return "%";}
+      case mod:{
+        t = jj_consume_token(mod);
+{if ("" != null) return t;}
         break;
         }
       default:
@@ -1113,19 +1113,19 @@ Exp e0; Token id;
     }
 }
 
-  final public String op5() throws ParseException {
+  final public Token op5() throws ParseException {
     trace_call("op5");
     try {
-
+Token t;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case 48:{
-        jj_consume_token(48);
-{if ("" != null) return "-";}
+      case resta:{
+        t = jj_consume_token(resta);
+{if ("" != null) return t;}
         break;
         }
       case not:{
-        jj_consume_token(not);
-{if ("" != null) return "not";}
+        t = jj_consume_token(not);
+{if ("" != null) return t;}
         break;
         }
       default:
@@ -1159,7 +1159,7 @@ Exp e0; Token id;
 	   jj_la1_0 = new int[] {0x5045e000,0x0,0x5045e000,0x4041e000,0x0,0x40000000,0x0,0x4041e000,0x4041e000,0x0,0x2fa80000,0x0,0x2fa80000,0x100000,0x0,0x0,0x0,0x0,0x0,0x0,0x300,0x0,0xc0021c00,0x0,0xc0021800,0x0,0x0,0x400,};
 	}
 	private static void jj_la1_init_1() {
-	   jj_la1_1 = new int[] {0x1000,0x20,0x1000,0x1000,0x100,0x200,0x400,0x1000,0x0,0x100,0x2004,0x20,0x2004,0x0,0x40,0x100,0x4000,0xfc0000,0x8000,0x10000,0x0,0x7000000,0x10043,0x21400,0x43,0xfc0000,0x7000000,0x10000,};
+	   jj_la1_1 = new int[] {0x8000,0x80000,0x8000,0x8000,0x400000,0x800000,0x4000,0x8000,0x0,0x400000,0x2010000,0x80000,0x2010000,0x0,0x100000,0x400000,0x80,0x3f00,0x4,0x8,0x0,0x70,0x10000b,0x400c000,0x100003,0x3f00,0x70,0x8,};
 	}
 
   {

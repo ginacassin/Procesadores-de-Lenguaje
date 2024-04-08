@@ -70,6 +70,20 @@ PARSER_END(ConstructorASTsTiny)
   TOKEN:{<literalEntero:(["+","-"])?<parteEntera>>}
   TOKEN:{<literalReal:<literalEntero>(("."<parteDecimal>)|(("e"|"E")(["+","-"])?<parteEntera>)|("."<parteDecimal>("e"|"E")(["+","-"])?<parteEntera>)) >}
   TOKEN:{<literalCadena:"\""(~["\""])*"\"">}
+  TOKEN:{<suma:"+">}
+  TOKEN:{<resta:"-">}
+  TOKEN:{<mod:"%">}
+  TOKEN:{<mul:"*">}
+  TOKEN:{<div:"/">}
+  TOKEN:{<asignar:"=">}
+  TOKEN:{<menor:"<">}
+  TOKEN:{<mayor:">">}
+  TOKEN:{<menorIgual:"<=">}
+  TOKEN:{<mayorIgual:">=">}
+  TOKEN:{<igual:"==">}
+  TOKEN:{<noIgual:"!=">}
+  TOKEN:{<abrirCorchete:"[">}
+  TOKEN:{<indir:"^">}
 
 // ======== REGLAS SINTACTICAS ========
 
@@ -330,9 +344,9 @@ PARSER_END(ConstructorASTsTiny)
                 {return e0;}
           }
     Exp facE1(Exp e1h)   :
-          {Exp e1; Exp e0;}
+          {Exp e1; Exp e0; Token asign;}
           {
-             "=" e1 = e0() e0 = facE1(sem.asig(e1h, e1))
+             asign = <asignar> e1 = e0() e0 = facE1((Exp) sem.asig(e1h, e1).ponFila(asign.beginLine + 1).ponCol(asign.beginColumn))
                 {return e0;}
              |
                 {return e1h;}
@@ -344,9 +358,9 @@ PARSER_END(ConstructorASTsTiny)
                 {return e1;}
           }
     Exp recOp1(Exp e2h)   :
-          {String op1; Exp e2,e1;}
+          {Token op1; Exp e2,e1;}
           {
-             op1 = op1() e2 = e2() e1 = recOp1(sem.mkop1(op1, e2h, e2))
+             op1 = op1() e2 = e2() e1 = recOp1((Exp) sem.mkop1Token(op1, e2h, e2).ponFila(op1.beginLine + 1).ponCol(op1.beginColumn))
                 {return e1;}
              |
                 {return e2h;}
@@ -358,18 +372,18 @@ PARSER_END(ConstructorASTsTiny)
                 {return e33;}
           }
     Exp recSuma(Exp e3h)   :
-          {Exp e31, e32;}
+          {Exp e31, e32; Token sum;}
           {
-             "+" e31 = e3() e32 = recSuma(sem.suma(e3h, e31))
+             sum = <suma> e31 = e3() e32 = recSuma((Exp) sem.suma(e3h, e31).ponFila(sum.beginLine + 1).ponCol(sum.beginColumn))
                 {return e32;}
              |
                 {return e3h;}
           }
     Exp facE3(Exp e31h)   :
-          {Exp e3;}
+          {Exp e3; Token subs;}
           {
-             "-" e3 = e3()
-                {return sem.resta(e31h, e3);}
+             subs = <resta> e3 = e3()
+                {return (Exp) sem.resta(e31h, e3).ponFila(subs.beginLine + 1).ponCol(subs.beginColumn);}
              |
                 {return e31h;}
           }
@@ -380,13 +394,13 @@ PARSER_END(ConstructorASTsTiny)
                 {return e;}
           }
     Exp facE4(Exp e4h)   :
-          {Exp e;}
+          {Exp e; Token t;}
           {
-             <and> e = e3()
-                {return sem.and(e4h, e);}
+             t = <and> e = e3()
+                {return (Exp) sem.and(e4h, e).ponFila(t.beginLine + 1).ponCol(t.beginColumn);}
              |
-             <or> e = e4()
-                {return sem.or(e4h, e);}
+             t = <or> e = e4()
+                {return (Exp) sem.or(e4h, e).ponFila(t.beginLine + 1).ponCol(t.beginColumn);}
              |
                 {return e4h;}
           }
@@ -397,18 +411,18 @@ PARSER_END(ConstructorASTsTiny)
                 {return e52;}
           }
     Exp recOp4(Exp e5h)   :
-          {String op; Exp e51, e52;}
+          {Token op; Exp e51, e52;}
           {
-             op = op4() e51 = e5() e52 = recOp4(sem.mkop4(op, e5h, e51))
+             op = op4() e51 = e5() e52 = recOp4((Exp) sem.mkop4Token(op, e5h, e51).ponFila(op.beginLine + 1).ponCol(op.beginColumn))
                 {return e52;}
              |
                 {return e5h;}
           }
     Exp e5()   :
-          {String op; Exp e;}
+          {Token op; Exp e;}
           {
              op = op5() e = e5()
-                {return sem.mkop5(op, e);}
+                {return (Exp)sem.mkop5Token(op, e).ponFila(op.beginLine + 1).ponCol(op.beginColumn);}
              |
              e = e6()
                 {return e;}
@@ -420,15 +434,15 @@ PARSER_END(ConstructorASTsTiny)
                 {return e;}
           }
     Exp recOp6(Exp e7h)   :
-          {Exp expr, e; Token id;}
+          {Exp expr, e; Token id; Token t;}
           {
-             "[" expr = expr() "]" e = recOp6(sem.index(e7h, expr))
+             t = <abrirCorchete> expr = expr() "]" e = recOp6((Exp) sem.index(e7h, expr).ponFila(t.beginLine + 1).ponCol(t.beginColumn))
                 {return e;}
              |
              "." id = <iden> e = recOp6((Exp)sem.acceso(e7h, id.image).ponFila(id.beginLine + 1).ponCol(id.beginColumn))
                 {return e;}
              |
-             "^" e = recOp6(sem.indireccion(e7h))
+             t = <indir> e = recOp6((Exp) sem.indireccion(e7h).ponFila(t.beginLine + 1).ponCol(t.beginColumn))
                 {return e;}
              |
                 {return e7h;}
@@ -460,47 +474,47 @@ PARSER_END(ConstructorASTsTiny)
              <NULL>
                 {return sem.vnull();}
           }
-    String op1()   :
-        {}
+    Token op1()   :
+        {Token t;}
         {
-           "<"
-            {return "<";}
+            t = <menor>
+            {return t;}
             |
-            ">"
-            {return ">";}
+            t = <mayor>
+            {return t;}
             |
-            "<="
-            {return "<=";}
+            t = <menorIgual>
+            {return t;}
             |
-            ">="
-            {return ">=";}
+            t = <mayorIgual>
+            {return t;}
             |
-            "=="
-            {return "==";}
+            t = <igual>
+            {return t;}
             |
-            "!="
-            {return "!=";}
+            t = <noIgual>
+            {return t;}
         }
-    String op4()   :
-        {}
+    Token op4()   :
+        {Token t;}
         {
-           "*"
-            {return "*";}
+            t = <mul>
+            {return t;}
             |
-            "/"
-            {return "/";}
+            t = <div>
+            {return t;}
             |
-            "%"
-            {return "%";}
+            t = <mod>
+            {return t;}
         }
-    String op5()   :
-        {}
+    Token op5()   :
+        {Token t;}
         {
-           "-"
-            {return "-";}
+            t = <resta>
+            {return t;}
             |
-            <not>
-            {return "not";}
+            t = <not>
+            {return t;}
         }
 
 

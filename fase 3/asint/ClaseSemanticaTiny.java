@@ -1,4 +1,5 @@
 package asint;
+import c_ast_descendente.Token;
 
 public class ClaseSemanticaTiny extends SintaxisAbstractaTiny {
     public ClaseSemanticaTiny() {
@@ -25,6 +26,33 @@ public class ClaseSemanticaTiny extends SintaxisAbstractaTiny {
     }
     public Exp mkop5(String op, Exp opnd) {
         switch(op) {
+            case "-": return negativo(opnd);
+            case "not": return not(opnd);
+            default: throw new UnsupportedOperationException("Bad op");
+        }
+    }
+
+    public Exp mkop1Token(Token op, Exp opnd1, Exp opnd2) {
+        switch(op.image) {
+            case "<": return menor(opnd1,opnd2);
+            case ">": return mayor(opnd1,opnd2);
+            case "<=": return menor_igual(opnd1,opnd2);
+            case ">=": return mayor_igual(opnd1,opnd2);
+            case "==": return igual(opnd1,opnd2);
+            case "!=": return no_igual(opnd1,opnd2);
+            default: throw new UnsupportedOperationException("Bad op");
+        }
+    }
+    public Exp mkop4Token(Token op, Exp opnd1, Exp opnd2) {
+        switch(op.image) {
+            case "*": return mult(opnd1,opnd2);
+            case "/": return div(opnd1,opnd2);
+            case "%": return mod(opnd1,opnd2);
+            default: throw new UnsupportedOperationException("Bad op");
+        }
+    }
+    public Exp mkop5Token(Token op, Exp opnd) {
+        switch(op.image) {
             case "-": return negativo(opnd);
             case "not": return not(opnd);
             default: throw new UnsupportedOperationException("Bad op");
