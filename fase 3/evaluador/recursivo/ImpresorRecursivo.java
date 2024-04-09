@@ -2,7 +2,7 @@ package evaluador.recursivo;
 
 import asint.SintaxisAbstractaTiny;
 
-public class EvaluadorRecursivo extends SintaxisAbstractaTiny {
+public class ImpresorRecursivo extends SintaxisAbstractaTiny {
     private void imprime(String str) {
         System.out.println(str);
     }
