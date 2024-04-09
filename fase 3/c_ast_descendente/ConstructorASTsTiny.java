@@ -701,13 +701,12 @@ Exp e1; Exp e0;
   final public Exp facE1(Exp e1h) throws ParseException {
     trace_call("facE1");
     try {
-Exp e1; Exp e0; Token asign;
+Exp e0; Token asign;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case asignar:{
         asign = jj_consume_token(asignar);
-        e1 = e0();
-        e0 = facE1((Exp) sem.asig(e1h, e1).ponFila(asign.beginLine).ponCol(asign.beginColumn));
-{if ("" != null) return e0;}
+        e0 = e0();
+{if ("" != null) return (Exp) sem.asig(e1h, e0).ponFila(asign.beginLine).ponCol(asign.beginColumn);}
         break;
         }
       default:

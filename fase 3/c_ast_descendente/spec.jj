@@ -344,10 +344,10 @@ PARSER_END(ConstructorASTsTiny)
                 {return e0;}
           }
     Exp facE1(Exp e1h)   :
-          {Exp e1; Exp e0; Token asign;}
+          {Exp e0; Token asign;}
           {
-             asign = <asignar> e1 = e0() e0 = facE1((Exp) sem.asig(e1h, e1).ponFila(asign.beginLine).ponCol(asign.beginColumn))
-                {return e0;}
+             asign = <asignar> e0 = e0()
+                {return (Exp) sem.asig(e1h, e0).ponFila(asign.beginLine).ponCol(asign.beginColumn);}
              |
                 {return e1h;}
           }
