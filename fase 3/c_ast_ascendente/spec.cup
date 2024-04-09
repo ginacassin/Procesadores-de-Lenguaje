@@ -22,11 +22,11 @@ action code {:
 :}
 
 terminal PABRIR, PCERRAR, BABRIR, BCERRAR, TCERRAR,
-         FINDEC, TRUE, FALSE, BITAND, ENTERO, REAL, BOOL, STRING,
+         FINDEC, BITAND, ENTERO, REAL, BOOL, STRING,
          PROC, IF, ELSE, WHILE, STRUCT, NEW, DELETE, READ, WRITE, NL, TYPE,
          CALL, EVAL, PUNTO, COMA, PUNTOCOMA;
 
-terminal StringLocalizado IDEN, LITREAL, LITCADENA, LITENT, TABRIR, PUNTERO, NULL,
+terminal StringLocalizado IDEN, LITREAL, LITCADENA, LITENT, TABRIR, PUNTERO, NULL, TRUE, FALSE,
             AND, OR, SUMA, RESTA, MOD, MUL, DIV, ASIG, MENOR, MAYOR, MENORIGUAL, MAYORIGUAL, IGUAL, NOIGUAL, NOT;
 
 non terminal Prog programa;
@@ -201,10 +201,10 @@ e7 ::= LITENT: ent
    {: RESULT = (Exp) sem.lit_ent(ent.str()).ponFila(ent.fila()).ponCol(ent.col()); :};
 e7 ::= LITREAL: real
    {: RESULT = (Exp) sem.lit_real(real.str()).ponFila(real.fila()).ponCol(real.col()); :};
-e7 ::= TRUE
-   {: RESULT = sem.btrue(); :};
-e7 ::= FALSE
-   {: RESULT = sem.bfalse(); :};
+e7 ::= TRUE: btrue
+   {: RESULT = (Exp) sem.btrue().ponFila(btrue.fila()).ponCol(btrue.col()); :};
+e7 ::= FALSE: bfalse
+   {: RESULT = (Exp) sem.bfalse().ponFila(bfalse.fila()).ponCol(bfalse.col()); :};
 e7 ::= LITCADENA: litCadena
    {: RESULT = (Exp) sem.lit_cadena(litCadena.str()).ponFila(litCadena.fila()).ponCol(litCadena.col()); :};
 e7 ::= IDEN: id
