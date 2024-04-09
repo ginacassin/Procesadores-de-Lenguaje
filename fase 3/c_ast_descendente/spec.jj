@@ -465,11 +465,11 @@ PARSER_END(ConstructorASTsTiny)
              id = <literalReal>
                 {return (Exp)sem.lit_real(id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
              |
-             <TRUE>
-                {return sem.btrue();}
+             id = <TRUE>
+                {return (Exp)sem.btrue().ponFila(id.beginLine).ponCol(id.beginColumn);}
              |
-             <FALSE>
-                {return sem.bfalse();}
+             id = <FALSE>
+                {return (Exp)sem.bfalse().ponFila(id.beginLine).ponCol(id.beginColumn);}
              |
              id = <literalCadena>
                 {return (Exp)sem.lit_cadena(id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}

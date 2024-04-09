@@ -1021,13 +1021,13 @@ Exp e0; Token id;
         break;
         }
       case TRUE:{
-        jj_consume_token(TRUE);
-{if ("" != null) return sem.btrue();}
+        id = jj_consume_token(TRUE);
+{if ("" != null) return (Exp)sem.btrue().ponFila(id.beginLine).ponCol(id.beginColumn);}
         break;
         }
       case FALSE:{
-        jj_consume_token(FALSE);
-{if ("" != null) return sem.bfalse();}
+        id = jj_consume_token(FALSE);
+{if ("" != null) return (Exp)sem.bfalse().ponFila(id.beginLine).ponCol(id.beginColumn);}
         break;
         }
       case literalCadena:{
