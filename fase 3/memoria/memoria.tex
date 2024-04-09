@@ -603,14 +603,13 @@
                 \subitem recParamFormal1.a = recParamFormal2.a
             \item recParamFormal $\rightarrow$ $\varepsilon$
                 \subitem recParamFormal.a = recParamFormal.h
-            \item param $\rightarrow$ tipo0 referencia identificador
-                \subitem referencia.ht = tipo0.a
-                \subitem referencia.hi = identificador.lex
-                \subitem param.a = referencia.a
-            \item referencia $\rightarrow$ \&
-                \subitem referencia.a = param\_ref(referencia.ht, referencia.hi)
-            \item referencia $\rightarrow$ $\varepsilon$
-                \subitem referencia.a = param(referencia.ht, referencia.hi)
+            \item param $\rightarrow$ tipo0 facParam
+                \subitem facParam.ht = tipo0.a
+                \subitem param.a = facParam.a
+            \item facParam $\rightarrow$ \& identificador
+                \subitem facParam.a = param\_ref(facParam.ht, identificador.lex)
+            \item facParam $\rightarrow$ identificador
+                \subitem facParam.a = param(facParam.h, identificador.lex)
         \end{itemize}
         \
         \begin{itemize}
@@ -710,9 +709,8 @@
             \item e0 $\rightarrow$ e1 facE1
                 \subitem facE1.h = e1.a
                 \subitem e0.a = facE1.a
-            \item facE1 $\rightarrow$ = e0 facE1
-                \subitem facE$1_2$.h = asig(facE$1_1$.h, e0.a)
-                \subitem facE$1_1$.a = facE$1_2$.a
+            \item facE1 $\rightarrow$ = e0
+                \subitem facE$1_1$.a = asig(facE$1_1$.h, e0.a)
             \item facE1 $\rightarrow$ $\varepsilon$
                 \subitem facE1.a = facE1.h
             \item e1 $\rightarrow$ e2 recOp1
@@ -758,16 +756,16 @@
             \item e5 $\rightarrow$ e6
                 \subitem e5.a = e6.a
             \item e6 $\rightarrow$ e7 recOp6
-                \subitem recOp6.h = e6Aux.a
+                \subitem recOp6.h = e7.a
                 \subitem e6.a = recOp6.a
             \item recOp6 $\rightarrow$ [ expr ] recOp6
-                \subitem recOp$6_2$.h = index(recOp6.h, expr.a)
+                \subitem recOp$6_2$.h = index(recOp$6_1$.h, expr.a)
                 \subitem recOp$6_1$.a = recOp$6_2$.a
             \item recOp6 $\rightarrow$ . identificador recOp6
                 \subitem recOp$6_2$.h = acceso(recOp6.a, identificador.lex)
                 \subitem recOp$6_1$.a = recOp$6_2$.a
             \item recOp6 $\rightarrow$ \^{} recOp6
-                \subitem recOp$6_2$.h = indireccion(recOp6.h)
+                \subitem recOp$6_2$.h = indireccion(recOp$6_1$.h)
                 \subitem recOp$6_1$.a = recOp$6_2$.a
             \item recOp6 $\rightarrow$ $\varepsilon$
                 \subitem recOp6.a = recOp6.h
