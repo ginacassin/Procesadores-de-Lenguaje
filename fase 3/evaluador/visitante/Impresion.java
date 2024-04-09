@@ -52,10 +52,10 @@ public class Impresion extends ProcesamientoDef{
         imprimeExpBin(exp.getOpnd0(), "!="  + exp.getFilaColInfo(), exp.getOpnd1(), 1, 2);
     }
     public void procesa(And exp) {
-        imprimeExpBin(exp.getOpnd0(), "and" + exp.getFilaColInfo(), exp.getOpnd1(), 4, 3);
+        imprimeExpBin(exp.getOpnd0(), "<and>" + exp.getFilaColInfo(), exp.getOpnd1(), 4, 3);
     }
     public void procesa(Or exp) {
-        imprimeExpBin(exp.getOpnd0(), "or" + exp.getFilaColInfo(), exp.getOpnd1(), 4, 4);
+        imprimeExpBin(exp.getOpnd0(), "<or>" + exp.getFilaColInfo(), exp.getOpnd1(), 4, 4);
     }
     public void procesa(Mod exp) {
         imprimeExpBin(exp.getOpnd0(), "%" + exp.getFilaColInfo(), exp.getOpnd1(), 4, 5);
@@ -64,7 +64,7 @@ public class Impresion extends ProcesamientoDef{
         imprimeExpUni(exp.getOpnd0(), "-" + exp.getFilaColInfo(), 5);
     }
     public void procesa(Not exp) {
-        imprimeExpUni(exp.getOpnd0(), "not" + exp.getFilaColInfo(), 5);
+        imprimeExpUni(exp.getOpnd0(), "<not>" + exp.getFilaColInfo(), 5);
     }
     public void procesa(Indireccion exp) {
         imprimeOpnd(exp.getOpnd0(),exp.prioridad());
