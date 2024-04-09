@@ -406,7 +406,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            imprimeExpUnarioPrefijo(opnd0,"-",5);
+            imprimeExpUnarioPrefijo(opnd0,"-" + getFilaColInfo(),5);
         }
         @Override
         public int prioridad() {
@@ -425,7 +425,7 @@ public class SintaxisAbstractaTiny {
         }
         @Override
         public void imprime() {
-            imprimeExpUnarioPrefijo(opnd0,"<not>",5);
+            imprimeExpUnarioPrefijo(opnd0,"<not>" + getFilaColInfo(),5);
         }
         @Override
         public int prioridad() {
