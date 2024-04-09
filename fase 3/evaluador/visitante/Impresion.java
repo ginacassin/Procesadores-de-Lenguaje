@@ -67,8 +67,8 @@ public class Impresion extends ProcesamientoDef{
         imprimeExpUni(exp.getOpnd0(), "not" + exp.getFilaColInfo(), 5);
     }
     public void procesa(Indireccion exp) {
-        System.out.println("^" + exp.getFilaColInfo());
         imprimeOpnd(exp.getOpnd0(),exp.prioridad());
+        System.out.println("^" + exp.getFilaColInfo());
     }
     public void procesa(Index exp) {
         imprimeOpnd(exp.getOpnd(), exp.prioridad());
