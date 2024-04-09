@@ -619,12 +619,33 @@ Bloq bloq;
   final public ParamsR paramsReales() throws ParseException {
     trace_call("paramsReales");
     try {
+ParamsR paramsRealesAux;
+      jj_consume_token(52);
+      paramsRealesAux = paramsRealesAux();
+      jj_consume_token(53);
+{if ("" != null) return paramsRealesAux;}
+    throw new Error("Missing return statement in function");
+    } finally {
+      trace_return("paramsReales");
+    }
+}
+
+  final public ParamsR paramsRealesAux() throws ParseException {
+    trace_call("paramsRealesAux");
+    try {
 ParamsRL paramsRL;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case not:
+      case TRUE:
+      case FALSE:
+      case NULL:
+      case iden:
+      case literalEntero:
+      case literalReal:
+      case literalCadena:
+      case resta:
       case 52:{
-        jj_consume_token(52);
         paramsRL = paramsRealesLista();
-        jj_consume_token(53);
 {if ("" != null) return sem.si_paramsR(paramsRL);}
         break;
         }
@@ -634,7 +655,7 @@ ParamsRL paramsRL;
       }
     throw new Error("Missing return statement in function");
     } finally {
-      trace_return("paramsReales");
+      trace_return("paramsRealesAux");
     }
 }
 
@@ -1155,10 +1176,10 @@ Token t;
 	   jj_la1_init_1();
 	}
 	private static void jj_la1_init_0() {
-	   jj_la1_0 = new int[] {0x5045e000,0x0,0x5045e000,0x4041e000,0x0,0x40000000,0x0,0x4041e000,0x4041e000,0x0,0x2fa80000,0x0,0x2fa80000,0x100000,0x0,0x0,0x0,0x0,0x0,0x0,0x300,0x0,0xc0021c00,0x0,0xc0021800,0x0,0x0,0x400,};
+	   jj_la1_0 = new int[] {0x5045e000,0x0,0x5045e000,0x4041e000,0x0,0x40000000,0x0,0x4041e000,0x4041e000,0x0,0x2fa80000,0x0,0x2fa80000,0x100000,0xc0021c00,0x0,0x0,0x0,0x0,0x0,0x300,0x0,0xc0021c00,0x0,0xc0021800,0x0,0x0,0x400,};
 	}
 	private static void jj_la1_init_1() {
-	   jj_la1_1 = new int[] {0x8000,0x80000,0x8000,0x8000,0x400000,0x800000,0x4000,0x8000,0x0,0x400000,0x2010000,0x80000,0x2010000,0x0,0x100000,0x400000,0x80,0x3f00,0x4,0x8,0x0,0x70,0x10000b,0x400c000,0x100003,0x3f00,0x70,0x8,};
+	   jj_la1_1 = new int[] {0x8000,0x80000,0x8000,0x8000,0x400000,0x800000,0x4000,0x8000,0x0,0x400000,0x2010000,0x80000,0x2010000,0x0,0x10000b,0x400000,0x80,0x3f00,0x4,0x8,0x0,0x70,0x10000b,0x400c000,0x100003,0x3f00,0x70,0x8,};
 	}
 
   {

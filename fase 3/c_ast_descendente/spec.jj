@@ -310,9 +310,15 @@ PARSER_END(ConstructorASTsTiny)
                 {return sem.instr_if(exph, bloqh);}
           }
     ParamsR paramsReales()   :
+          {ParamsR paramsRealesAux;}
+          {
+             "(" paramsRealesAux = paramsRealesAux() ")"
+                {return paramsRealesAux;}
+          }
+    ParamsR paramsRealesAux()   :
           {ParamsRL paramsRL;}
           {
-             "(" paramsRL = paramsRealesLista() ")"
+             paramsRL = paramsRealesLista()
                 {return sem.si_paramsR(paramsRL);}
              |
                 {return sem.no_paramsR();}
