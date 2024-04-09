@@ -341,7 +341,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            imprimeExpBin(opnd0,"and" + getFilaColInfo(),opnd1,4,3);
+            imprimeExpBin(opnd0,"<and>" + getFilaColInfo(),opnd1,4,3);
         }
         @Override
         public int prioridad() {
@@ -362,7 +362,7 @@ public class SintaxisAbstractaTiny {
 
         @Override
         public void imprime() {
-            imprimeExpBin(opnd0,"or" + getFilaColInfo(),opnd1,4,4);
+            imprimeExpBin(opnd0,"<or>" + getFilaColInfo(),opnd1,4,4);
         }
         @Override
         public int prioridad() {
@@ -425,7 +425,7 @@ public class SintaxisAbstractaTiny {
         }
         @Override
         public void imprime() {
-            imprimeExpUnarioPrefijo(opnd0,"not",5);
+            imprimeExpUnarioPrefijo(opnd0,"<not>",5);
         }
         @Override
         public int prioridad() {
