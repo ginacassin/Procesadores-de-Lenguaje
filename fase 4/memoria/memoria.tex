@@ -1,0 +1,94 @@
+% Preamble
+\documentclass[11pt]{article}
+
+% Packages
+\usepackage{amsmath}
+\usepackage{titling}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{graphicx}
+\graphicspath{ {/} }
+
+% Titles
+\title{Memoria: Procesadores de Lenguaje - Lenguaje Tiny}
+\author{Burgos Sosa, Rodrigo \and Cassin, Gina Andrea \and Estebán Velasco, Luis \and Rabbia, Santiago Elias}
+\date{Curso 2024}
+
+% Document
+\begin{document}
+\begin{titlepage}
+    \centering
+    {\Huge Memoria: Procesadores de Lenguaje - Lenguaje Tiny \par}
+    \vspace{1cm}
+    {\Large Fase 4: Finalización del procesador para Tiny \par}
+    \vspace{2cm}
+    {\Large Grupo G03: \par}
+    {\Large Burgos Sosa Rodrigo, Cassin Gina Andrea, \par}
+    {\Large Estebán Velasco Luis, Rabbia Santiago Elias \par}
+    \vspace{2cm}
+    {\Large Curso 2024 \par}
+\end{titlepage}
+\thispagestyle{empty}
+
+    \newpage
+
+    \section{Introducción}
+        En el siguiente documento se expondrá una memoria sobre las especificaciones necesarias para finalizar la implementación del procesador de lenguaje Tiny.         
+        Se realizará:
+        \begin{enumerate}
+            \item Una especificación del procesamiento de vinculación.
+            \item Una especificación del procesamiento de comprobación de tipos.
+            \item Una especificación del procesamiento de asignación de espacio.
+            \item Una descripción del repertorio de instrucciones de la máquina-p necesario para soportar la traducción de Tiny a código-p.
+            \item Una especificación del procesamiento de etiquetado.
+            \item Una especificación del procesamiento de generación de código.
+        \end{enumerate}
+
+    \section{Especificación del procesamiento de vinculación}
+        A continuación se presentará la especificación del procesamiento de vinculación. Durante este procesamiento se comprueban las reglas de ámbito del lenguaje, siendo estas dos:
+        
+        \begin{itemize}
+            \item Se comprueba que, cuando se utiliza un identificador, éste haya sido previamente declarado.
+            \item Los usos de los identificadores se vinculan con sus declaraciones.
+        \end{itemize}
+        Cada nodo de tipo iden tendrá un atributo vinculo: una referencia a nodos de
+        tipo Dec.
+
+        \subsection{Tabla de símbolos}
+            Es un diccionario String $\rightarrow$ Dec, con las siguientes operaciones:
+            \begin{itemize}
+                \item \textbf{creaTS()}: Crea una tabla de símbolos vacía.
+                \item \textbf{contiene(ts,id)}: Comprueba si la tabla de símbolos ts contiene ya una entrada para el identificador id.
+                \item \textbf{inserta(ts,id,dec)}: Inserta el identificador id en la tabla de símbolos ts, con la referencia al nodo dec como valor.
+                \item \textbf{vinculoDe(ts,id)}: Recupera la referencia asociada a id en la tabla de símbolos ts. Si no está, devuelve $\bot$.
+            \end{itemize}
+
+        \subsection{Organización del procesamiento}
+            \begin{itemize}
+                \item Procesar, en orden de aparición, las declaraciones en la sección de declaraciones.
+                \item Para cada declaración:
+                    \begin{itemize}
+                        \item Se comprueba que el identificador no esté en la tabla de símbolos (si es así, se señala error).
+                        \item Vincular los identificadores en la expresión.
+                        \item Asociar la declaración con el identificador en la tabla de símbolos.
+                    \end{itemize}
+                \item La vinculación en las expresiones compuestas se lleva a cabo vinculando en cada uno de sus operandos.
+                \item La vinculación de las expresiones iden se lleva a cabo:
+                    \begin{itemize}
+                        \item Comprobando que el identificador esté en la tabla de símbolos. Si no es así, se señala error.
+                        \item Fijando el atributo vinculo al nodo asociado al identificador en la tabla de símbolos.
+                    \end{itemize}
+            \end{itemize}
+
+        \subsection{Vinculador para Tiny}
+        
+    
+    \section{Especificación del procesamiento de comprobación de tipos}
+        A continuación se presentará la especificación del procesamiento de comprobación de tipos. Durante este procesamiento se comprueban las reglas de tipado del lenguaje:
+        \begin{itemize}
+            \item Se comprueba que las distintas construcciones del lenguaje estén
+            correctamente tipadas.
+            \item Se asocian tipos con estas construcciones.
+        \end{itemize}
+
+\end{document}
