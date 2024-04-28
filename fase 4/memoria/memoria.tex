@@ -57,10 +57,12 @@
         \subsection{Tabla de símbolos}
             Es un diccionario String $\rightarrow$ Dec, con las siguientes operaciones:
             \begin{itemize}
-                \item \textbf{creaTS()}: Crea una tabla de símbolos vacía.
+                \item \textbf{creaTS()}: Crea una tabla de símbolos vacía que no tiene aún ningún ámbito abierto.
+                \item \textbf{abreAmbito(ts)}: Añade a la tabla de símbolos ts un nuevo ámbito, que tendrá como padre el ámbito más reciente (o $\bot$, si aún no se ha creado ningún ámbito).
                 \item \textbf{contiene(ts,id)}: Comprueba si la tabla de símbolos ts contiene ya una entrada para el identificador id.
                 \item \textbf{inserta(ts,id,dec)}: Inserta el identificador id en la tabla de símbolos ts, con la referencia al nodo dec como valor.
-                \item \textbf{vinculoDe(ts,id)}: Recupera la referencia asociada a id en la tabla de símbolos ts. Si no está, devuelve $\bot$.
+                \item \textbf{vinculoDe(ts,id)}: Recupera la referencia asociada a id en la tabla de símbolos ts. Para ello busca sucesivamente en la cadena de ámbitos, hasta que lo encuentra. Si no está, devuelve $\bot$.
+                \item \textbf{cierraAmbito(ts)}: Fija en ts el ámbito actual al ámbito padre del ámbito más reciente.
             \end{itemize}
 
         \subsection{Organización del procesamiento}
@@ -78,10 +80,302 @@
                         \item Comprobando que el identificador esté en la tabla de símbolos. Si no es así, se señala error.
                         \item Fijando el atributo vinculo al nodo asociado al identificador en la tabla de símbolos.
                     \end{itemize}
+                \item Para permitir el algoritmo de compatibilidad estructural de tipos recursivos, se realizan dos pasadas en el vinculador en la sección de declaraciones.
             \end{itemize}
 
         \subsection{Vinculador para Tiny}
-        
+            \begin{itemize}
+                \item var ts \/// \textit{La tabla de símbolos}
+                \item vincula(prog(Bloq)):
+                    \subitem vincula(Bloq)
+                    \subitem ts = creaTS()
+                    \subitem abreAmbito(ts)
+                    \subitem vincula(Bloq)       
+                \item vincula(bloq(Decs, Insts)):
+                    \subitem abreAmbito(ts)
+                    \subitem vincula(Decs)
+                    \subitem vincula(Insts)
+                    \subitem cierraAmbito(ts)
+                \item vincula(si\_decs(DecsAux)):
+                    \subitem vincula1(DecsAux)
+                    \subitem vincula2(DecsAux)
+                \item vincula(no\_decs()):
+                    \subitem noop
+            \end{itemize}
+            \textbf{\/// Primera pasada}
+            \begin{itemize}
+                \item vincula1(muchas\_decs(DecsAux, Dec)):
+                    \subitem vincula1(DecsAux)
+                    \subitem vincula1(Dec)
+                \item vincula1(una\_dec(Dec)):
+                    \subitem vincula1(Dec)
+                \item vincula1(dec\_var(T, string)):
+                    \subitem vincula1(T)
+                    \subitem if contiene(ts, string) then
+                        \subsubitem error
+                    \subitem else
+                        \subsubitem inserta(ts, string, \$)
+                    \subitem end if 
+                \item vincula1(dec\_tipo(T, string)):
+                    \subitem vincula1(T)
+                    \subitem if contiene(ts, string) then
+                        \subsubitem error
+                    \subitem else
+                        \subsubitem inserta(ts, string, \$)
+                    \subitem end if
+                \item vincula1(dec\_proc(string, ParamsF, Bloq)):
+                    \subitem if contiene(ts, string) then
+                        \subsubitem error
+                    \subitem else
+                        \subsubitem inserta(ts, string, \$)
+                    \subitem end if
+                    \subitem abreAmbito(ts)
+                    \subitem vincula1(ParamsF)
+                    \subitem vincula1(Bloq)
+                    \subitem cierraAmbito(ts)
+                \item vincula1(si\_paramF(ParamsFL)):
+                    \subitem vincula1(ParamsFL)
+                \item vincula1(no\_paramF()):
+                    \subitem noop
+                \item vincula1(muchos\_paramsF(ParamsFL, Param)):
+                    \subitem vincula1(ParamsFL)
+                    \subitem vincula1(Param)
+                \item vincula1(un\_paramF(Param)): 
+                    \subitem vincula1(Param) 
+                \item vincula1(param\_ref(T, string)): 
+                    \subitem vincula1(T) 
+                    \subitem if contiene(ts, string) then 
+                        \subsubitem error 
+                    \subitem else 
+                        \subsubitem inserta(ts, string, \$) 
+                    \subitem end if
+                \item vincula1(param(T, string)): 
+                    \subitem vincula1(T) 
+                    \subitem if contiene(ts, string) then 
+                        \subsubitem error 
+                    \subitem else 
+                        \subsubitem inserta(ts, string, \$) 
+                    \subitem end if
+                \item vincula1(tipo\_array(T, string)): 
+                    \subitem vincula1(T) 
+                    \subitem if contiene(ts, string) then 
+                        \subsubitem error 
+                    \subitem else 
+                        \subsubitem inserta(ts, string, \$) 
+                    \subitem end if
+                \item vincula1(tipo\_punt(T)): 
+                    \subitem if T $\neq$ tipo\_iden(\_) then 
+                        \subsubitem vincula1(T)
+                    \subitem end if
+                \item vincula1(tipo\_struct(LCampos)): 
+                    \subitem abreAmbito(ts)
+                    \subitem vincula1(LCampos)
+                    \subitem cierraAmbito(ts)
+                \item vincula1(muchos\_campos(LCampos, Campo)): 
+                    \subitem vincula1(LCampos) 
+                    \subitem vincula1(Campo)
+                \item vincula1(un\_campo(Campo)): 
+                    \subitem vincula1(Campo)
+                \item vincula1(campo(T, string)): 
+                    \subitem vincula1(T)
+                \item vincula1(tipo\_int()): 
+                    \subitem noop 
+                \item vincula1(tipo\_real()): 
+                    \subitem noop
+                \item vincula1(tipo\_bool()): 
+                    \subitem noop
+                \item vincula1(tipo\_string()): 
+                    \subitem noop
+                \item vincula1(tipo\_iden(string)): 
+                    \subitem \$.vinculo = vinculoDe(ts,string)
+                    \subitem if \$.vinculo $\neq$ dec\_tipo(\_,\_) then
+                        \subsubitem error
+                    \subitem end if
+            \end{itemize}
+            \textbf{\/// Segunda pasada}
+            \begin{itemize}
+                \item vincula2(muchas\_decs(DecsAux, Dec)):
+                    \subitem vincula2(DecsAux)
+                    \subitem vincula2(Dec)
+                \item vincula2(una\_dec(Dec)):
+                    \subitem vincula2(Dec)
+                \item vincula2(dec\_var(T, string)):
+                    \subitem vincula2(T)
+                \item vincula2(dec\_tipo(T, string)):
+                    \subitem vincula2(T)
+                \item vincula2(dec\_proc(string, ParamsF, Bloq)):
+                    \subitem vincula2(ParamsF)
+                    \subitem vincula2(Bloq)
+                \item vincula2(si\_paramF(ParamsFL)):
+                    \subitem vincula2(ParamsFL)
+                \item vincula2(no\_paramF()):
+                    \subitem noop
+                \item vincula2(muchos\_paramsF(ParamsFL, Param)):
+                    \subitem vincula2(ParamsFL)
+                    \subitem vincula2(Param)
+                \item vincula2(un\_paramF(Param)): 
+                    \subitem vincula2(Param) 
+                \item vincula2(param\_ref(T, string)): 
+                    \subitem vincula2(T) 
+                \item vincula2(param(T, string)): 
+                    \subitem vincula2(T)
+                \item vincula2(tipo\_array(T, string)): 
+                    \subitem vincula2(T)
+                \item vincula2(tipo\_punt(T)): 
+                    \subitem if T = tipo\_iden(iden) then 
+                        \subsubitem T.vinculo = vinculoDe(ts,iden)
+                        \subsubitem if T.vinculo $\neq$ dec\_tipo(\_,\_) then
+                            \subsubitem \hspace{2em} error
+                        \subsubitem end if
+                    \subitem else
+                        \subsubitem vincula2(T)
+                    \subitem end if
+                \item vincula2(tipo\_struct(LCampos)): 
+                    \subitem vincula2(LCampos)
+                \item vincula2(muchos\_campos(LCampos, Campo)): 
+                    \subitem vincula2(LCampos) 
+                    \subitem vincula2(Campo)
+                \item vincula2(un\_campo(Campo)): 
+                    \subitem vincula2(Campo)
+                \item vincula2(campo(T, string)): 
+                    \subitem vincula2(T)
+                \item vincula1(tipo\_int()): 
+                    \subitem noop 
+                \item vincula1(tipo\_real()): 
+                    \subitem noop
+                \item vincula1(tipo\_bool()): 
+                    \subitem noop
+                \item vincula1(tipo\_string()): 
+                    \subitem noop
+                \item vincula1(tipo\_iden(string)): 
+                    \subitem noop
+            \end{itemize}
+            \textbf{\/// Única pasada}
+            \begin{itemize}
+                \item vincula(si\_instr(InstAux)): 
+                    \subitem vincula(InstAux)
+                \item vincula(no\_instr()): 
+                    \subitem noop
+                \item vincula(muchas\_instr(InstsAux, Inst): 
+                    \subitem vincula(InstsAux) 
+                    \subitem vincula(Inst)
+                \item vincula(una\_instr(Inst)): 
+                    \subitem vincula(Inst)
+                \item vincula(instr\_expr(Exp)): 
+                    \subitem vincula(Exp)
+                \item vincula(instr\_if(Exp, Bloq)): 
+                    \subitem vincula(Exp) 
+                    \subitem vincula(Bloq)
+                \item vincula(instr\_if\_else(Exp, Bloq1, Bloq2)): 
+                    \subitem vincula(Exp) 
+                    \subitem vincula(Bloq1) 
+                    \subitem vincula(Bloq2)
+                \item vincula(instr\_while(Exp, Bloq)): 
+                    \subitem vincula(Exp) 
+                    \subitem vincula(Bloq)
+                \item vincula(instr\_read(Exp)): 
+                    \subitem vincula(Exp)
+                \item vincula(instr\_write(Exp)): 
+                    \subitem vincula(Exp)
+                \item vincula(instr\_nl()): 
+                    \subitem noop
+                \item vincula(instr\_new(Exp)): 
+                    \subitem vincula(Exp)
+                \item vincula(instr\_del(Exp)): 
+                    \subitem vincula(Exp)
+                \item vincula(instr\_call(string, ParamsR)): 
+                    \subitem vincula(ParamsR) 
+                    \subitem \$.vinculo = vinculoDe(ts,string) 
+                    \subitem if \$.vinculo == $\bot$ then 
+                        \subsubitem error 
+                    \subitem end if
+                \item vincula(instr\_bloque(Bloq)): 
+                    \subitem vincula(Bloq)
+                \item vincula(si\_paramsR(ParamsRL)): 
+                    \subitem vincula(ParamsRL)
+                \item vincula(no\_paramsR()): 
+                    \subitem noop
+                \item vincula(muchos\_paramsR(ParamsRL, Exp)): 
+                    \subitem vincula(ParamsRL) 
+                    \subitem vincula(Exp)
+                \item vincula(un\_paramsR(Exp)): 
+                    \subitem vincula(Exp)
+                \item vincula(asig(Exp1, Exp2)): 
+                    \subitem vincula(Exp1) 
+                    \subitem vincula(Exp2)
+                \item vincula(menor(Exp1, Exp2)): 
+                    \subitem vincula(Exp1) 
+                    \subitem vincula(Exp2)
+                \item vincula(mayor(Exp1, Exp2)): 
+                    \subitem vincula(Exp1) 
+                    \subitem vincula(Exp2)
+                \item vincula(menor\_igual(Exp1, Exp2)): 
+                    \subitem vincula(Exp1) 
+                    \subitem vincula(Exp2)
+                \item vincula(mayor\_igual(Exp1, Exp2)): 
+                    \subitem vincula(Exp1) 
+                    \subitem vincula(Exp2)
+                \item vincula(igual(Exp1, Exp2)): 
+                    \subitem vincula(Exp1) 
+                    \subitem vincula(Exp2)
+                \item vincula(no\_igual(Exp1, Exp2)): 
+                    \subitem vincula(Exp1) 
+                    \subitem vincula(Exp2)
+                \item vincula(suma(Exp1, Exp2)): 
+                    \subitem vincula(Exp1) 
+                    \subitem vincula(Exp2)
+                \item vincula(resta(Exp1, Exp2)): 
+                    \subitem vincula(Exp1) 
+                    \subitem vincula(Exp2)
+                \item vincula(and(Exp1, Exp2)): 
+                    \subitem vincula(Exp1) 
+                    \subitem vincula(Exp2)
+                \item vincula(or(Exp1, Exp2)): 
+                    \subitem vincula(Exp1) 
+                    \subitem vincula(Exp2)
+                \item vincula(mult(Exp1, Exp2)): 
+                    \subitem vincula(Exp1) 
+                    \subitem vincula(Exp2)
+                \item vincula(div(Exp1, Exp2)): 
+                    \subitem vincula(Exp1) 
+                    \subitem vincula(Exp2)
+                \item vincula(mod(Exp1, Exp2)): 
+                    \subitem vincula(Exp1) 
+                    \subitem vincula(Exp2)
+                \item vincula(negativo(Exp)): 
+                    \subitem vincula(Exp)
+                \item vincula(not(Exp)): 
+                    \subitem vincula(Exp)
+                \item vincula(index(Exp1, Exp2)): 
+                    \subitem vincula(Exp1) 
+                    \subitem vincula(Exp2)
+                \item vincula(acceso(Exp, string)): 
+                    \subitem vincula(Exp) 
+                    \subitem \$.vinculo = vinculoDe(ts,string) 
+                    \subitem if \$.vinculo == $\bot$ then 
+                        \subsubitem error 
+                    \subitem end if
+                \item vincula(indireccion(Exp)): 
+                    \subitem vincula(Exp)
+                \item vincula(lit\_ent(string)): 
+                    \subitem noop
+                \item vincula(lit\_real(string)): 
+                    \subitem noop
+                \item vincula(true()): 
+                    \subitem noop
+                \item vincula(false()): 
+                    \subitem noop
+                \item vincula(lit\_cadena(string)): 
+                    \subitem noop
+                \item vincula(iden(string)): 
+                    \subitem \$.vinculo = vinculoDe(ts,string) 
+                    \subitem if \$.vinculo == $\bot$ then 
+                        \subsubitem error 
+                    \subitem end if
+                \item vincula(null()): 
+                    \subitem noop
+            \end{itemize}
+
     
     \section{Especificación del procesamiento de comprobación de tipos}
         A continuación se presentará la especificación del procesamiento de comprobación de tipos. Durante este procesamiento se comprueban las reglas de tipado del lenguaje:
@@ -90,5 +384,7 @@
             correctamente tipadas.
             \item Se asocian tipos con estas construcciones.
         \end{itemize}
+        Tiny es un lenguaje fuertamente tipado. 
 
+        
 \end{document}
