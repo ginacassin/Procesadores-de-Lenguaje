@@ -1,4 +1,4 @@
-package implementacion.asint;
+package asint;
 
 public class ProcesamientoDef implements Procesamiento {
     public void procesa(SintaxisAbstractaTiny.Suma exp) {}

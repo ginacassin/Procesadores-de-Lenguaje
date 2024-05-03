@@ -1,4 +1,4 @@
-package maquinap;
+package maquinaP;
 
 public class GestorMemoriaDinamica {
     private final static boolean DEBUG=false;

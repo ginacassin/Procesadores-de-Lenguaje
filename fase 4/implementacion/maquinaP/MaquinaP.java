@@ -1,4 +1,4 @@
-package maquinap;
+package maquinaP;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,6 @@
-package implementacion.asint;
+package asint;
+
+import asint.SintaxisAbstractaTiny;
 
 public interface Procesamiento {
     public void procesa(SintaxisAbstractaTiny.Suma exp) ;

@@ -1,7 +1,7 @@
-package implementacion.visitantes;
+package visitantes;
 
-import implementacion.asint.ProcesamientoDef;
-import implementacion.asint.SintaxisAbstractaTiny.*;
+import asint.ProcesamientoDef;
+import asint.SintaxisAbstractaTiny.*;
 
 public class VinculacionPrimera extends ProcesamientoDef {
 

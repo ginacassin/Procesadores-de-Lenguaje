@@ -1,6 +1,6 @@
-package implementacion.visitantes;
+package visitantes;
 
-import implementacion.asint.SintaxisAbstractaTiny.Nodo;
+import asint.SintaxisAbstractaTiny.Nodo;
 
 import java.util.HashMap;
 import java.util.Map;

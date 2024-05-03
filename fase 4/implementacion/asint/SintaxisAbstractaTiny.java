@@ -1,6 +1,6 @@
-package implementacion.asint;
+package asint;
 
-import implementacion.asint.Procesamiento;
+import asint.Procesamiento;
 
 public class SintaxisAbstractaTiny {
 
