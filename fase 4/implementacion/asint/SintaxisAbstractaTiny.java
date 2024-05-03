@@ -1,4 +1,6 @@
-package asint;
+package implementacion.asint;
+
+import implementacion.asint.Procesamiento;
 
 public class SintaxisAbstractaTiny {
 
@@ -26,6 +28,7 @@ public class SintaxisAbstractaTiny {
         }
         private int fila;
         private int col;
+        private Nodo vinculo;
         public Nodo ponFila(int fila) {
             this.fila = fila;
             return this;
@@ -39,6 +42,10 @@ public class SintaxisAbstractaTiny {
         }
         public int leeCol() {
             return col;
+        }
+
+        public void setVinculo(Nodo vinculo) {
+            this.vinculo = vinculo;
         }
 
         public abstract void procesa(Procesamiento p);

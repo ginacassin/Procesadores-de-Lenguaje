@@ -1,22 +1,4 @@
-package asint;
-
-import asint.SintaxisAbstractaTiny.Exp;
-import asint.SintaxisAbstractaTiny.ParamsR;
-import asint.SintaxisAbstractaTiny.ParamsRL;
-import asint.SintaxisAbstractaTiny.Insts;
-import asint.SintaxisAbstractaTiny.InstsAux;
-import asint.SintaxisAbstractaTiny.Inst;
-import asint.SintaxisAbstractaTiny.Campo;
-import asint.SintaxisAbstractaTiny.LCampos;
-import asint.SintaxisAbstractaTiny.T;
-import asint.SintaxisAbstractaTiny.ParamsF;
-import asint.SintaxisAbstractaTiny.Param;
-import asint.SintaxisAbstractaTiny.ParamsFL;
-import asint.SintaxisAbstractaTiny.Dec;
-import asint.SintaxisAbstractaTiny.Decs;
-import asint.SintaxisAbstractaTiny.DecsAux;
-import asint.SintaxisAbstractaTiny.Bloq;
-import asint.SintaxisAbstractaTiny.Prog;
+package implementacion.asint;
 
 public interface Procesamiento {
     public void procesa(SintaxisAbstractaTiny.Suma exp) ;
@@ -64,7 +46,7 @@ public interface Procesamiento {
     public void procesa(SintaxisAbstractaTiny.Instr_Del exp) ;
     public void procesa(SintaxisAbstractaTiny.Instr_Call exp) ;
     public void procesa(SintaxisAbstractaTiny.Instr_Bloque exp) ;
-    public void procesa(Campo exp) ;
+    public void procesa(SintaxisAbstractaTiny.Campo exp) ;
     public void procesa(SintaxisAbstractaTiny.Muchos_Campos exp) ;
     public void procesa(SintaxisAbstractaTiny.Un_Campo exp) ;
     public void procesa(SintaxisAbstractaTiny.TipoArray exp) ;
@@ -88,8 +70,8 @@ public interface Procesamiento {
     public void procesa(SintaxisAbstractaTiny.NoDecs exp);
     public void procesa(SintaxisAbstractaTiny.MuchasDecs exp);
     public void procesa(SintaxisAbstractaTiny.UnaDec exp);
-    public void procesa(Bloq exp);
-    public void procesa(Prog exp);
+    public void procesa(SintaxisAbstractaTiny.Bloq exp);
+    public void procesa(SintaxisAbstractaTiny.Prog exp);
 
     void procesa(SintaxisAbstractaTiny.Op op);
 }
