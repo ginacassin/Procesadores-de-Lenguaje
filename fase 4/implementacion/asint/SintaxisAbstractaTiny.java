@@ -33,6 +33,8 @@ public class SintaxisAbstractaTiny {
         private int prim;
         private int sig;
         private int nivel;
+        private int dir;
+        private int tam;
 
         public Nodo ponFila(int fila) {
             this.fila = fila;
@@ -68,12 +70,15 @@ public class SintaxisAbstractaTiny {
         public int getSig(){ return this.sig; }
         public void setNivel(int nivel){ this.nivel = nivel; }
         public int getNivel(){ return this.nivel; }
-
-        public abstract void procesa(Procesamiento p);
-        public abstract void procesa_acc_val(Procesamiento p);
-        public abstract void procesa_acc_id(Procesamiento p);
-        public abstract void procesa_acc_var(Procesamiento p);
-        public abstract void recolecta_subs(Procesamiento p);
+        public void setTam(int tam){ this.tam = tam; }
+        public int getTam(){ return this.tam; }
+        public void setDir(int dir){ this.dir = dir; }
+        public int getDir(){ return this.dir; }
+        public void procesa(Procesamiento p){}
+        public void procesa_acc_val(Procesamiento p){}
+        public void procesa_acc_id(Procesamiento p){}
+        public void procesa_acc_var(Procesamiento p){}
+        public void recolecta_subs(Procesamiento p){}
 
         public abstract void imprime();
 
@@ -99,6 +104,7 @@ public class SintaxisAbstractaTiny {
         public Exp getIndex() {throw new UnsupportedOperationException();}
         public Exp getOpnd() {throw new UnsupportedOperationException();}
         public abstract int prioridad();
+        @Override
         public void procesa_acc_val(Procesamiento p){ p.procesa_acc_val(this);}
     }
 
@@ -1246,6 +1252,7 @@ public class SintaxisAbstractaTiny {
 
     public static class Campo extends Nodo {
         private T tipo;
+        private int desp;
         private String iden;
         public Campo(T tipo, String iden) {
             super();
@@ -1260,6 +1267,12 @@ public class SintaxisAbstractaTiny {
         }
         public T getTipo() {
             return tipo;
+        }
+        public void setDesp(int desp){
+            this.desp = desp;
+        }
+        public int getDesp(){
+            return this.desp;
         }
 
         public void procesa(Procesamiento p) {
@@ -1517,6 +1530,7 @@ public class SintaxisAbstractaTiny {
         }
         public String getIden() { throw new UnsupportedOperationException();}
         public T getTipo() { throw new UnsupportedOperationException();}
+        @Override
         public void procesa_acc_var(Procesamiento p) { p.procesa_acc_var(this);}
     }
     public static class ParamRef extends Param {
@@ -1540,6 +1554,7 @@ public class SintaxisAbstractaTiny {
         public void procesa(Procesamiento p) {
             p.procesa(this);
         }
+        @Override
         public void procesa_acc_id(Procesamiento p) { p.procesa_acc_id(this);}
 
         @Override
@@ -1571,6 +1586,7 @@ public class SintaxisAbstractaTiny {
         public void procesa(Procesamiento p) {
             p.procesa(this);
         }
+        @Override
         public void procesa_acc_id(Procesamiento p) { p.procesa_acc_id(this);}
 
         @Override
@@ -1718,7 +1734,9 @@ public class SintaxisAbstractaTiny {
         public void procesa(Procesamiento p) {
             p.procesa(this);
         }
+        @Override
         public void procesa_acc_id(Procesamiento p) { p.procesa_acc_id(this);}
+        @Override
         public void recolecta_subs(Procesamiento p) { p.recolecta_subs(this); }
 
         @Override
@@ -1749,6 +1767,7 @@ public class SintaxisAbstractaTiny {
         public void procesa(Procesamiento p) {
             p.procesa(this);
         }
+        @Override
         public void recolecta_subs(Procesamiento p) { p.recolecta_subs(this); }
 
         @Override
@@ -1785,6 +1804,7 @@ public class SintaxisAbstractaTiny {
         public void procesa(Procesamiento p) {
             p.procesa(this);
         }
+        @Override
         public void recolecta_subs(Procesamiento p) { p.recolecta_subs(this); }
 
         @Override
@@ -1820,6 +1840,7 @@ public class SintaxisAbstractaTiny {
         public void procesa(Procesamiento p) {
             p.procesa(this);
         }
+        @Override
         public void recolecta_subs(Procesamiento p) { p.recolecta_subs(this); }
 
         @Override
@@ -1837,6 +1858,7 @@ public class SintaxisAbstractaTiny {
         public void procesa(Procesamiento p) {
             p.procesa(this);
         }
+        @Override
         public void recolecta_subs(Procesamiento p) { p.recolecta_subs(this); }
 
         @Override
@@ -1872,6 +1894,7 @@ public class SintaxisAbstractaTiny {
         public void procesa(Procesamiento p) {
             p.procesa(this);
         }
+        @Override
         public void recolecta_subs(Procesamiento p) { p.recolecta_subs(this); }
 
         @Override
@@ -1898,6 +1921,7 @@ public class SintaxisAbstractaTiny {
         public void procesa(Procesamiento p) {
             p.procesa(this);
         }
+        @Override
         public void recolecta_subs(Procesamiento p) { p.recolecta_subs(this); }
 
         @Override

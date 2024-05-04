@@ -3,10 +3,15 @@ package visitantes;
 import asint.ProcesamientoDef;
 import asint.SintaxisAbstractaTiny.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class VinculacionSegunda extends ProcesamientoDef {
     private TablaSimbolos ts;
-    public VinculacionSegunda(TablaSimbolos ts) {
+    private List<String> errors;
+    public VinculacionSegunda(TablaSimbolos ts, List<String> errors) {
         this.ts = ts;
+        this.errors = errors;
     }
 
     @Override
@@ -31,7 +36,7 @@ public class VinculacionSegunda extends ProcesamientoDef {
     }
 
     @Override
-    public void procesa(DecProc decProc) {}
+    public void procesa(DecProc decProc) {} // noop
 
     @Override
     public void procesa(SiParamF siParamF) {
@@ -39,7 +44,7 @@ public class VinculacionSegunda extends ProcesamientoDef {
     }
 
     @Override
-    public void procesa(NoParamF noParamF) {}
+    public void procesa(NoParamF noParamF) {} // noop
 
     @Override
     public void procesa(MuchosParamsF muchosParamsF) {
@@ -53,13 +58,13 @@ public class VinculacionSegunda extends ProcesamientoDef {
     }
 
     @Override
-    public void procesa(ParamNoRef param) {
-        param.getTipo().procesa(this);
+    public void procesa(ParamRef paramRef) {
+        paramRef.getTipo().procesa(this);
     }
 
     @Override
-    public void procesa(ParamRef siParamF) {
-        siParamF.getTipo().procesa(this);
+    public void procesa(ParamNoRef param) {
+        param.getTipo().procesa(this);
     }
 
     @Override
@@ -70,11 +75,11 @@ public class VinculacionSegunda extends ProcesamientoDef {
     @Override
     public void procesa(TipoPunt tipoPunt) {
         if (tipoPunt.getTipo() instanceof Identificador) {
-            Nodo nodo = ts.vinculoDe(tipoPunt.getTipo().getIden());
-            tipoPunt.getTipo().setVinculo(nodo);
-            if (!(nodo instanceof DecTipo)) {
-                throw new RuntimeException("Vinculo debe ser declaración de tipo");
+            Nodo vinculo = ts.vinculoDe(tipoPunt.getTipo().getIden());
+            if (!(vinculo instanceof DecTipo)) {
+                errors.add("ERROR_VINCULACION. Vinculo debe ser declaración de tipo. " + tipoPunt.getFilaColInfo());
             }
+            tipoPunt.getTipo().setVinculo(vinculo);
         } else {
             tipoPunt.getTipo().procesa(this);
         }
@@ -103,17 +108,17 @@ public class VinculacionSegunda extends ProcesamientoDef {
     }
 
     @Override
-    public void procesa(TipoInt tipoInt) {}
+    public void procesa(TipoInt tipoInt) {} // noop
 
     @Override
-    public void procesa(TipoReal tipoReal) {}
+    public void procesa(TipoReal tipoReal) {} // noop
 
     @Override
-    public void procesa(TipoBool tipoBool) {}
+    public void procesa(TipoBool tipoBool) {} // noop
 
     @Override
-    public void procesa(TipoString exp) {}
+    public void procesa(TipoString exp) {} // noop
 
     @Override
-    public void procesa(Identificador id) {}
+    public void procesa(Identificador id) {} // noop
 }
