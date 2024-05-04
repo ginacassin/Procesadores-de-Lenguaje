@@ -29,6 +29,7 @@ public class SintaxisAbstractaTiny {
         private int fila;
         private int col;
         private Nodo vinculo;
+        private T tipado;
         private int prim;
         private int sig;
         private int nivel;
@@ -53,6 +54,12 @@ public class SintaxisAbstractaTiny {
         }
         public void setVinculo(Nodo vinculo) {
             this.vinculo = vinculo;
+        }
+        public T getTipado() {
+            return this.tipado;
+        }
+        public void setTipado(T tipado) {
+            this.tipado = tipado;
         }
 
         public void setPrim(int prim){ this.prim = prim; }
