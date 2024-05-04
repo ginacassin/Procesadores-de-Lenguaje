@@ -3,36 +3,46 @@ package visitantes;
 import asint.ProcesamientoDef;
 import asint.SintaxisAbstractaTiny.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class VinculacionPrimera extends ProcesamientoDef {
-
+    /*
+        Procesa es sintácticamente equivalente a vincula en la memoria
+     */
     private TablaSimbolos ts;
+    private VinculacionSegunda vs;
+    private List<String> errors;
 
-    public class TamanioArrayInvalido extends RuntimeException {
-
-        TamanioArrayInvalido(String msg) {
-            super(msg);
-        }
+    public VinculacionPrimera() {
+        errors = new ArrayList<>();
     }
 
     @Override
     public void procesa(Prog prog) {
-        ts = new TablaSimbolos();
-        prog.getBloq().procesa(this);
+        ts = new TablaSimbolos(); // creaTS()
+        vs = new VinculacionSegunda(ts, errors);
+        prog.getBloq().procesa(this); // vincula(Bloq)
     }
+
     @Override
     public void procesa(Bloq bloq) {
         ts.abreAmbito();
         bloq.getDecs().procesa(this);
         bloq.getInsts().procesa(this);
+        ts.cierraAmbito();
     }
+
     @Override
     public void procesa(SiDecs siDecs) {
-        siDecs.getDecsAux().procesa(this);
-        siDecs.getDecsAux().procesa(new VinculacionSegunda(ts));
+        siDecs.getDecsAux().procesa(this); // vincula1(DecsAux)
+        siDecs.getDecsAux().procesa(vs); // vincula2(DecsAux)
     }
-    @Override
-    public void procesa(NoDecs noDecs) {}
 
+    @Override
+    public void procesa(NoDecs noDecs) {} // noop
+
+    // Primera pasada
     public void procesa(MuchasDecs decsAux) {
         decsAux.getDecsAux().procesa(this);
         decsAux.getDec().procesa(this);
@@ -47,12 +57,16 @@ public class VinculacionPrimera extends ProcesamientoDef {
         ts.inserta(dec.getIden(), dec);
     }
 
+    public void procesa(DecTipo dec) {
+        dec.getTipo().procesa(this);
+        ts.inserta(dec.getIden(), dec);
+    }
+
     public void procesa(DecProc dec) {
         ts.inserta(dec.getIden(), dec);
         ts.abreAmbito();
         dec.getParamsF().procesa(this);
         dec.getBloq().procesa(this);
-        VinculacionSegunda vs = new VinculacionSegunda(ts);
         dec.getParamsF().procesa(vs);
         dec.getBloq().procesa(vs);
         ts.cierraAmbito();
@@ -62,7 +76,7 @@ public class VinculacionPrimera extends ProcesamientoDef {
         siParamF.getParamsFL().procesa(this);
     }
 
-    public void procesa(NoParamF noParamF) {}
+    public void procesa(NoParamF noParamF) {} // noop
 
     public void procesa(MuchosParamsF muchosParamsF) {
         muchosParamsF.getParamsFL().procesa(this);
@@ -85,21 +99,22 @@ public class VinculacionPrimera extends ProcesamientoDef {
 
     public void procesa(TipoArray tipoArray) {
         tipoArray.getTipo().procesa(this);
-        if (Integer.parseInt(tipoArray.getLitEnt()) < 1) {
-            throw new TamanioArrayInvalido("El tamaño del array debe ser positivo no nulo");
+        if (Integer.parseInt(tipoArray.getLitEnt()) < 1) { // Pre-tipado
+            // El tamaño de los arrays es siempre un entero no negativo
+            errors.add("ERROR_VINCULACION. El tamaño del array debe ser un positivo no nulo. " + tipoArray.getFilaColInfo());
         }
     }
 
     @Override
     public void procesa(TipoPunt tipoPunt) {
-        if (tipoPunt.getTipo() instanceof Identificador) {
+        if (!(tipoPunt.getTipo() instanceof Identificador)) {
             tipoPunt.getTipo().procesa(this);
         }
     }
 
     @Override
     public void procesa(TipoStruct tipoStruct) {
-        ts.abreAmbito();
+        ts.abreAmbito(); // Pre-tipado: las definiciones de tipo registro no tienen campos duplicados
         tipoStruct.getlCampos().procesa(this);
         ts.cierraAmbito();
     }
@@ -116,31 +131,40 @@ public class VinculacionPrimera extends ProcesamientoDef {
     }
 
     @Override
-    public void procesa(TipoInt tipoInt) {}
+    public void procesa(Campo campo) {
+        campo.getTipo().procesa(this);
+    }
 
     @Override
-    public void procesa(TipoReal tipoReal) {}
+    public void procesa(TipoInt tipoInt) {} // noop
 
     @Override
-    public void procesa(TipoBool tipoBool) {}
+    public void procesa(TipoReal tipoReal) {} // noop
 
     @Override
-    public void procesa(TipoString exp) {}
+    public void procesa(TipoBool tipoBool) {} // noop
+
+    @Override
+    public void procesa(TipoString exp) {} // noop
 
     @Override
     public void procesa(Identificador id) {
+        // Pre-tipado:
+        // Los vínculos de los nombres de tipo utilizados en las declaraciones de tipo
+        // deben ser declaraciones type
         Nodo vinculo = ts.vinculoDe(id.getIden());
         if(!(vinculo instanceof DecTipo)) {
-            throw new RuntimeException("Error de vinculación");
+            errors.add("ERROR_VINCULACION. " + id.getFilaColInfo());
         }
         id.setVinculo(vinculo);
     }
 
+    // Única pasada
     public void procesa(Si_Instr siInstr) {
         siInstr.getInstsAux().procesa(this);
     }
 
-    public void procesa(No_Instr noInstr) {}
+    public void procesa(No_Instr noInstr) {} // noop
 
     public void procesa(Muchas_Instr muchasInstr) {
         muchasInstr.getInstsAux().procesa(this);
@@ -179,7 +203,7 @@ public class VinculacionPrimera extends ProcesamientoDef {
         inst.getExp().procesa(this);
     }
 
-    public void procesa(Instr_Nl inst) {}
+    public void procesa(Instr_Nl inst) {} // noop
 
     public void procesa(Instr_New inst) {
         inst.getExp().procesa(this);
@@ -192,10 +216,10 @@ public class VinculacionPrimera extends ProcesamientoDef {
     public void procesa(Instr_Call inst) {
         inst.getParamsR().procesa(this);
         Nodo vinculo = ts.vinculoDe(inst.getIden());
-        inst.setVinculo(vinculo);
         if (vinculo == null) {
-            throw new RuntimeException("Vinculo no encontrado");
+            errors.add("ERROR_VINCULACION. Vínculo no encontrado. " + inst.getFilaColInfo());
         }
+        inst.setVinculo(vinculo);
     }
 
     public void procesa(Instr_Bloque inst) {
@@ -207,7 +231,7 @@ public class VinculacionPrimera extends ProcesamientoDef {
     }
 
     @Override
-    public void procesa(No_ParamsR noParamsR) {}
+    public void procesa(No_ParamsR noParamsR) {} // noop
 
     @Override
     public void procesa(Muchos_ParamsR muchosParamsR) {
@@ -312,19 +336,19 @@ public class VinculacionPrimera extends ProcesamientoDef {
         exp.getOpnd().procesa(this);
     }
 
-    public void procesa(Lit_ent exp) {}
-    public void procesa(Lit_real exp) {}
-    public void procesa(True exp) {}
-    public void procesa(False exp) {}
-    public void procesa(Lit_cadena exp) {}
-    public void procesa(Iden exp) {
-        Nodo vinculo = ts.vinculoDe(exp.getId());
-        exp.setVinculo(vinculo);
+    public void procesa(Lit_ent exp) {} // noop
+    public void procesa(Lit_real exp) {} // noop
+    public void procesa(True exp) {} // noop
+    public void procesa(False exp) {} // noop
+    public void procesa(Lit_cadena exp) {} // noop
+    public void procesa(Iden id) {
+        Nodo vinculo = ts.vinculoDe(id.getId());
         if (vinculo == null) {
-            throw new RuntimeException("Vinculo no encontrado");
+            errors.add("ERROR_VINCULACION. " + id.getFilaColInfo());
         }
+        id.setVinculo(vinculo);
     }
 
     @Override
-    public void procesa(Null exp) {}
+    public void procesa(Null exp) {} // noop
 }

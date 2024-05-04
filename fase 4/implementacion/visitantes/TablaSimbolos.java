@@ -42,9 +42,11 @@ public class TablaSimbolos {
         }
 
         public void inserta(String id, Nodo nodo) {
-            if(env.containsKey(id))
+            if (env.containsKey(id)) { // if contiene(ts,string)
                 throw new IdDuplicada("Id: " + id + "ya esta en la tabla de simbolos");
-            env.put(id, nodo);
+            }
+
+            env.put(id, nodo); // inserta(ts,string,$)
         }
 
         public boolean contiene(String id) {
