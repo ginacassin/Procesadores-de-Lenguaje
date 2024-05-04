@@ -32,6 +32,8 @@ public class SintaxisAbstractaTiny {
         private int prim;
         private int sig;
         private int nivel;
+        private int dir;
+        private int tam;
 
         public Nodo ponFila(int fila) {
             this.fila = fila;
@@ -61,7 +63,10 @@ public class SintaxisAbstractaTiny {
         public int getSig(){ return this.sig; }
         public void setNivel(int nivel){ this.nivel = nivel; }
         public int getNivel(){ return this.nivel; }
-
+        public void setTam(int tam){ this.tam = tam; }
+        public int getTam(){ return this.tam; }
+        public void setDir(int dir){ this.dir = dir; }
+        public int getDir(){ return this.dir; }
         public void procesa(Procesamiento p){}
         public void procesa_acc_val(Procesamiento p){}
         public void procesa_acc_id(Procesamiento p){}
@@ -1240,6 +1245,7 @@ public class SintaxisAbstractaTiny {
 
     public static class Campo extends Nodo {
         private T tipo;
+        private int desp;
         private String iden;
         public Campo(T tipo, String iden) {
             super();
@@ -1254,6 +1260,12 @@ public class SintaxisAbstractaTiny {
         }
         public T getTipo() {
             return tipo;
+        }
+        public void setDesp(int desp){
+            this.desp = desp;
+        }
+        public int getDesp(){
+            return this.desp;
         }
 
         public void procesa(Procesamiento p) {
