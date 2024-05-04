@@ -29,6 +29,10 @@ public class SintaxisAbstractaTiny {
         private int fila;
         private int col;
         private Nodo vinculo;
+        private int prim;
+        private int sig;
+        private int nivel;
+
         public Nodo ponFila(int fila) {
             this.fila = fila;
             return this;
@@ -44,12 +48,25 @@ public class SintaxisAbstractaTiny {
             return col;
         }
 
+        public Nodo getVinculo() {
+            return vinculo;
+        }
         public void setVinculo(Nodo vinculo) {
             this.vinculo = vinculo;
         }
 
-        public abstract void procesa(Procesamiento p);
+        public void setPrim(int prim){ this.prim = prim; }
+        public int getPrim(){ return this.prim; }
+        public void setSig(int sig){ this.sig = sig; }
+        public int getSig(){ return this.sig; }
+        public void setNivel(int nivel){ this.nivel = nivel; }
+        public int getNivel(){ return this.nivel; }
 
+        public abstract void procesa(Procesamiento p);
+        public abstract void procesa_acc_val(Procesamiento p);
+        public abstract void procesa_acc_id(Procesamiento p);
+        public abstract void procesa_acc_var(Procesamiento p);
+        public abstract void recolecta_subs(Procesamiento p);
 
         public abstract void imprime();
 
@@ -75,6 +92,7 @@ public class SintaxisAbstractaTiny {
         public Exp getIndex() {throw new UnsupportedOperationException();}
         public Exp getOpnd() {throw new UnsupportedOperationException();}
         public abstract int prioridad();
+        public void procesa_acc_val(Procesamiento p){ p.procesa_acc_val(this);}
     }
 
     private static abstract class ExpBin extends Exp {
@@ -983,6 +1001,7 @@ public class SintaxisAbstractaTiny {
         private Exp exp;
         private Bloq bloq1;
         private Bloq bloq2;
+        private int aElse;
 
         public Instr_If_Else(Exp exp, Bloq bloq1, Bloq bloq2) {
             super();
@@ -1002,6 +1021,8 @@ public class SintaxisAbstractaTiny {
         public Exp getExp() {
             return exp;
         }
+        public void setElse(int aElse){ this.aElse = aElse; }
+        public int getElse(){ return this.aElse; }
 
         public void procesa(Procesamiento p) {
             p.procesa(this);
@@ -1489,6 +1510,7 @@ public class SintaxisAbstractaTiny {
         }
         public String getIden() { throw new UnsupportedOperationException();}
         public T getTipo() { throw new UnsupportedOperationException();}
+        public void procesa_acc_var(Procesamiento p) { p.procesa_acc_var(this);}
     }
     public static class ParamRef extends Param {
         private T tipo;
@@ -1511,6 +1533,7 @@ public class SintaxisAbstractaTiny {
         public void procesa(Procesamiento p) {
             p.procesa(this);
         }
+        public void procesa_acc_id(Procesamiento p) { p.procesa_acc_id(this);}
 
         @Override
         public void imprime() {
@@ -1541,6 +1564,7 @@ public class SintaxisAbstractaTiny {
         public void procesa(Procesamiento p) {
             p.procesa(this);
         }
+        public void procesa_acc_id(Procesamiento p) { p.procesa_acc_id(this);}
 
         @Override
         public void imprime() {
@@ -1687,6 +1711,8 @@ public class SintaxisAbstractaTiny {
         public void procesa(Procesamiento p) {
             p.procesa(this);
         }
+        public void procesa_acc_id(Procesamiento p) { p.procesa_acc_id(this);}
+        public void recolecta_subs(Procesamiento p) { p.recolecta_subs(this); }
 
         @Override
         public void imprime() {
@@ -1716,6 +1742,7 @@ public class SintaxisAbstractaTiny {
         public void procesa(Procesamiento p) {
             p.procesa(this);
         }
+        public void recolecta_subs(Procesamiento p) { p.recolecta_subs(this); }
 
         @Override
         public void imprime() {
@@ -1751,6 +1778,7 @@ public class SintaxisAbstractaTiny {
         public void procesa(Procesamiento p) {
             p.procesa(this);
         }
+        public void recolecta_subs(Procesamiento p) { p.recolecta_subs(this); }
 
         @Override
         public void imprime() {
@@ -1785,6 +1813,7 @@ public class SintaxisAbstractaTiny {
         public void procesa(Procesamiento p) {
             p.procesa(this);
         }
+        public void recolecta_subs(Procesamiento p) { p.recolecta_subs(this); }
 
         @Override
         public void imprime() {
@@ -1801,7 +1830,7 @@ public class SintaxisAbstractaTiny {
         public void procesa(Procesamiento p) {
             p.procesa(this);
         }
-
+        public void recolecta_subs(Procesamiento p) { p.recolecta_subs(this); }
 
         @Override
         public void imprime() { }
@@ -1836,6 +1865,7 @@ public class SintaxisAbstractaTiny {
         public void procesa(Procesamiento p) {
             p.procesa(this);
         }
+        public void recolecta_subs(Procesamiento p) { p.recolecta_subs(this); }
 
         @Override
         public void imprime() {
@@ -1861,6 +1891,7 @@ public class SintaxisAbstractaTiny {
         public void procesa(Procesamiento p) {
             p.procesa(this);
         }
+        public void recolecta_subs(Procesamiento p) { p.recolecta_subs(this); }
 
         @Override
         public void imprime() {
