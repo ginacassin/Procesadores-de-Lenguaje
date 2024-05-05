@@ -52,14 +52,14 @@ public class MainPrincipal {
         // Proceso de asignacion de espacio
         prog.procesa(new AsignacionEspacioPrimera());
 
-        MaquinaP maquinaP = new MaquinaP(1, 1, 1, 1);
+        //MaquinaP maquinaP = new MaquinaP(1, 1, 1, 1);
 
         // Proceso etiquetado
-        prog.procesa(new Etiquetado(maquinaP));
+        //prog.procesa(new Etiquetado(maquinaP));
 
         // Proceso de generacion de codigo
-        prog.procesa(new GeneracionCodigo(maquinaP));
+        //prog.procesa(new GeneracionCodigo(maquinaP));
 
-        maquinaP.ejecuta();
+        //maquinaP.ejecuta();
     }
 }

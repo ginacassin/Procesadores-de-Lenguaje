@@ -1,5 +1,6 @@
 package visitantes;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -9,8 +10,16 @@ import asint.ProcesamientoDef;
 import asint.SintaxisAbstractaTiny.*;
 
 public class Tipado extends ProcesamientoDef {
-    
+
     private static List<String> errors;
+
+    public static List<String> getErrors() {
+        return errors;
+    }
+
+    public Tipado() {
+        errors = new ArrayList<>();
+    }
 
     public static class TipoOK extends T {
         @Override

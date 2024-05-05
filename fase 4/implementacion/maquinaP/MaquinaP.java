@@ -1,7 +1,10 @@
 package maquinaP;
 
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Stack;
 
 
@@ -525,7 +528,36 @@ public class MaquinaP {
            return "write";
        }
    }
-   
+
+   private IRead IREAD;
+   private class IRead implements Instruccion {
+       public void ejecuta() {
+           // Realiza la lectura de entrada y apila el valor leído en la pila,
+           // por cada tipo
+
+           if (input.hasNextInt()) {
+               pilaEvaluacion.push(new ValorInt(input.nextInt()));
+               input.nextLine();
+           }
+           else if (input.hasNextDouble()) {
+               pilaEvaluacion.push(new ValorReal(input.nextDouble()));
+               input.nextLine();
+           }
+           else if (input.hasNextBoolean()) {
+               pilaEvaluacion.push(new ValorBool(input.nextBoolean()));
+               input.nextLine();
+           }
+           else if (input.hasNextLine()) {
+               pilaEvaluacion.push(new ValorString(input.nextLine()));
+           }
+
+           pc++;
+       }
+
+       public String toString() {
+           return "read";
+       }
+   }
    private Instruccion IIRIND;
    private class IIrind implements Instruccion {
        public void ejecuta() {
@@ -583,6 +615,7 @@ public class MaquinaP {
    public Instruccion stop() {return ISTOP;}
    public Instruccion nl() {return INL;}
    public Instruccion write() {return IWRITE;}
+   public Instruccion read() {return IREAD;}
    public void emit(Instruccion i) {
       codigoP.add(i); 
    }
@@ -590,7 +623,9 @@ public class MaquinaP {
    private int tamdatos;
    private int tamheap;
    private int ndisplays;
-   public MaquinaP(int tamdatos, int tampila, int tamheap, int ndisplays) {
+   private Scanner input;
+   public MaquinaP(Reader input, int tamdatos, int tampila, int tamheap, int ndisplays) {
+       this.input = new Scanner(input);
       this.tamdatos = tamdatos;
       this.tamheap = tamheap;
       this.ndisplays = ndisplays;
@@ -622,6 +657,7 @@ public class MaquinaP {
       ISTOP = new IStop();
       INL = new INl();
       IWRITE = new IWrite();
+      IREAD = new IRead();
       gestorPilaActivaciones = new GestorPilaActivaciones(tamdatos,(tamdatos+tampila)-1,ndisplays); 
       gestorMemoriaDinamica = new GestorMemoriaDinamica(tamdatos+tampila,(tamdatos+tampila+tamheap)-1);
    }
@@ -656,7 +692,7 @@ public class MaquinaP {
    }
    
    public static void main(String[] args) {
-       MaquinaP m = new MaquinaP(5,10,10,2);
+       MaquinaP m = new MaquinaP(new InputStreamReader(System.in),10,10,2, 1);
 
           /*
             int x;
