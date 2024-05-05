@@ -443,7 +443,7 @@ public class Etiquetado extends ProcesamientoDef {
     }
 
     @Override
-    public void procesa_acc_var(Param param){
+    public void procesa_acc_var(Nodo nodo){
         etq += 3;
     }
 

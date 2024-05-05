@@ -88,6 +88,9 @@ public class ProcesamientoDef implements Procesamiento {
     public void procesa_acc_id(SintaxisAbstractaTiny.ParamRef paramRef){}
     public void procesa_acc_id(SintaxisAbstractaTiny.ParamNoRef paramNoRef){}
     public void procesa_acc_var(SintaxisAbstractaTiny.Param param){}
+
+    public void procesa_acc_var(SintaxisAbstractaTiny.Nodo nodo) {}
+
     public void recolecta_subs(SintaxisAbstractaTiny.SiDecs siDecs){}
     public void recolecta_subs(SintaxisAbstractaTiny.NoDecs noDecs){}
     public void recolecta_subs(SintaxisAbstractaTiny.MuchasDecs muchasDecs){}

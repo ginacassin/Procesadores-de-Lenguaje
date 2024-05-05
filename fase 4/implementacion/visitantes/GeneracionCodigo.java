@@ -6,7 +6,11 @@ import asint.SintaxisAbstractaTiny.*;
 import maquinaP.MaquinaP;
 
 import java.util.Stack;
+
 public class GeneracionCodigo extends ProcesamientoDef {
+    /*
+        Procesa es sintácticamente equivalente a gen-cod en la memoria
+     */
     private Stack<DecProc> sub_pendientes;
     private MaquinaP maquinaP;
     public GeneracionCodigo(MaquinaP maquinaP){
@@ -20,10 +24,10 @@ public class GeneracionCodigo extends ProcesamientoDef {
         prog.getBloq().procesa(this);
         while(!sub_pendientes.empty()){
             sub = sub_pendientes.pop();
-            maquinaP.desapilad(sub.getNivel());
+            maquinaP.emit(maquinaP.desapilad(sub.getNivel()));
             sub.getBloq().procesa(this);
-            maquinaP.desactiva(sub.getNivel(), sub.getTam());
-            maquinaP.ir_ind();
+            maquinaP.emit(maquinaP.desactiva(sub.getNivel(), sub.getTam()));
+            maquinaP.emit(maquinaP.ir_ind());
         }
     }
 
@@ -31,8 +35,9 @@ public class GeneracionCodigo extends ProcesamientoDef {
     public void procesa(Bloq bloq){
         bloq.getDecs().recolecta_subs(this);
         bloq.getInsts().procesa(this);
-        maquinaP.stop();
+        maquinaP.emit(maquinaP.stop());
     }
+
     @Override
     public void procesa(Si_Instr siInstr){
         siInstr.getInstsAux().procesa(this);
@@ -57,14 +62,14 @@ public class GeneracionCodigo extends ProcesamientoDef {
     @Override
     public void procesa(Instr_Expr instrExpr){
         instrExpr.getExp().procesa(this);
-        maquinaP.desapila(); //TODO crear desapila
+        maquinaP.emit(maquinaP.desapila_ind());
     }
 
     @Override
     public void procesa(Instr_If instrIf){
         instrIf.getExp().procesa(this);
-        procesa_acc_val(instrIf.getExp()); //TODO check que la llamada es asi
-        maquinaP.ir_f(instrIf.getSig());
+        procesa_acc_val(instrIf.getExp());
+        maquinaP.emit(maquinaP.ir_f(instrIf.getSig()));
         instrIf.getBloq().procesa(this);
     }
 
@@ -72,59 +77,82 @@ public class GeneracionCodigo extends ProcesamientoDef {
     public void procesa(Instr_If_Else instrIfElse){
         instrIfElse.getExp().procesa(this);
         gen_acc_val(instrIfElse.getExp());
-        maquinaP.ir_f(instrIfElse.getElse());
+        maquinaP.emit(maquinaP.ir_f(instrIfElse.getElse()));
         instrIfElse.getBloq1().procesa(this);
-        maquinaP.ir_a(instrIfElse.getSig());
+        maquinaP.emit(maquinaP.ir_a(instrIfElse.getSig()));
         instrIfElse.getBloq2().procesa(this);
     }
 
     @Override
     public void procesa(Instr_While instrWhile){
         instrWhile.getExp().procesa(this);
-        gen_acc_val(instrWhile.getExp()); //TODO check
-        maquinaP.ir_f(instrWhile.getSig());
+        gen_acc_val(instrWhile.getExp());
+        maquinaP.emit(maquinaP.ir_f(instrWhile.getSig()));
         instrWhile.getBloq().procesa(this);
-        maquinaP.ir_a(instrWhile.getPrim());
+        maquinaP.emit(maquinaP.ir_a(instrWhile.getPrim()));
     }
 
     @Override
     public void procesa(Instr_Read instrRead){
         instrRead.getExp().procesa(this);
-        gen_acc_val(instrRead.getExp()); //TODO
-        maquinaP.read();//TODO check
+        gen_acc_val(instrRead.getExp());
+        Scanner scanner = new Scanner(System.in);
+        if (instrRead.getTipado() instanceof TipoInt){
+            int valor = scanner.nextInt();
+            maquinaP.emit(maquinaP.apila_int(valor));
+        }
+        else if (instrRead.getTipado() instanceof TipoReal){
+            double valor = scanner.nextFloat();
+            maquinaP.emit(maquinaP.apila_real(valor));
+        }
+        else if (instrRead.getTipado() instanceof TipoBool){
+            boolean valor = scanner.nextBoolean();
+            maquinaP.emit(maquinaP.apila_bool(valor));
+        }
+        else if (instrRead.getTipado() instanceof TipoString){
+            String valor = scanner.nextLine();
+            maquinaP.emit(maquinaP.apila_string(valor));
+        }
     }
 
     @Override
     public void procesa(Instr_Write instrWrite){
         instrWrite.getExp().procesa(this);
-        gen_acc_val(instrWrite.getExp()); //TODO
-        maquinaP.write();
+        gen_acc_val(instrWrite.getExp());
+        if (es_designador(instrWrite.getExp())){
+            maquinaP.emit(maquinaP.apila_ind());
+        }
+        maquinaP.emit(maquinaP.write());
     }
 
     @Override
     public void procesa(Instr_Nl instrNl){
-        maquinaP.nl();
+        maquinaP.emit(maquinaP.nl());
     }
 
     @Override
     public void procesa(Instr_New instrNew){
         instrNew.getExp().procesa(this);
-        maquinaP.alloc(instrNew.getExp().getTipo().getTam());
-        maquinaP.desapila_ind();
+        if (ref(instrNew.getExp().getTipado()) instanceof TipoPunt) {
+            maquinaP.emit(maquinaP.alloc(instrNew.getExp().getTipado().getTam()));
+        }
+        maquinaP.emit(maquinaP.desapila_ind());
     }
 
     @Override
     public void procesa(Instr_Del instrDel){
         instrDel.getExp().procesa(this);
-        maquinaP.apila_ind();
-        maquinaP.dealloc(instrDel.getExp().getTipo().getTam());
+        maquinaP.emit(maquinaP.apila_ind());
+        if (ref(instrDel.getExp().getTipado()) instanceof TipoPunt) {
+            maquinaP.emit(maquinaP.dealloc(instrDel.getExp().getTipado().getTam()));
+        }
     }
 
     @Override
     public void procesa(Instr_Call instrCall){
-        maquinaP.activa(instrCall.getVinculo().getNivel(), instrCall.getVinculo().getTam(), instrCall.getSig());
-        gen_paso_param(instrCall.getVinculo(), instrCall.getParamsR());
-        maquinaP.ir_a(instrCall.getVinculo().getPrim());
+        maquinaP.emit(maquinaP.activa(instrCall.getVinculo().getNivel(), instrCall.getVinculo().getTam(), instrCall.getSig()));
+        gen_paso_param((DecProc) instrCall.getVinculo(), instrCall.getParamsR());
+        maquinaP.emit(maquinaP.ir_a(instrCall.getVinculo().getPrim()));
     }
 
     @Override
@@ -157,188 +185,235 @@ public class GeneracionCodigo extends ProcesamientoDef {
     public void procesa(Asignacion asignacion){
         asignacion.getOpnd0().procesa(this);
         asignacion.getOpnd1().procesa(this);
-        //TODO mirar donde esta lo de ref
+        if (ref(asignacion.getOpnd0().getTipado()) instanceof TipoReal &&
+            ref(asignacion.getOpnd1().getTipado()) instanceof TipoInt){
+            gen_asig_prom(asignacion.getOpnd1());
+        } else {
+            gen_asig(asignacion.getOpnd1());
+        }
     }
 
     void gen_asig(Exp exp){
-        //TODO mirar la funcion es_designador()
+        if (es_designador(exp)) {
+            maquinaP.emit(maquinaP.copia(exp.getTipado().getTam()));
+        }
+        else {
+            maquinaP.emit(maquinaP.desapila_ind());
+        }
     }
 
     void gen_asig_prom(Exp exp){
-        //TODO mirar lo de arriba
+        if (es_designador(exp)) {
+            maquinaP.emit(maquinaP.apila_ind());
+            maquinaP.emit(maquinaP.int2real());
+            maquinaP.emit(maquinaP.desapila_ind());
+        }
+        else {
+            maquinaP.emit(maquinaP.int2real());
+            maquinaP.emit(maquinaP.desapila_ind());
+        }
     }
 
     @Override
     public void procesa(Menor menor){
         gen_cod_opnds(menor.getOpnd0(), menor.getOpnd1());
-        maquinaP.menor();//TODO incluir
+        maquinaP.emit(maquinaP.menor());
     }
 
     @Override
     public void procesa(Mayor mayor){
         gen_cod_opnds(mayor.getOpnd0(), mayor.getOpnd1());
-        maquinaP.mayor();//TODO incluir
+        maquinaP.emit(maquinaP.mayor());
     }
 
     @Override
     public void procesa(MenorIgual menorIgual){
         gen_cod_opnds(menorIgual.getOpnd0(), menorIgual.getOpnd1());
-        maquinaP.menorIgual();//TODO incluir
+        maquinaP.emit(maquinaP.menorIgual());
     }
 
     @Override
     public void procesa(MayorIgual mayorIgual){
         gen_cod_opnds(mayorIgual.getOpnd0(), mayorIgual.getOpnd1());
-        maquinaP.mayorIgual();//TODO incluir
+        maquinaP.emit(maquinaP.mayorIgual());
     }
 
     @Override
     public void procesa(Igual igual){
         gen_cod_opnds(igual.getOpnd0(), igual.getOpnd1());
-        maquinaP.igual();//TODO incluir
+        maquinaP.emit(maquinaP.igual());
     }
 
     @Override
     public void procesa(NoIgual noIgual){
         gen_cod_opnds(noIgual.getOpnd0(), noIgual.getOpnd1());
-        maquinaP.noIgual();//TODO incluir
+        maquinaP.emit(maquinaP.noIgual());
     }
 
     @Override
     public void procesa(Suma suma){
         gen_cod_opnds(suma.getOpnd0(), suma.getOpnd1());
-        maquinaP.suma();
+        maquinaP.emit(maquinaP.suma());
     }
 
     @Override
     public void procesa(Resta resta){
         gen_cod_opnds(resta.getOpnd0(), resta.getOpnd1());
-        maquinaP.resta();//TODO incluir
+        maquinaP.emit(maquinaP.resta());
     }
 
     @Override
     public void procesa(And and){
         gen_cod_opnds(and.getOpnd0(), and.getOpnd1());
-        maquinaP.and();//TODO incluir
+        maquinaP.emit(maquinaP.and());
     }
 
     @Override
     public void procesa(Or or){
         gen_cod_opnds(or.getOpnd0(), or.getOpnd1());
-        maquinaP.or();//TODO incluir
+        maquinaP.emit(maquinaP.or());
     }
 
     @Override
     public void procesa(Mul mul){
         gen_cod_opnds(mul.getOpnd0(), mul.getOpnd1());
-        maquinaP.mul();
+        maquinaP.emit(maquinaP.mul());
     }
 
     @Override
     public void procesa(Div div){
         gen_cod_opnds(div.getOpnd0(), div.getOpnd1());
-        maquinaP.div();//TODO incluir
+        maquinaP.emit(maquinaP.div());
     }
 
     @Override
     public void procesa(Mod mod){
         gen_cod_opnds(mod.getOpnd0(), mod.getOpnd1());
-        maquinaP.mod();//TODO incluir
+        maquinaP.emit(maquinaP.mod());
     }
 
     @Override
     public void procesa(Negativo negativo){
         negativo.getOpnd0().procesa(this);
-        gen_acc_val(negativo.getOpnd0()); //TODO
-        maquinaP.negativo();// TODO incluir
+        gen_acc_val(negativo.getOpnd0());
+        maquinaP.emit(maquinaP.negativo());
     }
 
     @Override
     public void procesa(Not not){
         not.getOpnd0().procesa(this);
-        gen_acc_val(not.getOpnd0()); //TODO
-        maquinaP.not();// TODO incluir
+        gen_acc_val(not.getOpnd0());
+        maquinaP.emit(maquinaP.not());
     }
 
     @Override
     public void procesa(Index index){
         index.getOpnd().procesa(this);
         index.getIndex().procesa(this);
-        gen_acc_val(index.getIndex()); //TODO
-        maquinaP.apila_int(index.getTipo().getTam());
-        maquinaP.mul();
-        maquinaP.suma();
+        gen_acc_val(index.getIndex());
+        if (ref(index.getOpnd().getTipado()) instanceof TipoArray) {
+            maquinaP.emit(maquinaP.apila_int(index.getOpnd().getTipado().getTam()));
+        }
+        maquinaP.emit(maquinaP.mul());
+        maquinaP.emit(maquinaP.suma());
     }
 
     @Override
     public void procesa(Acceso acceso){
         acceso.getOpnd().procesa(this);
-        // TODO hacer las funciones
+        if (ref(acceso.getOpnd().getTipado()) instanceof TipoStruct) {
+            TipoStruct registro = (TipoStruct) acceso.getOpnd().getVinculo();
+            maquinaP.emit(maquinaP.apila_int(desplazamiento(registro.getlCampos(), acceso.getId())));
+        }
+        maquinaP.emit(maquinaP.suma());
     }
 
     @Override
     public void procesa(Indireccion indireccion){
         indireccion.getIndex().procesa(this);
-        maquinaP.apila_ind();
+        maquinaP.emit(maquinaP.apila_ind());
     }
 
     @Override
     public void procesa(Lit_ent litEnt){
-        maquinaP.apila_int(litEnt.getNum());
+        maquinaP.emit(maquinaP.apila_int(Integer.parseInt(litEnt.getNum())));
     }
 
     @Override
     public void procesa(Lit_real litReal){
-        maquinaP.apila_real(litReal.getNum());
+        maquinaP.emit(maquinaP.apila_real(Double.parseDouble(litReal.getNum())));
     }
 
     @Override
     public void procesa(SintaxisAbstractaTiny.True strue){
-        maquinaP.apila_bool(true);
+        maquinaP.emit(maquinaP.apila_bool(true));
     }
 
     @Override
     public void procesa(SintaxisAbstractaTiny.False sfalse){
-        maquinaP.apila_bool(false);
+        maquinaP.emit(maquinaP.apila_bool(false));
     }
 
     @Override
     public void procesa(Lit_cadena cadena){
-        maquinaP.apila_string(cadena);
+        maquinaP.emit(maquinaP.apila_string(cadena.getIden()));
     }
 
     @Override
     public void procesa(Iden iden){
-        gen_acc_id(iden.getVinculo()); //TODO
+        gen_acc_id((DecVar) iden.getVinculo());
     }
 
     @Override
     public void procesa(Null snull){
-        maquinaP.null();
+        maquinaP.emit(maquinaP.apila_null());
     }
 
     public void gen_cod_opnds(Exp opnd1, Exp opnd2){
-        // TODO mirar
+        if (ref(opnd1.getTipado()) instanceof TipoInt &&
+            ref(opnd2.getTipado()) instanceof TipoReal){
+            opnd1.procesa(this);
+            gen_acc_val(opnd1);
+            maquinaP.emit(maquinaP.int2real());
+            opnd2.procesa(this);
+            gen_acc_val(opnd2);
+        }
+        else if (ref(opnd1.getTipado()) instanceof TipoReal &&
+                   ref(opnd2.getTipado()) instanceof TipoInt){
+            opnd1.procesa(this);
+            gen_acc_val(opnd1);
+            opnd2.procesa(this);
+            gen_acc_val(opnd2);
+            maquinaP.emit(maquinaP.int2real());
+        }
+        else {
+            opnd1.procesa(this);
+            gen_acc_val(opnd1);
+            opnd2.procesa(this);
+            gen_acc_val(opnd2);
+        }
     }
 
     void gen_acc_val(Exp exp){
-        // TODO mirar
+        if (es_designador(exp)) {
+            maquinaP.emit(maquinaP.apila_ind());
+        }
     }
 
     void gen_acc_id(DecVar decVar){
         if (decVar.getNivel() == 0)
-            maquinaP.apila_ind();
+            maquinaP.emit(maquinaP.apila_int(decVar.getVinculo().getDir()));
         else
-            gen_acc_var(decVar);//TODO
+            procesa_acc_var(decVar);
     }
 
     void gen_acc_id(ParamRef paramRef){
-        gen_acc_var(paramRef);//TODO
-        maquinaP.apila_ind();
+        this.procesa_acc_var(paramRef);
+        maquinaP.emit(maquinaP.apila_ind());
     }
 
     void gen_acc_id(Param param){
-        gen_acc_var(param);//TODO
+        this.procesa_acc_var(param);
     }
 
     void gen_acc_var(Param param){
@@ -353,7 +428,9 @@ public class GeneracionCodigo extends ProcesamientoDef {
     }
 
     @Override
-    public void recolecta_subs(NoDecs noDecs){}
+    public void recolecta_subs(NoDecs noDecs){
+        // noop
+    }
 
     @Override
     public void recolecta_subs(MuchasDecs muchasDecs){
@@ -367,10 +444,14 @@ public class GeneracionCodigo extends ProcesamientoDef {
     }
 
     @Override
-    public void recolecta_subs(DecVar decVar){}
+    public void recolecta_subs(DecVar decVar){
+        // noop
+    }
 
     @Override
-    public void recolecta_subs(DecTipo decTipo){}
+    public void recolecta_subs(DecTipo decTipo){
+        // noop
+    }
 
     @Override
     public void recolecta_subs(DecProc decProc){
@@ -381,29 +462,48 @@ public class GeneracionCodigo extends ProcesamientoDef {
         gen_paso_param_aux(decProc.getParamsF(), paramsR);
     }
 
-    void gen_paso_param_aux(SiParamF paramF, Si_ParamsR siParamsR){
-        gen_paso_param_aux(paramF.getParamsFL(), siParamsR.getParamsrl());
+    void gen_paso_param_aux(ParamsF paramF, ParamsR paramsR){
+        if (paramF instanceof SiParamF &&
+                paramsR instanceof Si_ParamsR){
+            gen_paso_param_aux(paramF.getParamsFL(), paramsR.getParamsrl());
+        }
+        else if (paramF instanceof NoParamF &&
+                paramsR instanceof No_ParamsR){
+            // noop
+        }
     }
 
-    void gen_paso_param_aux(NoParamF paramF, No_ParamsR paramsR){
-        // noop
-    }
+    void gen_paso_param_aux(ParamsFL paramsFL, ParamsRL paramsRL){
+        if (paramsFL instanceof MuchosParamsF &&
+                paramsRL instanceof Muchos_ParamsR){
+            gen_paso_param_aux(paramsFL.getParamsFL(), paramsRL.getParamrl());
+            maquinaP.emit(maquinaP.dup());
+            maquinaP.emit(maquinaP.apila_int(paramsFL.getParam().getDir()));
+            maquinaP.emit(maquinaP.suma());
+            paramsRL.getExp().procesa(this);
 
-    void gen_paso_param_aux(MuchosParamsF muchosParamsF, Muchos_ParamsR muchosParamsR){
-        gen_paso_param_aux(muchosParamsF.getParamsFL(), muchosParamsR.getParamrl());
-        maquinaP.dup();
-        maquinaP.apila_int(muchosParamsF.getParam());
-        maquinaP.suma();
-        muchosParamsR.getExp().procesa(this);
-        // TODO terminar
-    }
+            if (paramsFL.getParam() instanceof ParamRef ||
+                !(es_designador(paramsRL.getExp()))){
+                maquinaP.emit(maquinaP.desapila_ind());
+            }
+            else {
+                maquinaP.emit(maquinaP.copia(paramsFL.getParam().getTipado().getTam()));
+            }
+        }
+        else if (paramsFL instanceof UnParamF &&
+                paramsRL instanceof Un_ParamsR){
+            maquinaP.emit(maquinaP.dup());
+            maquinaP.emit(maquinaP.apila_int(paramsFL.getParam().getDir()));
+            maquinaP.emit(maquinaP.suma());
+            paramsRL.getExp().procesa(this);
 
-    void gen_paso_param_aux(UnParamF unParamF, Un_ParamsR unParamsR){
-        maquinaP.dup();
-        maquinaP.apila_int(unParamF.getParam().getDir());
-        maquinaP.suma();
-        unParamsR.getExp().procesa(this);
-        // TODO terminar
+            if (paramsFL.getParam() instanceof ParamRef ||
+                    !(es_designador(paramsRL.getExp()))){
+                maquinaP.emit(maquinaP.desapila_ind());
+            }
+            else {
+                maquinaP.emit(maquinaP.copia(paramsFL.getParam().getTipado().getTam()));
+            }
+        }
     }
-
 }
