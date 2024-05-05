@@ -85,20 +85,6 @@ public class Tipado extends ProcesamientoDef {
             errors.add("ERROR_TIPADO. " + t.getFilaColInfo());
         }
     }
-
-    private static T ref(T n) {
-        if (n instanceof Identificador) {
-            return ref(((DecTipo)n.getVinculo()).getTipo());
-        }
-        return n.getTipado();
-    }
-
-    private static boolean es_designador(Exp e) {
-        return e instanceof Iden
-            || e instanceof Acceso
-            || e instanceof Index
-            || e instanceof Indireccion;
-    }
     
     private static Set<String> theta;
 

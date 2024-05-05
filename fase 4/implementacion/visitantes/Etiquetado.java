@@ -8,13 +8,17 @@ import maquinaP.MaquinaP;
 import java.util.Stack;
 
 public class Etiquetado extends ProcesamientoDef {
-    private Stack<DecProc> sub_pendientes;
+    /*
+        Procesa es sintácticamente equivalente a etiquetado en la memoria
+     */
     private MaquinaP maquinaP;
+    private Stack<DecProc> sub_pendientes;
     private int etq;
+
     public Etiquetado(MaquinaP maquinaP){
         this.maquinaP = maquinaP;
         this.etq = 0;
-        sub_pendientes = new Stack<DecProc>();
+        this.sub_pendientes = new Stack<DecProc>(); // pila-vacia
     }
 
     @Override
@@ -41,6 +45,7 @@ public class Etiquetado extends ProcesamientoDef {
         etq++;
         bloq.setSig(etq);
     }
+
     @Override
     public void procesa(Si_Instr siInstr){
         siInstr.getInstsAux().procesa(this);
@@ -48,7 +53,7 @@ public class Etiquetado extends ProcesamientoDef {
 
     @Override
     public void procesa(No_Instr noInstr){
-        //noop
+        // noop
     }
 
     @Override
@@ -112,7 +117,6 @@ public class Etiquetado extends ProcesamientoDef {
     public void procesa(Instr_Read instrRead){
         instrRead.setPrim(etq);
         instrRead.getExp().procesa(this);
-        procesa_acc_val(instrRead.getExp());
         etq++;
         instrRead.setSig(etq);
     }
@@ -121,7 +125,6 @@ public class Etiquetado extends ProcesamientoDef {
     public void procesa(Instr_Write instrWrite){
         instrWrite.setPrim(etq);
         instrWrite.getExp().procesa(this);
-        procesa_acc_val(instrWrite.getExp());
         etq++;
         instrWrite.setSig(etq);
     }
@@ -153,7 +156,7 @@ public class Etiquetado extends ProcesamientoDef {
     public void procesa(Instr_Call instrCall){
         instrCall.setPrim(etq);
         etq++;
-        etiquetado_paso_param(instrCall.getVinculo(), instrCall.getParamsR());
+        etiquetado_paso_param((DecProc) instrCall.getVinculo(), instrCall.getParamsR());
         etq++;
         instrCall.setSig(etq);
     }
@@ -198,7 +201,14 @@ public class Etiquetado extends ProcesamientoDef {
         asignacion.setPrim(etq);
         asignacion.getOpnd0().procesa(this);
         asignacion.getOpnd1().procesa(this);
-        //TODO mirar donde esta lo de ref
+        if (ref(asignacion.getOpnd0().getTipado()) != ref(asignacion.getOpnd1().getTipado()) &&
+                es_designador(asignacion.getOpnd1()))
+        {
+            etq += 3;
+        }
+        else {
+            etq++;
+        }
         asignacion.setSig(etq);
     }
 
@@ -388,7 +398,7 @@ public class Etiquetado extends ProcesamientoDef {
     @Override
     public void procesa(Iden iden){
         iden.setPrim(etq);
-        procesa_acc_id(iden.getVinculo());
+        procesa_acc_id((DecVar) iden.getVinculo());
         iden.setSig(etq);
     }
 
@@ -408,7 +418,9 @@ public class Etiquetado extends ProcesamientoDef {
 
     @Override
     public void procesa_acc_val(Exp exp){
-        // TODO mirar
+        if (es_designador(exp)) {
+            etq++;
+        }
     }
 
     @Override
@@ -416,7 +428,12 @@ public class Etiquetado extends ProcesamientoDef {
         if (decVar.getNivel() == 0)
             etq++;
         else
-            procesa_acc_var(decVar);
+            decVar.procesa_acc_var(this);
+    }
+
+    @Override
+    public void procesa_acc_id(ParamNoRef paramNoRef){
+        paramNoRef.procesa_acc_var(this);
     }
 
     @Override
@@ -426,13 +443,8 @@ public class Etiquetado extends ProcesamientoDef {
     }
 
     @Override
-    public void procesa_acc_id(ParamNoRef paramNoRef){
-        paramNoRef.procesa_acc_var(this);
-    }
-
-    @Override
     public void procesa_acc_var(Param param){
-        etq++;
+        etq += 3;
     }
 
     @Override
@@ -441,7 +453,9 @@ public class Etiquetado extends ProcesamientoDef {
     }
 
     @Override
-    public void recolecta_subs(NoDecs noDecs){}
+    public void recolecta_subs(NoDecs noDecs){
+        // noop
+    }
 
     @Override
     public void recolecta_subs(MuchasDecs muchasDecs){
@@ -455,10 +469,14 @@ public class Etiquetado extends ProcesamientoDef {
     }
 
     @Override
-    public void recolecta_subs(DecVar decVar){}
+    public void recolecta_subs(DecVar decVar){
+        // noop
+    }
 
     @Override
-    public void recolecta_subs(DecTipo decTipo){}
+    public void recolecta_subs(DecTipo decTipo){
+        // noop
+    }
 
     @Override
     public void recolecta_subs(DecProc decProc){
@@ -469,24 +487,26 @@ public class Etiquetado extends ProcesamientoDef {
         etiquetado_paso_param_aux(decProc.getParamsF(), paramsR);
     }
 
-    void etiquetado_paso_param_aux(SiParamF paramF, Si_ParamsR siParamsR){
-        etiquetado_paso_param_aux(paramF.getParamsFL(), siParamsR.getParamsrl());
+    void etiquetado_paso_param_aux(ParamsF paramF, ParamsR paramsR){
+        if (paramF instanceof SiParamF && paramsR instanceof Si_ParamsR) {
+            etiquetado_paso_param_aux(paramF.getParamsFL(), paramsR.getParamsrl());
+        }
+        else if (paramF instanceof NoParamF && paramsR instanceof No_ParamsR) {
+            // noop
+        }
     }
 
-    void etiquetado_paso_param_aux(NoParamF paramF, No_ParamsR paramsR){
-        // noop
-    }
-
-    void etiquetado_paso_param_aux(MuchosParamsF muchosParamsF, Muchos_ParamsR muchosParamsR){
-        etiquetado_paso_param_aux(muchosParamsF.getParamsFL(), muchosParamsR.getParamrl());
-        etq += 3;
-        muchosParamsR.getExp().procesa(this);
-        etq++;
-    }
-
-    void etiquetado_paso_param_aux(UnParamF unParamF, Un_ParamsR unParamsR){
-        etq += 3;
-        unParamsR.getExp().procesa(this);
-        etq++;
+    void etiquetado_paso_param_aux(ParamsFL paramsFL, ParamsRL paramsRL){
+        if (paramsFL instanceof MuchosParamsF && paramsRL instanceof Muchos_ParamsR) {
+            etiquetado_paso_param_aux(paramsFL.getParamsFL(), paramsRL.getParamrl());
+            etq += 3;
+            paramsRL.getExp().procesa(this);
+            etq++;
+        }
+        else if (paramsFL instanceof UnParamF && paramsRL instanceof Un_ParamsR) {
+            etq += 3;
+            paramsRL.getExp().procesa(this);
+            etq++;
+        }
     }
 }

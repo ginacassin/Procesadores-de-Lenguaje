@@ -94,6 +94,22 @@ public class ProcesamientoDef implements Procesamiento {
     public void recolecta_subs(SintaxisAbstractaTiny.DecVar decVar){}
     public void recolecta_subs(SintaxisAbstractaTiny.DecTipo decTipo){}
     public void recolecta_subs(SintaxisAbstractaTiny.DecProc decProc){}
+
+    protected static SintaxisAbstractaTiny.T ref(SintaxisAbstractaTiny.T n) {
+        // Sigue la cadena de vínculos entre nombres de tipos sinónimos
+        if (n instanceof SintaxisAbstractaTiny.Identificador) {
+            return ref(((SintaxisAbstractaTiny.DecTipo)n.getVinculo()).getTipo());
+        }
+
+        return n.getTipado();
+    }
+
+    protected static boolean es_designador(SintaxisAbstractaTiny.Exp e) {
+        return e instanceof SintaxisAbstractaTiny.Iden
+                || e instanceof SintaxisAbstractaTiny.Acceso
+                || e instanceof SintaxisAbstractaTiny.Index
+                || e instanceof SintaxisAbstractaTiny.Indireccion;
+    }
 }
 
 
