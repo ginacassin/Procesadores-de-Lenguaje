@@ -105,7 +105,7 @@ public class ProcesamientoDef implements Procesamiento {
             return ref(((SintaxisAbstractaTiny.DecTipo)n.getVinculo()).getTipo());
         }
 
-        return n.getTipado();
+        return n;
     }
 
     protected static boolean es_designador(SintaxisAbstractaTiny.Exp e) {

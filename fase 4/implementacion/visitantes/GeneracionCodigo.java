@@ -359,7 +359,7 @@ public class GeneracionCodigo extends ProcesamientoDef {
 
     @Override
     public void procesa(Lit_cadena cadena){
-        maquinaP.emit(maquinaP.apila_string(cadena.getIden()));
+        maquinaP.emit(maquinaP.apila_string(cadena.getCadena()));
     }
 
     @Override
@@ -410,7 +410,7 @@ public class GeneracionCodigo extends ProcesamientoDef {
 
     void gen_acc_id(DecVar decVar){
         if (decVar.getNivel() == 0)
-            maquinaP.emit(maquinaP.apila_int(decVar.getVinculo().getDir()));
+            maquinaP.emit(maquinaP.apila_int(decVar.getDir()));
         else
             procesa_acc_var(decVar);
     }

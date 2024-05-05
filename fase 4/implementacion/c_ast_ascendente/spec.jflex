@@ -88,6 +88,7 @@ identificador = ({letra}|_)({letra}|{digito}|_)*
 literalEntero = (\+|\-)?{parteEntera}
 literalReal = (\+|\-)?{parteEntera}((\.{parteDecimal})|((e|E)(\+|\-)?{parteEntera})|((\.{parteDecimal})((e|E)(\+|\-)?{parteEntera})))
 literalCadena = \"[^\"]*\"
+eof = \$
 //definicion de cadenas ignorables
 separador = [ \t\r\b\n]
 comentario = ##([^\n])*
@@ -146,4 +147,5 @@ comentario = ##([^\n])*
 {literalEntero}           {return ops.unidadLiteralEntero();}
 {literalReal}             {return ops.unidadLiteralReal();}
 {literalCadena}           {return ops.unidadLiteralCadena();}
+{eof}                     {return ops.unidadEof();}
 [^]                       {errores.errorLexico(fila(),columna(),lexema());}

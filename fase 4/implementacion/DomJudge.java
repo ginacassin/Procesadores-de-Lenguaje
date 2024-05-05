@@ -1,72 +1,83 @@
-import java.io.InputStreamReader;
-import java.io.Reader;
-
 import asint.SintaxisAbstractaTiny.*;
 import c_ast_ascendente.AnalizadorLexicoTiny;
-import c_ast_ascendente.GestionErroresTiny.ErrorLexico;
-import c_ast_ascendente.GestionErroresTiny.ErrorSintactico;
-import c_ast_descendente.ConstructorASTsTiny;
-import c_ast_descendente.ConstructorASTsTinyDJ;
+import c_ast_ascendente.ConstructorASTTiny;
+import c_ast_ascendente.GestionErroresTiny.*;
 import c_ast_descendente.ParseException;
 import c_ast_descendente.TokenMgrError;
-import evaluador.recursivo.ImpresorRecursivo;
-import evaluador.visitante.Impresion;
+import maquinaP.MaquinaP;
+import visitantes.*;
+import java.io.Reader;
 
 public class DomJudge {
-    public static void main(String[] args) throws Exception {
-        Reader input = new InputStreamReader(System.in);
-        char c = (char) input.read();
-        Prog prog;
-        if (c == 'a') {
-            AnalizadorLexicoTiny alex = new AnalizadorLexicoTiny(input);
-            c_ast_ascendente.ConstructorASTTiny asint = new c_ast_ascendente.ConstructorASTTinyDJ(alex);
-
-            System.out.println("CONSTRUCCION AST ASCENDENTE");
+    private static Prog construye_ast(Reader input, char constructor) throws Exception {
+        if(constructor == 'a') {
             try {
-                prog = (Prog)asint.debug_parse().value;
+                AnalizadorLexicoTiny alex = new AnalizadorLexicoTiny(input);
+                // en esta fase no necesitamos volcar los distintos tokens leídos: utilizamos
+                // directamente la clase ConstructorASTTiny, en lugar de su especialización
+                // ConstructorASTTinyDJ, e invocamos a parse, en lugar de debug_parse.
+                ConstructorASTTiny asint = new ConstructorASTTiny(alex);
+                Prog p = (Prog)asint.parse().value;
+                return p;
             }
             catch(ErrorLexico e) {
                 System.out.println("ERROR_LEXICO");
-                return;
             }
             catch(ErrorSintactico e) {
                 System.out.println("ERROR_SINTACTICO");
-                return;
+                System.exit(0);
             }
-
-            System.out.println("IMPRESION RECURSIVA");
-            new ImpresorRecursivo().muestraPrograma(prog);
-
-            System.out.println("IMPRESION INTERPRETE");
-            prog.imprime();
-
-            System.out.println("IMPRESION VISITANTE");
-            prog.procesa(new Impresion());
         }
-        else {
-            ConstructorASTsTiny asint = new ConstructorASTsTinyDJ(input);
-            asint.disable_tracing();
-            System.out.println("CONSTRUCCION AST DESCENDENTE");
+        else if(constructor == 'd') {
             try {
-                prog = asint.analiza();
-            }
-            catch(ParseException e) {
-                System.out.println("ERROR_SINTACTICO");
-                return;
+                // no necesitamos volcar los tokens: usamos directamente la clase generada
+                // por javacc, y deshabilitamos la traza (por si estuviera activo DEBUG_PARSER.
+                c_ast_descendente.ConstructorASTsTiny asint =
+                        new c_ast_descendente.ConstructorASTsTiny(input);
+                asint.disable_tracing();
+                return asint.analiza();
             }
             catch(TokenMgrError e) {
                 System.out.println("ERROR_LEXICO");
-                return;
             }
+            catch(ParseException e) {
+                System.out.println("ERROR_SINTACTICO");
+                System.exit(0);
+            }
+        }
+        else {
+            System.err.println("Metodo de construccion no soportado:"+constructor);
+        }
+        return null;
+    }
 
-            System.out.println("IMPRESION RECURSIVA");
-            new ImpresorRecursivo().muestraPrograma(prog);
+    public static void procesa(Prog p, Reader datos) throws Exception {
+        Tipado t = null;
+        VinculacionPrimera vp = new VinculacionPrimera();
+        p.procesa(vp);
+        if(vp.getErrors().isEmpty()) {
+            t = new Tipado();
+            p.procesa(t);
+        }
+        if(t != null && t.getErrors().isEmpty()) {
+            p.procesa(new AsignacionEspacioPrimera());
+            MaquinaP maquinaP = new MaquinaP(datos, 500, 5000,5000, 10);
 
-            System.out.println("IMPRESION INTERPRETE");
-            prog.imprime();
+            // Proceso etiquetado
+            p.procesa(new Etiquetado(maquinaP));
 
-            System.out.println("IMPRESION VISITANTE");
-            prog.procesa(new Impresion());
+            // Proceso de generacion de codigo
+            p.procesa(new GeneracionCodigo(maquinaP));
+
+            maquinaP.ejecuta();
+        }
+    }
+    public static void main(String[] args) throws Exception {
+        char constructor = (char)System.in.read();
+        Reader r = new BISReader(System.in);
+        Prog prog = construye_ast(r,constructor);
+        if(prog != null) {
+            procesa(prog, r);
         }
     }
 }

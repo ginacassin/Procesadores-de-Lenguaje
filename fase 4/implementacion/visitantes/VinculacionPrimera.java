@@ -14,6 +14,10 @@ public class VinculacionPrimera extends ProcesamientoDef {
     private VinculacionSegunda vs;
     private List<String> errors;
 
+    public List<String> getErrors() {
+        return errors;
+    }
+
     public VinculacionPrimera() {
         errors = new ArrayList<>();
     }

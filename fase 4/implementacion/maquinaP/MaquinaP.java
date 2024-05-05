@@ -1,5 +1,7 @@
 package maquinaP;
 
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -522,23 +524,24 @@ public class MaquinaP {
        public void ejecuta() {
            // Realiza la lectura de entrada y apila el valor leído en la pila,
            // por cada tipo
-           Scanner scanner = new Scanner(System.in);
 
-           if (scanner.hasNextInt()) {
-               pilaEvaluacion.push(new ValorInt(scanner.nextInt()));
+           if (input.hasNextInt()) {
+               pilaEvaluacion.push(new ValorInt(input.nextInt()));
+               input.nextLine();
            }
-           else if (scanner.hasNextDouble()) {
-               pilaEvaluacion.push(new ValorReal(scanner.nextDouble()));
+           else if (input.hasNextDouble()) {
+               pilaEvaluacion.push(new ValorReal(input.nextDouble()));
+               input.nextLine();
            }
-           else if (scanner.hasNextBoolean()) {
-               pilaEvaluacion.push(new ValorBool(scanner.nextBoolean()));
+           else if (input.hasNextBoolean()) {
+               pilaEvaluacion.push(new ValorBool(input.nextBoolean()));
+               input.nextLine();
            }
-           else if (scanner.hasNextLine()) {
-               pilaEvaluacion.push(new ValorString(scanner.nextLine()));
+           else if (input.hasNextLine()) {
+               pilaEvaluacion.push(new ValorString(input.nextLine()));
            }
 
            pc++;
-           scanner.close();
        }
 
        public String toString() {
@@ -609,7 +612,9 @@ public class MaquinaP {
    private int tamdatos;
    private int tamheap;
    private int ndisplays;
-   public MaquinaP(int tamdatos, int tampila, int tamheap, int ndisplays) {
+   private Scanner input;
+   public MaquinaP(Reader input, int tamdatos, int tampila, int tamheap, int ndisplays) {
+       this.input = new Scanner(input);
       this.tamdatos = tamdatos;
       this.tamheap = tamheap;
       this.ndisplays = ndisplays;
@@ -675,7 +680,7 @@ public class MaquinaP {
    }
    
    public static void main(String[] args) {
-       MaquinaP m = new MaquinaP(5,10,10,2);
+       MaquinaP m = new MaquinaP(new InputStreamReader(System.in),10,10,2, 1);
 
           /*
             int x;
