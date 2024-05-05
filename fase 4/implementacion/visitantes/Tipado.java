@@ -123,15 +123,15 @@ public class Tipado extends ProcesamientoDef {
     }
 
     private static boolean unificables(T t1, T t2) {
-        Object t1Prime = ref(t1);
-        Object t2Prime = ref(t2);
+        T t1Prime = ref(t1);
+        T t2Prime = ref(t2);
 
         // Lógica de unificación
         if (t1Prime.getClass() == t2Prime.getClass()) {
             return true;
         } else if (t1Prime instanceof TipoReal && t2Prime instanceof TipoInt) {
             return true; // Se asigna un int a un real
-        } else if (t1Prime instanceof TipoPunt && t2Prime instanceof Null) {
+        } else if (t1Prime instanceof TipoPunt && t2Prime instanceof TipoNull) {
             return true; // Se asigna null a un puntero
         } else if (t1Prime instanceof TipoArray && t2Prime instanceof TipoArray) {
             TipoArray array1 = (TipoArray) t1Prime;
