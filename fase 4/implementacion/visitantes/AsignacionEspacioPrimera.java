@@ -128,7 +128,7 @@ public class AsignacionEspacioPrimera extends ProcesamientoDef {
     @Override
     public void procesa(TipoArray tipoArray){
         tipoArray.getTipo().procesa(this);
-        tipoArray.setTam(tipoArray.getTipo().getTam() * tipoArray.getLitEnt());
+        tipoArray.setTam(tipoArray.getTipo().getTam() * Integer.parseInt(tipoArray.getLitEnt()));
     }
 
     @Override
