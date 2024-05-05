@@ -4,6 +4,7 @@ import asint.ProcesamientoDef;
 import asint.SintaxisAbstractaTiny;
 import asint.SintaxisAbstractaTiny.*;
 import maquinaP.MaquinaP;
+import java.util.Scanner;
 
 import java.util.Stack;
 
@@ -328,6 +329,24 @@ public class GeneracionCodigo extends ProcesamientoDef {
         maquinaP.emit(maquinaP.suma());
     }
 
+    private int desplazamiento(LCampos lCampos, String id){
+        if (lCampos instanceof Muchos_Campos) {
+            if (lCampos.getCampo().getIden().equals(id)){
+                return lCampos.getCampo().getDesp();
+            }
+            else{
+                desplazamiento(lCampos.getlCampos(), id);
+            }
+        }
+        else if (lCampos instanceof Un_Campo){
+            if (lCampos.getCampo().getIden().equals(id)){
+                return lCampos.getCampo().getDesp();
+            }
+        }
+
+        return 0;
+    }
+
     @Override
     public void procesa(Indireccion indireccion){
         indireccion.getIndex().procesa(this);
@@ -416,10 +435,11 @@ public class GeneracionCodigo extends ProcesamientoDef {
         this.procesa_acc_var(param);
     }
 
-    void gen_acc_var(Param param){
-        maquinaP.apilad(param.getNivel());
-        maquinaP.apila_int(param.getDir());
-        maquinaP.suma();
+    @Override
+    public void procesa_acc_var(Nodo nodo){
+        maquinaP.emit(maquinaP.apilad(nodo.getNivel()));
+        maquinaP.emit(maquinaP.apila_int(nodo.getDir()));
+        maquinaP.emit(maquinaP.suma());
     }
 
     @Override

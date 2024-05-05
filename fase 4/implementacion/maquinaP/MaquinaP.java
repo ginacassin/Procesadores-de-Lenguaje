@@ -503,6 +503,18 @@ public class MaquinaP {
        }
 
    }
+
+   private IWrite IWRITE;
+   private class IWrite implements Instruccion {
+       public void ejecuta() {
+            Valor valor = pilaEvaluacion.pop();
+            System.out.print(valor.toString());
+            pc++;
+       }
+       public String toString() {
+           return "write";
+       }
+   }
    
    private Instruccion IIRIND;
    private class IIrind implements Instruccion {
