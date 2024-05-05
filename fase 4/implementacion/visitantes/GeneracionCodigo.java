@@ -63,7 +63,7 @@ public class GeneracionCodigo extends ProcesamientoDef {
     @Override
     public void procesa(Instr_Expr instrExpr){
         instrExpr.getExp().procesa(this);
-        maquinaP.emit(maquinaP.desapila_ind());
+        maquinaP.emit(maquinaP.desapila()); // descartar resultado
     }
 
     @Override

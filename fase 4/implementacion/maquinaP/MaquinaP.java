@@ -487,7 +487,17 @@ public class MaquinaP {
           return "stop";                 
        }
    }
-   
+
+   //private IDesapila IDESAPILA;
+   private class IDesapila implements Instruccion {
+       public void ejecuta() {
+           pilaEvaluacion.pop();
+           pc++;
+       }
+       public String toString() {
+           return "desapila";
+       }
+   }
    
    private class IApilad implements Instruccion {
        private int nivel;
@@ -568,6 +578,7 @@ public class MaquinaP {
    public Instruccion activa(int nivel, int tam, int dirretorno) {return new IActiva(nivel,tam,dirretorno);}
    public Instruccion desactiva(int nivel, int tam) {return new IDesactiva(nivel,tam);}
    public Instruccion desapilad(int nivel) {return new IDesapilad(nivel);}
+   public Instruccion desapila() {return new IDesapila();}
    public Instruccion dup() {return IDUP;}
    public Instruccion stop() {return ISTOP;}
    public Instruccion nl() {return INL;}
@@ -605,6 +616,7 @@ public class MaquinaP {
       INT2REAL = new IIntToReal();
       IAPILAIND = new IApilaind();
       IDESAPILAIND = new IDesapilaind();
+      //IDESAPILA = new IDesapila();
       IIRIND = new IIrind();
       IDUP = new IDup();
       ISTOP = new IStop();
