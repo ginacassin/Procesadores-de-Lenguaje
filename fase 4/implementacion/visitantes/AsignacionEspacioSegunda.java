@@ -10,6 +10,11 @@ public class AsignacionEspacioSegunda extends ProcesamientoDef{
     }
 
     @Override
+    public void procesa(NoDecs noDecs) {
+        // noop
+    }
+
+    @Override
     public void procesa(MuchasDecs muchasDecs){
         muchasDecs.getDecsAux().procesa(this);
         muchasDecs.getDec().procesa(this);
@@ -31,8 +36,18 @@ public class AsignacionEspacioSegunda extends ProcesamientoDef{
     }
 
     @Override
+    public void procesa(DecProc decProc){
+        // noop
+    }
+
+    @Override
     public void procesa(SiParamF siParamF){
         siParamF.getParamsFL().procesa(this);
+    }
+
+    @Override
+    public void procesa(NoParamF noParamF){
+        // noop
     }
 
     @Override
@@ -63,7 +78,12 @@ public class AsignacionEspacioSegunda extends ProcesamientoDef{
 
     @Override
     public void procesa(TipoPunt tipoPunt){
-        // TODO
+        if (tipoPunt.getTipo() instanceof Identificador) {
+            DecTipo vinculo = (DecTipo) tipoPunt.getTipo().getVinculo();
+            tipoPunt.setTam(vinculo.getTipo().getTam());
+        } else {
+            tipoPunt.getTipo().procesa(this);
+        }
     }
 
     @Override
@@ -86,4 +106,19 @@ public class AsignacionEspacioSegunda extends ProcesamientoDef{
     public void procesa(Campo campo){
         campo.getTipo().procesa(this);
     }
+
+    @Override
+    public void procesa(TipoInt tipoInt) {} // noop
+
+    @Override
+    public void procesa(TipoReal tipoReal) {} // noop
+
+    @Override
+    public void procesa(TipoBool tipoBool) {} // noop
+
+    @Override
+    public void procesa(TipoString tipoString) {} // noop
+
+    @Override
+    public void procesa(Identificador identificador) {} // noop
 }

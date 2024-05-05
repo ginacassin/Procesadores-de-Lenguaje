@@ -7,12 +7,12 @@ public class AsignacionEspacioPrimera extends ProcesamientoDef {
     private int dir;
     private int max_dir;
     private int nivel;
+    private AsignacionEspacioSegunda aes;
     public AsignacionEspacioPrimera(){
-        this.dir = 0;
-        this.max_dir = 0;
+        this.dir = 0; // contador de direcciones
+        this.max_dir = 0; // mantiene la máxima dirección asignada
         this.nivel = 0;
-
-
+        this.aes = new AsignacionEspacioSegunda();
     }
 
     private void inc_dir(int inc) { // se incrementa dir y se mantiene max_dir
@@ -30,12 +30,12 @@ public class AsignacionEspacioPrimera extends ProcesamientoDef {
     public void procesa(Bloq bloq){
         int dir_ant = this.dir;
         bloq.getDecs().procesa(this);
-        AsignacionEspacioSegunda aes = new AsignacionEspacioSegunda();
         bloq.getDecs().procesa(aes);
         bloq.getInsts().procesa(this);
         this.dir = dir_ant;
     }
 
+    // Primera pasada
     @Override
     public void procesa(SiDecs siDecs){
         siDecs.getDecsAux().procesa(this);
@@ -79,7 +79,6 @@ public class AsignacionEspacioPrimera extends ProcesamientoDef {
         this.dir = 0;
         this.max_dir = 0;
         decProc.getParamsF().procesa(this);
-        AsignacionEspacioSegunda aes = new AsignacionEspacioSegunda();
         decProc.getParamsF().procesa(aes);
         decProc.getBloq().procesa(this);
         decProc.setTam(this.dir);
@@ -133,7 +132,10 @@ public class AsignacionEspacioPrimera extends ProcesamientoDef {
 
     @Override
     public void procesa(TipoPunt tipoPunt){
-        // TODO
+        if (!(tipoPunt.getTipo() instanceof Identificador)) {
+            tipoPunt.getTipo().procesa(this);
+        }
+        tipoPunt.setTam(1);
     }
 
     @Override
@@ -188,6 +190,7 @@ public class AsignacionEspacioPrimera extends ProcesamientoDef {
         identificador.setTam(1);
     }
 
+    // Única pasada
     @Override
     public void procesa(Si_Instr siInstr){
         siInstr.getInstsAux().procesa(this);
