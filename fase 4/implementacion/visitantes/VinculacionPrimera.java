@@ -54,16 +54,31 @@ public class VinculacionPrimera extends ProcesamientoDef {
 
     public void procesa(DecVar dec) {
         dec.getTipo().procesa(this);
-        ts.inserta(dec.getIden(), dec);
+        try {
+            ts.inserta(dec.getIden(), dec);
+        }
+        catch (TablaSimbolos.IdDuplicada e) {
+            errors.add("ERROR_VINCULACION. " + e.getMessage() + dec.getFilaColInfo());
+        }
     }
 
     public void procesa(DecTipo dec) {
         dec.getTipo().procesa(this);
-        ts.inserta(dec.getIden(), dec);
+        try {
+            ts.inserta(dec.getIden(), dec);
+        }
+        catch (TablaSimbolos.IdDuplicada e) {
+            errors.add("ERROR_VINCULACION. " + e.getMessage() + dec.getFilaColInfo());
+        }
     }
 
     public void procesa(DecProc dec) {
-        ts.inserta(dec.getIden(), dec);
+        try {
+            ts.inserta(dec.getIden(), dec);
+        }
+        catch (TablaSimbolos.IdDuplicada e) {
+            errors.add("ERROR_VINCULACION. " + e.getMessage() + dec.getFilaColInfo());
+        }
         ts.abreAmbito();
         dec.getParamsF().procesa(this);
         dec.getBloq().procesa(this);
@@ -89,12 +104,22 @@ public class VinculacionPrimera extends ProcesamientoDef {
 
     public void procesa(ParamRef paramRef) {
         paramRef.getTipo().procesa(this);
-        ts.inserta(paramRef.getIden(), paramRef);
+        try {
+            ts.inserta(paramRef.getIden(), paramRef);
+        }
+        catch (TablaSimbolos.IdDuplicada e) {
+            errors.add("ERROR_VINCULACION. " + e.getMessage() + paramRef.getFilaColInfo());
+        }
     }
 
     public void procesa(ParamNoRef param) {
         param.getTipo().procesa(this);
-        ts.inserta(param.getIden(), param);
+        try {
+            ts.inserta(param.getIden(), param);
+        }
+        catch (TablaSimbolos.IdDuplicada e) {
+            errors.add("ERROR_VINCULACION. " + e.getMessage() + param.getFilaColInfo());
+        }
     }
 
     public void procesa(TipoArray tipoArray) {
@@ -219,7 +244,9 @@ public class VinculacionPrimera extends ProcesamientoDef {
         if (vinculo == null) {
             errors.add("ERROR_VINCULACION. Vínculo no encontrado. " + inst.getFilaColInfo());
         }
-        inst.setVinculo(vinculo);
+        else {
+            inst.setVinculo(vinculo);
+        }
     }
 
     public void procesa(Instr_Bloque inst) {
