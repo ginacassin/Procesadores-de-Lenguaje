@@ -154,6 +154,7 @@ public interface ConstructorASTsTinyConstants {
     "\"!=\"",
     "\"[\"",
     "\"^\"",
+    "\"$$\"",
     "\"{\"",
     "\"}\"",
     "\"&&\"",
