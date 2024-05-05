@@ -97,23 +97,7 @@ public class GeneracionCodigo extends ProcesamientoDef {
     public void procesa(Instr_Read instrRead){
         instrRead.getExp().procesa(this);
         gen_acc_val(instrRead.getExp());
-        Scanner scanner = new Scanner(System.in);
-        if (instrRead.getTipado() instanceof TipoInt){
-            int valor = scanner.nextInt();
-            maquinaP.emit(maquinaP.apila_int(valor));
-        }
-        else if (instrRead.getTipado() instanceof TipoReal){
-            double valor = scanner.nextFloat();
-            maquinaP.emit(maquinaP.apila_real(valor));
-        }
-        else if (instrRead.getTipado() instanceof TipoBool){
-            boolean valor = scanner.nextBoolean();
-            maquinaP.emit(maquinaP.apila_bool(valor));
-        }
-        else if (instrRead.getTipado() instanceof TipoString){
-            String valor = scanner.nextLine();
-            maquinaP.emit(maquinaP.apila_string(valor));
-        }
+        maquinaP.emit(maquinaP.read());
     }
 
     @Override

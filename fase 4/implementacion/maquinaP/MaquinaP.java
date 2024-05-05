@@ -2,6 +2,7 @@ package maquinaP;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Stack;
 
 
@@ -515,7 +516,35 @@ public class MaquinaP {
            return "write";
        }
    }
-   
+
+   private IRead IREAD;
+   private class IRead implements Instruccion {
+       public void ejecuta() {
+           // Realiza la lectura de entrada y apila el valor leído en la pila,
+           // por cada tipo
+           Scanner scanner = new Scanner(System.in);
+
+           if (scanner.hasNextInt()) {
+               pilaEvaluacion.push(new ValorInt(scanner.nextInt()));
+           }
+           else if (scanner.hasNextDouble()) {
+               pilaEvaluacion.push(new ValorReal(scanner.nextDouble()));
+           }
+           else if (scanner.hasNextBoolean()) {
+               pilaEvaluacion.push(new ValorBool(scanner.nextBoolean()));
+           }
+           else if (scanner.hasNextLine()) {
+               pilaEvaluacion.push(new ValorString(scanner.nextLine()));
+           }
+
+           pc++;
+           scanner.close();
+       }
+
+       public String toString() {
+           return "read";
+       }
+   }
    private Instruccion IIRIND;
    private class IIrind implements Instruccion {
        public void ejecuta() {
@@ -572,6 +601,7 @@ public class MaquinaP {
    public Instruccion stop() {return ISTOP;}
    public Instruccion nl() {return INL;}
    public Instruccion write() {return IWRITE;}
+   public Instruccion read() {return IREAD;}
    public void emit(Instruccion i) {
       codigoP.add(i); 
    }
@@ -610,6 +640,7 @@ public class MaquinaP {
       ISTOP = new IStop();
       INL = new INl();
       IWRITE = new IWrite();
+      IREAD = new IRead();
       gestorPilaActivaciones = new GestorPilaActivaciones(tamdatos,(tamdatos+tampila)-1,ndisplays); 
       gestorMemoriaDinamica = new GestorMemoriaDinamica(tamdatos+tampila,(tamdatos+tampila+tamheap)-1);
    }
