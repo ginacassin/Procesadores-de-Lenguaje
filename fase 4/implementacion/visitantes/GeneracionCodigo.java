@@ -380,7 +380,12 @@ public class GeneracionCodigo extends ProcesamientoDef {
 
     @Override
     public void procesa(Iden iden){
-        gen_acc_id((DecVar) iden.getVinculo());
+        if (iden.getVinculo() instanceof  DecVar)
+            gen_acc_id((DecVar) iden.getVinculo());
+        else if (iden.getVinculo() instanceof ParamNoRef)
+            gen_acc_id((ParamNoRef) iden.getVinculo());
+        else if (iden.getVinculo() instanceof ParamRef)
+            gen_acc_id((ParamRef) iden.getVinculo());
     }
 
     @Override
