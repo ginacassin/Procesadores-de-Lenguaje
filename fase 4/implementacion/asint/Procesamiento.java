@@ -56,6 +56,7 @@ public interface Procesamiento {
     public void procesa(SintaxisAbstractaTiny.TipoReal exp);
     public void procesa(SintaxisAbstractaTiny.TipoBool exp) ;
     public void procesa(SintaxisAbstractaTiny.TipoString exp) ;
+    public void procesa(SintaxisAbstractaTiny.TipoNull exp) ;
     public void procesa(SintaxisAbstractaTiny.Identificador exp) ;
     public void procesa(SintaxisAbstractaTiny.ParamRef exp) ;
     public void procesa(SintaxisAbstractaTiny.ParamNoRef exp);

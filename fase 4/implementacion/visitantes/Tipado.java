@@ -2,13 +2,18 @@ package visitantes;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 
 import asint.Procesamiento;
 import asint.ProcesamientoDef;
 import asint.SintaxisAbstractaTiny.*;
+import c_ast_ascendente.GestionErroresTiny.ErrorSintactico;
 
 public class Tipado extends ProcesamientoDef {
+    
+    private static List<String> errors;
 
     public static class TipoOK extends T {
         @Override
@@ -67,6 +72,18 @@ public class Tipado extends ProcesamientoDef {
         if (t1 instanceof TipoOK && t2 instanceof TipoOK)
             return new TipoOK();
         return new TipoError();
+    }
+
+    private static void aviso_error(T t1, T t2) {
+        if (!(t1 instanceof TipoError) && !(t2 instanceof TipoError)) {
+            errors.add("ERROR_TIPADO. " + t1.getFilaColInfo());
+        }
+    }
+
+    private static void aviso_error(T t) {
+        if (!(t instanceof TipoError)) {
+            errors.add("ERROR_TIPADO. " + t.getFilaColInfo());
+        }
     }
 
     private static T ref(T n) {
@@ -386,5 +403,282 @@ public class Tipado extends ProcesamientoDef {
             }
         }
         return null;
+    }
+
+    public void procesa(Instr_Bloque inst) {
+        inst.getBloq().procesa(this);
+        T t = inst.getBloq().getTipado();
+        inst.setTipado(t);
+    }
+
+    @Override
+    public void procesa(Asignacion asig) {
+        asig.getOpnd0().procesa(this);
+        asig.getOpnd1().procesa(this);
+
+        if (es_designador(asig.getOpnd0())) {
+            if (compatibles(asig.getOpnd0().getTipado(), asig.getOpnd1().getTipado())) {
+                asig.setTipado(new TipoOK());
+            }
+            else {
+                aviso_error(asig.getOpnd0().getTipado(), asig.getOpnd1().getTipado());
+                asig.setTipado(new TipoError());
+            }
+        }
+        else {
+            errors.add("ERROR_TIPADO. " + asig.getFilaColInfo());
+            asig.setTipado(new TipoError());
+        }
+    }
+
+    private void tipado_bin_comp(Exp e1, Exp e2, Exp e) {
+        e1.procesa(this);
+        e2.procesa(this);
+        T t1 = ref(e1.getTipado());
+        T t2 = ref(e2.getTipado());
+        if (((t1 instanceof TipoInt || t1 instanceof TipoReal) 
+                    && (t2 instanceof TipoInt || t2 instanceof TipoReal))
+            || (t1 instanceof TipoBool && t2 instanceof TipoBool)
+            || (t1 instanceof TipoString && t2 instanceof TipoString)) {
+            e.setTipado(new TipoBool());
+        }
+        else {
+            aviso_error(t1, t2);
+            e.setTipado(new TipoError());
+        }
+    }
+
+    public void procesa(Menor exp) {
+        tipado_bin_comp(exp.getOpnd0(), exp.getOpnd1(), exp);
+    }
+
+    public void procesa(Mayor exp) {
+        tipado_bin_comp(exp.getOpnd0(), exp.getOpnd1(), exp);
+    }
+
+    public void procesa(MenorIgual exp) {
+        tipado_bin_comp(exp.getOpnd0(), exp.getOpnd1(), exp);
+    }
+
+    public void procesa(MayorIgual exp) {
+        tipado_bin_comp(exp.getOpnd0(), exp.getOpnd1(), exp);
+    }
+
+    private void tipado_bin_igualdad(Exp e1, Exp e2, Exp e) {
+        e1.procesa(this);
+        e2.procesa(this);
+        T t1 = ref(e1.getTipado());
+        T t2 = ref(e2.getTipado());
+        if (((t1 instanceof TipoInt || t1 instanceof TipoReal) 
+                    && (t2 instanceof TipoInt || t2 instanceof TipoReal))
+            || (t1 instanceof TipoBool && t2 instanceof TipoBool)
+            || (t1 instanceof TipoString && t2 instanceof TipoString)
+            || ((t1 instanceof TipoPunt || t1 instanceof TipoNull)
+                    && (t2 instanceof TipoPunt || t2 instanceof TipoNull))) {
+            e.setTipado(new TipoBool());
+        }
+        else {
+            aviso_error(t1, t2);
+            e.setTipado(new TipoError());
+        }
+    }
+
+    public void procesa(Igual exp) {
+        tipado_bin_igualdad(exp.getOpnd0(), exp.getOpnd1(), exp);
+    }
+
+    public void procesa(NoIgual exp) {
+        tipado_bin_igualdad(exp.getOpnd0(), exp.getOpnd1(), exp);
+    }
+
+    private void tipado_bin_arit(Exp e1, Exp e2, Exp e) {
+        e1.procesa(this);
+        e2.procesa(this);
+        T t1 = ref(e1.getTipado());
+        T t2 = ref(e2.getTipado());
+        if (t1 instanceof TipoInt && t2 instanceof TipoInt) {
+            e.setTipado(new TipoInt());
+        }
+        else if ((t1 instanceof TipoInt || t1 instanceof TipoReal) 
+                    && (t2 instanceof TipoInt || t2 instanceof TipoReal)) {
+            e.setTipado(new TipoReal());
+        }
+        else {
+            aviso_error(t1, t2);
+            e.setTipado(new TipoError());
+        }
+    }
+
+    public void procesa(Suma exp) {
+        tipado_bin_arit(exp.getOpnd0(), exp.getOpnd1(), exp);
+    }
+
+    public void procesa(Resta exp) {
+        tipado_bin_arit(exp.getOpnd0(), exp.getOpnd1(), exp);
+    }
+
+    public void procesa(Mul exp) {
+        tipado_bin_arit(exp.getOpnd0(), exp.getOpnd1(), exp);
+    }
+
+    public void procesa(Div exp) {
+        tipado_bin_arit(exp.getOpnd0(), exp.getOpnd1(), exp);
+    }
+
+    private void tipado_bin_logi(Exp e1, Exp e2, Exp e) {
+        e1.procesa(this);
+        e2.procesa(this);
+        T t1 = ref(e1.getTipado());
+        T t2 = ref(e2.getTipado());
+        if (t1 instanceof TipoBool && t2 instanceof TipoBool) {
+            e.setTipado(new TipoBool());
+        }
+        else {
+            aviso_error(t1, t2);
+            e.setTipado(new TipoError());
+        }
+    }
+
+    public void procesa(And exp) {
+        tipado_bin_logi(exp.getOpnd0(), exp.getOpnd1(), exp);
+    }
+
+    public void procesa(Or exp) {
+        tipado_bin_logi(exp.getOpnd0(), exp.getOpnd1(), exp);
+    }
+
+    public void procesa(Mod exp) {
+        exp.getOpnd0().procesa(this);
+        exp.getOpnd1().procesa(this);
+        T t1 = ref(exp.getOpnd0().getTipado());
+        T t2 = ref(exp.getOpnd1().getTipado());
+        if (t1 instanceof TipoInt && t2 instanceof TipoInt) {
+            exp.setTipado(new TipoInt());
+        }
+        else {
+            aviso_error(t1, t2);
+            exp.setTipado(new TipoError());
+        }
+    }
+
+    public void procesa(Negativo exp) {
+        exp.getOpnd().procesa(this);
+        T t = ref(exp.getOpnd().getTipado());
+        if (t instanceof TipoInt || t instanceof TipoReal) {
+            exp.setTipado(t);
+        }
+        else {
+            aviso_error(t);
+            exp.setTipado(new TipoError());
+        }
+    }
+
+    public void procesa(Not exp) {
+        exp.getOpnd().procesa(this);
+        T t = ref(exp.getOpnd().getTipado());
+        if (t instanceof TipoBool) {
+            exp.setTipado(t);
+        }
+        else {
+            aviso_error(t);
+            exp.setTipado(new TipoError());
+        }
+    }
+
+    public void procesa(Index exp) {
+        exp.getOpnd().procesa(this);
+        T t = ref(exp.getOpnd().getTipado());
+        if (t instanceof TipoArray) {
+            exp.setTipado(t.getTipo());
+        }
+        else {
+            aviso_error(t);
+            exp.setTipado(new TipoError());
+        }
+    }
+
+    public void procesa(Acceso exp) {
+        exp.getOpnd().procesa(this);
+        T t = ref(exp.getOpnd().getTipado());
+        if (t instanceof TipoStruct) {
+            exp.setTipado(esCampoDe(exp.getIden(), t.getlCampos()));
+        }
+        else {
+            aviso_error(t);
+            exp.setTipado(new TipoError());
+        }
+    }
+
+    private static T esCampoDe(String iden, LCampos lcampos) {
+        if (lcampos instanceof Muchos_Campos) {
+            T t = esCampoDe(iden, lcampos.getCampo());
+            if (t instanceof TipoError) {
+                return esCampoDe(iden, lcampos);
+            }
+            else return t;
+        }
+        else if (lcampos instanceof Un_Campo) {
+            return esCampoDe(iden, lcampos.getCampo());
+        }
+        return null;
+    }
+
+    private static T esCampoDe(String iden, Campo campo) {
+        if (iden.equals(campo.getIden())) {
+            return campo.getTipo();
+        }
+        else return new TipoError();
+    }
+
+    public void procesa(Indireccion exp) {
+        exp.getOpnd().procesa(this);
+        T t = ref(exp.getOpnd().getTipado());
+        if (t instanceof TipoPunt) {
+            exp.setTipado(t);
+        }
+        else {
+            aviso_error(t);
+            exp.setTipado(new TipoError());
+        }
+    }
+
+    public void procesa(Lit_ent exp) {
+        exp.setTipado(new TipoInt());
+    }
+
+    public void procesa(Lit_real exp) {
+        exp.setTipado(new TipoReal());
+    }
+
+    public void procesa(True exp) {
+        exp.setTipado(new TipoBool());
+    }
+
+    public void procesa(False exp) {
+        exp.setTipado(new TipoBool());
+    }
+
+    public void procesa(Lit_cadena exp) {
+        exp.setTipado(new TipoString());
+    }
+
+    public void procesa(Iden iden) {
+        Nodo vinculo = iden.getVinculo();
+        if (vinculo instanceof DecVar) {
+            iden.setTipado(((DecVar)vinculo).getTipo());
+        }
+        else if (vinculo instanceof ParamRef) {
+            iden.setTipado(((ParamRef)vinculo).getTipo());
+        }
+        else if (vinculo instanceof ParamNoRef) {
+            iden.setTipado(((ParamNoRef)vinculo).getTipo());
+        }
+        else {
+            iden.setTipado(new TipoError());
+        }
+    }
+
+    public void procesa(Null n) {
+        n.setTipado(new TipoNull());
     }
 }

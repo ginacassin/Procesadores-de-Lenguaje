@@ -1499,6 +1499,21 @@ public class SintaxisAbstractaTiny {
 
         }
     }
+    public static class TipoNull extends T {
+        public TipoNull() {
+            super();
+        }
+
+        public void procesa(Procesamiento p) {
+            p.procesa(this);
+        }
+
+        @Override
+        public void imprime() {
+            System.out.println("<null>");
+
+        }
+    }
     public static class Identificador extends T {
         private String iden;
         public Identificador(String iden) {
