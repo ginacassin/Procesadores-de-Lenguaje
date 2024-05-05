@@ -1,15 +1,12 @@
 package visitantes;
 
-import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeoutException;
 
 import asint.Procesamiento;
 import asint.ProcesamientoDef;
 import asint.SintaxisAbstractaTiny.*;
-import c_ast_ascendente.GestionErroresTiny.ErrorSintactico;
 
 public class Tipado extends ProcesamientoDef {
     
@@ -88,14 +85,14 @@ public class Tipado extends ProcesamientoDef {
     
     private static Set<String> theta;
 
-    private static boolean son_unificables(LCampos l1, LCampos l2) {
+    private static boolean son_unificables(LCampos l1, LCampos l2, boolean esParamRef) {
         if (l1 instanceof Muchos_Campos && l2 instanceof Muchos_Campos) {
             LCampos l1Prime = l1.getlCampos();
             LCampos l2Prime = l2.getlCampos();
             Campo c1 = l1.getCampo();
             Campo c2 = l2.getCampo();
-            if (son_unificables(c1.getTipo(), c2.getTipo())) {
-                return son_unificables(l1Prime, l2Prime);
+            if (son_unificables(c1.getTipo(), c2.getTipo(), esParamRef)) {
+                return son_unificables(l1Prime, l2Prime, esParamRef);
             }
             else return false;
         }
@@ -107,22 +104,23 @@ public class Tipado extends ProcesamientoDef {
         }
         else if (l1 instanceof Un_Campo && l2 instanceof Un_Campo) {
             return son_unificables(((Un_Campo)l1).getCampo().getTipo(), 
-                                   ((Un_Campo)l2).getCampo().getTipo());
+                                   ((Un_Campo)l2).getCampo().getTipo(),
+                                   esParamRef);
         }
         return false;
     }
 
-    private static boolean son_unificables(T t1, T t2) {
+    private static boolean son_unificables(T t1, T t2, boolean esParamRef) {
         String equation = t1.toString() + "=" + t1.toString();
         if (!theta.contains(equation)) {
             theta.add(equation);
-            return unificables(t1, t2);
+            return unificables(t1, t2, esParamRef);
         } else {
             return true;
         }
     }
 
-    private static boolean unificables(T t1, T t2) {
+    private static boolean unificables(T t1, T t2, boolean esParamRef) {
         T t1Prime = ref(t1);
         T t2Prime = ref(t2);
 
@@ -130,22 +128,22 @@ public class Tipado extends ProcesamientoDef {
         if (t1Prime.getClass() == t2Prime.getClass()) {
             return true;
         } else if (t1Prime instanceof TipoReal && t2Prime instanceof TipoInt) {
-            return true; // Se asigna un int a un real
+            return !esParamRef; // Se asigna un int a un real
         } else if (t1Prime instanceof TipoPunt && t2Prime instanceof TipoNull) {
             return true; // Se asigna null a un puntero
         } else if (t1Prime instanceof TipoArray && t2Prime instanceof TipoArray) {
             TipoArray array1 = (TipoArray) t1Prime;
             TipoArray array2 = (TipoArray) t2Prime;
             return Integer.parseInt(array1.getLitEnt()) == Integer.parseInt(array2.getLitEnt())
-                && son_unificables(array1.getTipo(), array2.getTipo());
+                && son_unificables(array1.getTipo(), array2.getTipo(), esParamRef);
         } else if (t1Prime instanceof TipoPunt && t2Prime instanceof TipoPunt) {
             TipoPunt punt1 = (TipoPunt) t1Prime;
             TipoPunt punt2 = (TipoPunt) t2Prime;
-            return son_unificables(punt1.getTipo(), punt2.getTipo());
+            return son_unificables(punt1.getTipo(), punt2.getTipo(), esParamRef);
         } else if (t1Prime instanceof TipoStruct && t2Prime instanceof TipoStruct) {
             TipoStruct struct1 = (TipoStruct) t1Prime;
             TipoStruct struct2 = (TipoStruct) t2Prime;
-            return son_unificables(struct1.getlCampos(), struct2.getlCampos());
+            return son_unificables(struct1.getlCampos(), struct2.getlCampos(), esParamRef);
         } else {
             return false;
         }
@@ -153,7 +151,12 @@ public class Tipado extends ProcesamientoDef {
 
     private static boolean compatibles(T t1, T t2) {
         theta = new HashSet<>();
-        return unificables(t1, t2);
+        return unificables(t1, t2, false);
+    }
+
+    private static boolean compatibles(T t1, T t2, boolean esParamRef) {
+        theta = new HashSet<>();
+        return unificables(t1, t2, esParamRef);
     }
 
     @Override
@@ -357,7 +360,7 @@ public class Tipado extends ProcesamientoDef {
                 return new TipoError();
             }
             else { // Param ref
-                if (compatibles(exp_paramR.getTipado(), tipo_paramF)) {
+                if (compatibles(exp_paramR.getTipado(), tipo_paramF, true)) {
                     return llamadas_compatibles(mas_ParamsFL, mas_ParamsRL);
                 }
                 return new TipoError();
