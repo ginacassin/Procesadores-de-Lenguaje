@@ -24,8 +24,16 @@ public class TablaSimbolos {
         return currentAmbito.contiene(id);
     }
 
+    public Nodo vinculoDe(String id, Ambito ambito) {
+        Nodo vinculo = ambito.vinculoDe(id);
+        if (vinculo == null && ambito.getPadre() != null) {
+            vinculo = this.vinculoDe(id, ambito.getPadre());
+        }
+        return vinculo;
+    }
+
     public Nodo vinculoDe(String id) {
-        return currentAmbito.vinculoDe(id);
+        return this.vinculoDe(id, currentAmbito);
     }
 
     private class Ambito {

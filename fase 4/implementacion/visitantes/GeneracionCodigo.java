@@ -23,6 +23,7 @@ public class GeneracionCodigo extends ProcesamientoDef {
     public void procesa(Prog prog){
         DecProc sub;
         prog.getBloq().procesa(this);
+        maquinaP.emit(maquinaP.stop());
         while(!sub_pendientes.empty()){
             sub = sub_pendientes.pop();
             maquinaP.emit(maquinaP.desapilad(sub.getNivel()));
@@ -36,7 +37,6 @@ public class GeneracionCodigo extends ProcesamientoDef {
     public void procesa(Bloq bloq){
         bloq.getDecs().recolecta_subs(this);
         bloq.getInsts().procesa(this);
-        maquinaP.emit(maquinaP.stop());
     }
 
     @Override
@@ -63,7 +63,7 @@ public class GeneracionCodigo extends ProcesamientoDef {
     @Override
     public void procesa(Instr_Expr instrExpr){
         instrExpr.getExp().procesa(this);
-        maquinaP.emit(maquinaP.desapila()); // descartar resultado
+        //maquinaP.emit(maquinaP.desapila()); // descartar resultado
     }
 
     @Override
@@ -96,17 +96,18 @@ public class GeneracionCodigo extends ProcesamientoDef {
     @Override
     public void procesa(Instr_Read instrRead){
         instrRead.getExp().procesa(this);
-        gen_acc_val(instrRead.getExp());
+        //gen_acc_val(instrRead.getExp());
         maquinaP.emit(maquinaP.read());
+        maquinaP.emit(maquinaP.desapila_ind());
     }
 
     @Override
     public void procesa(Instr_Write instrWrite){
         instrWrite.getExp().procesa(this);
         gen_acc_val(instrWrite.getExp());
-        if (es_designador(instrWrite.getExp())){
-            maquinaP.emit(maquinaP.apila_ind());
-        }
+//        if (es_designador(instrWrite.getExp())){
+//            maquinaP.emit(maquinaP.apila_ind());
+//        }
         maquinaP.emit(maquinaP.write());
     }
 

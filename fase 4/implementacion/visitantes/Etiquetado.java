@@ -26,6 +26,7 @@ public class Etiquetado extends ProcesamientoDef {
         DecProc sub;
         prog.setPrim(etq);
         prog.getBloq().procesa(this);
+        etq++;
         while(!sub_pendientes.empty()){
             sub = sub_pendientes.pop();
             sub.setPrim(etq);
@@ -42,7 +43,6 @@ public class Etiquetado extends ProcesamientoDef {
         bloq.setPrim(etq);
         bloq.getDecs().recolecta_subs(this);
         bloq.getInsts().procesa(this);
-        etq++;
         bloq.setSig(etq);
     }
 
@@ -75,7 +75,7 @@ public class Etiquetado extends ProcesamientoDef {
     public void procesa(Instr_Expr instrExpr){
         instrExpr.setPrim(etq);
         instrExpr.getExp().procesa(this);
-        etq++;
+//        etq++;
         instrExpr.setSig(etq);
     }
 
@@ -96,8 +96,8 @@ public class Etiquetado extends ProcesamientoDef {
         procesa_acc_val(instrIfElse.getExp());
         etq++;
         instrIfElse.getBloq1().procesa(this);
-        instrIfElse.setElse(etq);
         etq++;
+        instrIfElse.setElse(etq);
         instrIfElse.getBloq2().procesa(this);
         instrIfElse.setSig(etq);
     }
@@ -117,7 +117,7 @@ public class Etiquetado extends ProcesamientoDef {
     public void procesa(Instr_Read instrRead){
         instrRead.setPrim(etq);
         instrRead.getExp().procesa(this);
-        etq++;
+        etq += 2;
         instrRead.setSig(etq);
     }
 
