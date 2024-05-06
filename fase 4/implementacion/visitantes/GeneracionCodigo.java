@@ -308,8 +308,8 @@ public class GeneracionCodigo extends ProcesamientoDef {
     public void procesa(Acceso acceso){
         acceso.getOpnd().procesa(this);
         if (ref(acceso.getOpnd().getTipado()) instanceof TipoStruct) {
-            TipoStruct registro = (TipoStruct) acceso.getOpnd().getVinculo();
-            maquinaP.emit(maquinaP.apila_int(desplazamiento(registro.getlCampos(), acceso.getId())));
+            TipoStruct registro = (TipoStruct) acceso.getOpnd().getTipado();
+            maquinaP.emit(maquinaP.apila_int(desplazamiento(registro.getlCampos(), acceso.getIden())));
         }
         maquinaP.emit(maquinaP.suma());
     }
