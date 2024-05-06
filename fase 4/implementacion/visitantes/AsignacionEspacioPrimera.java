@@ -160,8 +160,8 @@ public class AsignacionEspacioPrimera extends ProcesamientoDef {
 
     @Override
     public void procesa(Campo campo){
-        campo.getTipo().procesa(this);
         campo.setDesp(campo.getTipo().getTam());
+        campo.getTipo().procesa(this);
         this.dir += campo.getTipo().getTam();
     }
 
