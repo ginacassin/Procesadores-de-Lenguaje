@@ -140,7 +140,10 @@ public class Etiquetado extends ProcesamientoDef {
     public void procesa(Instr_New instrNew){
         instrNew.setPrim(etq);
         instrNew.getExp().procesa(this);
-        etq += 2;
+        if (ref(instrNew.getExp().getTipado()) instanceof TipoPunt) {
+            etq++;
+        }
+        etq++;
         instrNew.setSig(etq);
     }
 
@@ -148,7 +151,10 @@ public class Etiquetado extends ProcesamientoDef {
     public void procesa(Instr_Del instrDel){
         instrDel.setPrim(etq);
         instrDel.getExp().procesa(this);
-        etq += 2;
+        etq++;
+        if (ref(instrDel.getExp().getTipado()) instanceof TipoPunt) {
+            etq++;
+        }
         instrDel.setSig(etq);
     }
 
@@ -201,10 +207,12 @@ public class Etiquetado extends ProcesamientoDef {
         asignacion.setPrim(etq);
         asignacion.getOpnd0().procesa(this);
         asignacion.getOpnd1().procesa(this);
-        if (ref(asignacion.getOpnd0().getTipado()) != ref(asignacion.getOpnd1().getTipado()) &&
-                es_designador(asignacion.getOpnd1()))
+        if (ref(asignacion.getOpnd0().getTipado()) != ref(asignacion.getOpnd1().getTipado()))
         {
-            etq += 3;
+            if  (es_designador(asignacion.getOpnd1()))
+                etq += 3;
+            else
+                etq += 2;
         }
         else {
             etq++;
@@ -340,7 +348,10 @@ public class Etiquetado extends ProcesamientoDef {
         index.getOpnd().procesa(this);
         index.getIndex().procesa(this);
         procesa_acc_val(index.getIndex());
-        etq += 3;
+        if (ref(index.getOpnd().getTipado()) instanceof TipoArray) {
+            etq++;
+        }
+        etq += 2;
         index.setSig(etq);
     }
 
@@ -348,7 +359,10 @@ public class Etiquetado extends ProcesamientoDef {
     public void procesa(Acceso acceso){
         acceso.setPrim(etq);
         acceso.getOpnd().procesa(this);
-        etq += 2;
+        if (ref(acceso.getOpnd().getTipado()) instanceof TipoStruct) {
+            etq++;
+        }
+        etq++;
         acceso.setSig(etq);
     }
 
