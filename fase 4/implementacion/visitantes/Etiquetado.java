@@ -398,7 +398,13 @@ public class Etiquetado extends ProcesamientoDef {
     @Override
     public void procesa(Iden iden){
         iden.setPrim(etq);
-        procesa_acc_id((DecVar) iden.getVinculo());
+        //procesa_acc_id((DecVar) iden.getVinculo());
+        if (iden.getVinculo() instanceof  DecVar)
+            procesa_acc_id((DecVar) iden.getVinculo());
+        else if (iden.getVinculo() instanceof ParamNoRef)
+            procesa_acc_id((ParamNoRef) iden.getVinculo());
+        else if (iden.getVinculo() instanceof ParamRef)
+            procesa_acc_id((ParamRef) iden.getVinculo());
         iden.setSig(etq);
     }
 

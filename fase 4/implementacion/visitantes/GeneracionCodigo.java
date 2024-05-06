@@ -497,7 +497,7 @@ public class GeneracionCodigo extends ProcesamientoDef {
                 maquinaP.emit(maquinaP.desapila_ind());
             }
             else {
-                maquinaP.emit(maquinaP.copia(paramsFL.getParam().getTipado().getTam()));
+                maquinaP.emit(maquinaP.copia(paramsFL.getParam().getTipo().getTam()));
             }
         }
         else if (paramsFL instanceof UnParamF &&
@@ -512,7 +512,7 @@ public class GeneracionCodigo extends ProcesamientoDef {
                 maquinaP.emit(maquinaP.desapila_ind());
             }
             else {
-                maquinaP.emit(maquinaP.copia(paramsFL.getParam().getTipado().getTam()));
+                maquinaP.emit(maquinaP.copia(paramsFL.getParam().getTipo().getTam()));
             }
         }
     }
