@@ -355,8 +355,8 @@ public class VinculacionPrimera extends ProcesamientoDef {
     }
 
     public void procesa(Index exp) {
-        exp.getOpnd0().procesa(this);
-        exp.getOpnd1().procesa(this);
+        exp.getOpnd().procesa(this);
+        exp.getIndex().procesa(this);
     }
 
     public void procesa(Acceso exp) {
@@ -364,7 +364,7 @@ public class VinculacionPrimera extends ProcesamientoDef {
     }
 
     public void procesa(Indireccion exp) {
-        exp.getOpnd().procesa(this);
+        exp.getOpnd0().procesa(this);
     }
 
     public void procesa(Lit_ent exp) {} // noop

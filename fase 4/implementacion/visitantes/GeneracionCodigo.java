@@ -334,7 +334,7 @@ public class GeneracionCodigo extends ProcesamientoDef {
 
     @Override
     public void procesa(Indireccion indireccion){
-        indireccion.getIndex().procesa(this);
+        indireccion.getOpnd0().procesa(this);
         maquinaP.emit(maquinaP.apila_ind());
     }
 

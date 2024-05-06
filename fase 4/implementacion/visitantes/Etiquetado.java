@@ -355,7 +355,7 @@ public class Etiquetado extends ProcesamientoDef {
     @Override
     public void procesa(Indireccion indireccion){
         indireccion.setPrim(etq);
-        indireccion.getIndex().procesa(this);
+        indireccion.getOpnd0().procesa(this);
         etq++;
         indireccion.setSig(etq);
     }

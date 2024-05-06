@@ -611,7 +611,7 @@ public class Tipado extends ProcesamientoDef {
         if (lcampos instanceof Muchos_Campos) {
             T t = esCampoDe(iden, lcampos.getCampo());
             if (t instanceof TipoError) {
-                return esCampoDe(iden, lcampos);
+                return esCampoDe(iden, lcampos.getlCampos());
             }
             else return t;
         }
@@ -629,10 +629,10 @@ public class Tipado extends ProcesamientoDef {
     }
 
     public void procesa(Indireccion exp) {
-        exp.getOpnd().procesa(this);
-        T t = ref(exp.getOpnd().getTipado());
+        exp.getOpnd0().procesa(this);
+        T t = ref(exp.getOpnd0().getTipado());
         if (t instanceof TipoPunt) {
-            exp.setTipado(t);
+            exp.setTipado(t.getTipo());
         }
         else {
             aviso_error(t);

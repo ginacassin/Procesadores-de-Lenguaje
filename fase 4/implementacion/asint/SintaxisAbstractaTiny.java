@@ -537,7 +537,7 @@ public class SintaxisAbstractaTiny {
             this.iden = iden;
         }
         public String toString() {
-            return "index("+opnd+","+iden+")";
+            return "acceso("+opnd+","+iden+")";
         }
         public String getIden() {
             return iden;
