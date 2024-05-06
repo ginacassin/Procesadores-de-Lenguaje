@@ -29,8 +29,8 @@ public class Etiquetado extends ProcesamientoDef {
         etq++;
         while(!sub_pendientes.empty()){
             sub = sub_pendientes.pop();
-            etq++;
             sub.setPrim(etq);
+            etq++;
             sub.getBloq().procesa(this);
             etq+=2;
             sub.setSig(etq);
@@ -207,7 +207,8 @@ public class Etiquetado extends ProcesamientoDef {
         asignacion.setPrim(etq);
         asignacion.getOpnd0().procesa(this);
         asignacion.getOpnd1().procesa(this);
-        if (ref(asignacion.getOpnd0().getTipado()) != ref(asignacion.getOpnd1().getTipado()))
+        if (ref(asignacion.getOpnd0().getTipado()) instanceof TipoReal &&
+                ref(asignacion.getOpnd1().getTipado()) instanceof TipoInt)
         {
             if  (es_designador(asignacion.getOpnd1()))
                 etq += 3;

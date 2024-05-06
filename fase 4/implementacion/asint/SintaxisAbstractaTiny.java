@@ -1545,8 +1545,8 @@ public class SintaxisAbstractaTiny {
         }
         public String getIden() { throw new UnsupportedOperationException();}
         public T getTipo() { throw new UnsupportedOperationException();}
-        @Override
-        public void procesa_acc_var(Procesamiento p) { p.procesa_acc_var(this);}
+        //@Override
+        //public void procesa_acc_var(Procesamiento p) { p.procesa_acc_var(this);}
     }
     public static class ParamRef extends Param {
         private T tipo;

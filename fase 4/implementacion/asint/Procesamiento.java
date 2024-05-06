@@ -77,7 +77,7 @@ public interface Procesamiento {
     public void procesa_acc_id(SintaxisAbstractaTiny.DecVar decVar);
     public void procesa_acc_id(SintaxisAbstractaTiny.ParamRef paramRef);
     public void procesa_acc_id(SintaxisAbstractaTiny.ParamNoRef paramNoRef);
-    public void procesa_acc_var(SintaxisAbstractaTiny.Param param);
+//    public void procesa_acc_var(SintaxisAbstractaTiny.Param param);
     public void recolecta_subs(SintaxisAbstractaTiny.SiDecs siDecs);
     public void recolecta_subs(SintaxisAbstractaTiny.NoDecs noDecs);
     public void recolecta_subs(SintaxisAbstractaTiny.MuchasDecs muchasDecs);

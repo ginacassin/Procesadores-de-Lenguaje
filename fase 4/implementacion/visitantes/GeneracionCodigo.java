@@ -417,7 +417,7 @@ public class GeneracionCodigo extends ProcesamientoDef {
     }
 
     void gen_acc_id(ParamRef paramRef){
-        this.procesa_acc_var(paramRef);
+        procesa_acc_var(paramRef);
         maquinaP.emit(maquinaP.apila_ind());
     }
 
