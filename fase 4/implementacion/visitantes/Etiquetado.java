@@ -29,10 +29,10 @@ public class Etiquetado extends ProcesamientoDef {
         etq++;
         while(!sub_pendientes.empty()){
             sub = sub_pendientes.pop();
+            etq++;
             sub.setPrim(etq);
-            etq++;
             sub.getBloq().procesa(this);
-            etq++;
+            etq+=2;
             sub.setSig(etq);
         }
         prog.setSig(etq);
