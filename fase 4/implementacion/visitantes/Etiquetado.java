@@ -416,10 +416,28 @@ public class Etiquetado extends ProcesamientoDef {
     }
 
     void etiquetado_opnds(Exp opnd1, Exp opnd2){
-        opnd1.procesa(this);
-        procesa_acc_val(opnd1);
-        opnd2.procesa(this);
-        procesa_acc_val(opnd2);
+        if (ref(opnd1.getTipado()) instanceof TipoInt &&
+                ref(opnd2.getTipado()) instanceof TipoReal){
+            opnd1.procesa(this);
+            procesa_acc_val(opnd1);
+            etq++;
+            opnd2.procesa(this);
+            procesa_acc_val(opnd2);
+        }
+        else if (ref(opnd1.getTipado()) instanceof TipoReal &&
+                ref(opnd2.getTipado()) instanceof TipoInt){
+            opnd1.procesa(this);
+            procesa_acc_val(opnd1);
+            opnd2.procesa(this);
+            procesa_acc_val(opnd2);
+            etq++;
+        }
+        else {
+            opnd1.procesa(this);
+            procesa_acc_val(opnd1);
+            opnd2.procesa(this);
+            procesa_acc_val(opnd2);
+        }
     }
 
     @Override
