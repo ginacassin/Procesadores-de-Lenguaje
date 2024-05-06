@@ -65,7 +65,7 @@ public class MaquinaP {
        }
        public String valorString() {return valor;}
        public String toString() {
-           return valor;
+           return valor.substring(1, valor.length() - 1);
        }
    }
    private List<Instruccion> codigoP;
