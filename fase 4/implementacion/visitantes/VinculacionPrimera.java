@@ -85,9 +85,8 @@ public class VinculacionPrimera extends ProcesamientoDef {
         }
         ts.abreAmbito();
         dec.getParamsF().procesa(this);
-        dec.getBloq().procesa(this);
         dec.getParamsF().procesa(vs);
-        dec.getBloq().procesa(vs);
+        dec.getBloq().procesa(this);
         ts.cierraAmbito();
     }
 
@@ -162,6 +161,12 @@ public class VinculacionPrimera extends ProcesamientoDef {
     @Override
     public void procesa(Campo campo) {
         campo.getTipo().procesa(this);
+        try {
+            ts.inserta(campo.getIden(), campo);
+        }
+        catch (TablaSimbolos.IdDuplicada e) {
+            errors.add("ERROR_VINCULACION. " + e.getMessage() + campo.getFilaColInfo());
+        }
     }
 
     @Override
