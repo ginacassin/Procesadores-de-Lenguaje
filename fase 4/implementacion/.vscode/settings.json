@@ -1,0 +1,6 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "c_ast_ascendente/java_cup.jar"
+    ]
+}

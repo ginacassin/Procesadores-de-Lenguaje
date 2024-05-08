@@ -335,18 +335,73 @@ public class Tipado extends ProcesamientoDef {
     }
 
     public void procesa(Instr_Call inst) {
+        inst.getParamsR().procesa(this);
         DecProc dec = ((DecProc)inst.getVinculo());
-        T t = llamadas_compatibles(dec.getParamsF(), inst.getParamsR());
-        inst.setTipado(t);
+        if (num_elems(inst.getParamsR()) == num_elems(dec.getParamsF())) {
+            T t = llamadas_compatibles(dec.getParamsF(), inst.getParamsR());
+            inst.setTipado(t);
+        }
+        else
+            inst.setTipado(new TipoError());
+    }
+
+    public void procesa(No_ParamsR no_ParamsR) {
+        no_ParamsR.setTipado(new TipoOK());
+    }
+
+    public void procesa(Si_ParamsR si_ParamsR) {
+        si_ParamsR.getParamsrl().procesa(this);
+        si_ParamsR.setTipado(si_ParamsR.getParamsrl().getTipado());
+    }
+
+    public void procesa(Muchos_ParamsR muchos_ParamsR) {
+        muchos_ParamsR.getParamrl().procesa(this);
+        muchos_ParamsR.getExp().procesa(this);
+        if (muchos_ParamsR.getExp().getTipado() instanceof TipoError)
+            muchos_ParamsR.setTipado(new TipoError());
+        else 
+            muchos_ParamsR.setTipado(muchos_ParamsR.getParamrl().getTipado());
+    }
+
+    public void procesa(Un_ParamsR un_ParamsR) {
+        un_ParamsR.getExp().procesa(this);
+        if (un_ParamsR.getExp().getTipado() instanceof TipoError)
+            un_ParamsR.setTipado(new TipoError());
+        else 
+            un_ParamsR.setTipado(new TipoOK());
+    }
+
+    private int num_elems(ParamsR paramsR) {
+        if (paramsR instanceof Si_ParamsR)
+            return num_elems(paramsR.getParamsrl());
+        else // if (paramsR instanceof No_ParamsR)
+            return 0;
+    }
+    
+    private int num_elems(ParamsRL paramsRL) {
+        if (paramsRL instanceof Muchos_ParamsR) 
+            return 1 + num_elems(paramsRL.getParamrl());
+        else // if (paramsRL instanceof Un_ParamsR)
+            return 1;
+    }
+
+    private int num_elems(ParamsF paramsF) {
+        if (paramsF instanceof SiParamF)
+            return num_elems(paramsF.getParamsFL());
+        else // if (paramsF instanceof NoParamF)
+            return 0;
+    }
+    
+    private int num_elems(ParamsFL paramsFL) {
+        if (paramsFL instanceof MuchosParamsF) 
+            return 1 + num_elems(paramsFL.getParamsFL());
+        else // if (paramsRL instanceof Un_ParamsR)
+            return 1;
     }
 
     private T llamadas_compatibles(ParamsF paramsF, ParamsR paramsR) {
         if (paramsF instanceof SiParamF && paramsR instanceof Si_ParamsR)
             return llamadas_compatibles(paramsF.getParamsFL(), paramsR.getParamsrl());
-        else if (paramsF instanceof SiParamF && paramsR instanceof No_ParamsR)
-            return new TipoError();
-        else if (paramsF instanceof NoParamF && paramsR instanceof Si_ParamsR)
-            return new TipoError();
         else if (paramsF instanceof NoParamF && paramsR instanceof No_ParamsR)
             return new TipoOK();
         throw new RuntimeException("Error con Params");
@@ -359,7 +414,6 @@ public class Tipado extends ProcesamientoDef {
             ParamsRL mas_ParamsRL = paramsRL.getParamrl();
             Exp exp_paramR = paramsRL.getExp();
     
-            exp_paramR.procesa(this);
             Param paramF = paramsFL.getParam();
             if (paramF instanceof ParamNoRef) { // Param normal
                 if (es_designador(exp_paramR) 
@@ -375,16 +429,9 @@ public class Tipado extends ProcesamientoDef {
                 return new TipoError();
             }
         }
-        else if (paramsFL instanceof UnParamF && paramsRL instanceof Muchos_ParamsR) {
-            return new TipoError();
-        }
-        else if (paramsFL instanceof MuchosParamsF && paramsRL instanceof Un_ParamsR) {
-            return new TipoError();
-        }
         else if (paramsFL instanceof UnParamF && paramsRL instanceof Un_ParamsR) {
             Param param = paramsFL.getParam();
             Exp exp_paramR = paramsRL.getExp();
-            exp_paramR.procesa(this);
 
             if (param instanceof ParamNoRef) { // Param normal
                 if (compatibles(exp_paramR.getTipado(), param.getTipo())) {
