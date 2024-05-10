@@ -24,7 +24,7 @@ public class MaquinaP {
     
    private class Valor {
       public int valorInt() {throw new EAccesoIlegitimo();}
-      public double valorReal() {throw new EAccesoIlegitimo();}
+      public float valorReal() {throw new EAccesoIlegitimo();}
       public boolean valorBool() {throw new EAccesoIlegitimo();}
       public String valorString() {throw new EAccesoIlegitimo();}
    } 
@@ -39,11 +39,11 @@ public class MaquinaP {
       }
    }
    private class ValorReal extends Valor {
-       private double valor;
-       public ValorReal(double valor) {
+       private float valor;
+       public ValorReal(float valor) {
            this.valor = valor;
        }
-       public double valorReal() {return valor;}
+       public float valorReal() {return valor;}
        public String toString() {
            return String.valueOf(valor);
        }
@@ -281,8 +281,8 @@ public class MaquinaP {
       public String toString() {return "apila-int("+valor+")";};
    }
    private class IApilaReal implements Instruccion {
-       private double valor;
-       public IApilaReal(double valor) {
+       private float valor;
+       public IApilaReal(float valor) {
            this.valor = valor;
        }
        public void ejecuta() {
@@ -539,8 +539,8 @@ public class MaquinaP {
                pilaEvaluacion.push(new ValorInt(input.nextInt()));
                input.nextLine();
            }
-           else if (input.hasNextDouble()) {
-               pilaEvaluacion.push(new ValorReal(input.nextDouble()));
+           else if (input.hasNextFloat()) {
+               pilaEvaluacion.push(new ValorReal(input.nextFloat()));
                input.nextLine();
            }
            else if (input.hasNextBoolean()) {
@@ -594,7 +594,7 @@ public class MaquinaP {
    public Instruccion noIgual() {return INOIGUAL;}
    public Instruccion int2real() {return INT2REAL;}
    public Instruccion apila_int(int val) {return new IApilaInt(val);}
-   public Instruccion apila_real(double val) {return new IApilaReal(val);}
+   public Instruccion apila_real(float val) {return new IApilaReal(val);}
    public Instruccion apila_bool(boolean val) {return new IApilaBool(val);}
    public Instruccion apila_string(String val) {return new IApilaString(val);}
    public Instruccion apila_null() {return new IApilaNull();}
