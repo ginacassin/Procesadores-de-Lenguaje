@@ -345,7 +345,7 @@ public class GeneracionCodigo extends ProcesamientoDef {
 
     @Override
     public void procesa(Lit_real litReal){
-        maquinaP.emit(maquinaP.apila_real(Double.parseDouble(litReal.getNum())));
+        maquinaP.emit(maquinaP.apila_real(Float.parseFloat(litReal.getNum())));
     }
 
     @Override
