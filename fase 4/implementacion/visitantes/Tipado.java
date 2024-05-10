@@ -632,12 +632,14 @@ public class Tipado extends ProcesamientoDef {
 
     public void procesa(Index exp) {
         exp.getOpnd().procesa(this);
-        T t = ref(exp.getOpnd().getTipado());
-        if (t instanceof TipoArray) {
-            exp.setTipado(t.getTipo());
+        T t1 = ref(exp.getOpnd().getTipado());
+        exp.getIndex().procesa(this);
+        T t2 = ref(exp.getIndex().getTipado());
+        if (t1 instanceof TipoArray && t2 instanceof TipoInt) {
+            exp.setTipado(t1.getTipo());
         }
         else {
-            aviso_error(t);
+            aviso_error(t1,t2);
             exp.setTipado(new TipoError());
         }
     }
