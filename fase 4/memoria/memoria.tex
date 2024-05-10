@@ -87,9 +87,7 @@
             \begin{itemize}
                 \item var ts \/// \textit{La tabla de símbolos}
                 \item vincula(prog(Bloq)):
-                    \subitem vincula(Bloq)
                     \subitem ts = creaTS()
-                    \subitem abreAmbito(ts)
                     \subitem vincula(Bloq)       
                 \item vincula(bloq(Decs, Insts)):
                     \subitem abreAmbito(ts)
@@ -131,7 +129,8 @@
                     \subitem end if
                     \subitem abreAmbito(ts)
                     \subitem vincula1(ParamsF)
-                    \subitem vincula1(Bloq)
+                    \subitem vincula2(ParamsF)
+                    \subitem vincula(Bloq)
                     \subitem cierraAmbito(ts)
                 \item vincula1(si\_paramF(ParamsFL)):
                     \subitem vincula1(ParamsFL)
@@ -156,19 +155,17 @@
                     \subitem else 
                         \subsubitem inserta(ts, string, \$) 
                     \subitem end if
-                \item vincula1(tipo\_array(T, string)): 
+                \item vincula1(tipo\_array(T, tam)): 
                     \subitem vincula1(T) 
-                    \subitem if contiene(ts, string) then 
+                    \subitem if tam $<$ 1 then \/// \textit{Pre-tipado: El tamaño de los tipos array es siempre un entero no negativo}
                         \subsubitem error 
-                    \subitem else 
-                        \subsubitem inserta(ts, string, \$) 
                     \subitem end if
                 \item vincula1(tipo\_punt(T)): 
                     \subitem if T $\neq$ tipo\_iden(\_) then 
                         \subsubitem vincula1(T)
                     \subitem end if
                 \item vincula1(tipo\_struct(LCampos)): 
-                    \subitem abreAmbito(ts)
+                    \subitem abreAmbito(ts)  \/// \textit{Pre-tipado: Las definiciones de tipos registro no tienen campos duplicados}
                     \subitem vincula1(LCampos)
                     \subitem cierraAmbito(ts)
                 \item vincula1(muchos\_campos(LCampos, Campo)): 
@@ -178,6 +175,11 @@
                     \subitem vincula1(Campo)
                 \item vincula1(campo(T, string)): 
                     \subitem vincula1(T)
+                    \subitem if contiene(ts, string) then
+                        \subsubitem error
+                    \subitem else
+                        \subsubitem inserta(ts, string, \$)
+                    \subitem end if
                 \item vincula1(tipo\_int()): 
                     \subitem noop 
                 \item vincula1(tipo\_real()): 
@@ -186,8 +188,7 @@
                     \subitem noop
                 \item vincula1(tipo\_string()): 
                     \subitem noop
-                \item vincula1(tipo\_iden(string)): 
-                    \subitem \$.vinculo = vinculoDe(ts,string)
+                \item vincula1(tipo\_iden(string)):  \/// \textit{Pre-tipado: Los vínculos de los nombres de tipo utilizados en las declaraciones de tipo deben ser declaraciones type}                   \subitem \$.vinculo = vinculoDe(ts,string)
                     \subitem if \$.vinculo $\neq$ dec\_tipo(\_,\_) then
                         \subsubitem error
                     \subitem end if
@@ -204,8 +205,7 @@
                 \item vincula2(dec\_tipo(T, string)):
                     \subitem vincula2(T)
                 \item vincula2(dec\_proc(string, ParamsF, Bloq)):
-                    \subitem vincula2(ParamsF)
-                    \subitem vincula2(Bloq)
+                    \subitem noop
                 \item vincula2(si\_paramF(ParamsFL)):
                     \subitem vincula2(ParamsFL)
                 \item vincula2(no\_paramF()):
@@ -386,5 +386,5 @@
         \end{itemize}
         Tiny es un lenguaje fuertamente tipado. 
 
-        
+
 \end{document}
