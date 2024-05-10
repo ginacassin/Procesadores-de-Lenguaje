@@ -125,6 +125,7 @@ public class Etiquetado extends ProcesamientoDef {
     public void procesa(Instr_Write instrWrite){
         instrWrite.setPrim(etq);
         instrWrite.getExp().procesa(this);
+        procesa_acc_val(instrWrite.getExp());
         etq++;
         instrWrite.setSig(etq);
     }
@@ -467,17 +468,17 @@ public class Etiquetado extends ProcesamientoDef {
         if (decVar.getNivel() == 0)
             etq++;
         else
-            decVar.procesa_acc_var(this);
+            this.procesa_acc_var(decVar);
     }
 
     @Override
     public void procesa_acc_id(ParamNoRef paramNoRef){
-        paramNoRef.procesa_acc_var(this);
+        this.procesa_acc_var(paramNoRef);
     }
 
     @Override
     public void procesa_acc_id(ParamRef paramRef){
-        paramRef.procesa_acc_var(this);
+        this.procesa_acc_var(paramRef);
         etq++;
     }
 

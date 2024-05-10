@@ -6,7 +6,7 @@ type struct{
   int nValores
 } tLista;
 tLista lista;
-int i 
+int i
 &&
 
 ## Lectura de la lista

@@ -69,7 +69,7 @@ public class GeneracionCodigo extends ProcesamientoDef {
     @Override
     public void procesa(Instr_If instrIf){
         instrIf.getExp().procesa(this);
-        procesa_acc_val(instrIf.getExp());
+        gen_acc_val(instrIf.getExp());
         maquinaP.emit(maquinaP.ir_f(instrIf.getSig()));
         instrIf.getBloq().procesa(this);
     }
@@ -308,7 +308,7 @@ public class GeneracionCodigo extends ProcesamientoDef {
     public void procesa(Acceso acceso){
         acceso.getOpnd().procesa(this);
         if (ref(acceso.getOpnd().getTipado()) instanceof TipoStruct) {
-            TipoStruct registro = (TipoStruct) acceso.getOpnd().getTipado();
+            TipoStruct registro = (TipoStruct) ref(acceso.getOpnd().getTipado());
             maquinaP.emit(maquinaP.apila_int(desplazamiento(registro.getlCampos(), acceso.getIden())));
         }
         maquinaP.emit(maquinaP.suma());
