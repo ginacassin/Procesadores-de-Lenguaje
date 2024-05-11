@@ -463,7 +463,7 @@ public class Tipado extends ProcesamientoDef {
 
         if (es_designador(asig.getOpnd0())) {
             if (compatibles(asig.getOpnd0().getTipado(), asig.getOpnd1().getTipado())) {
-                asig.setTipado(new TipoOK());
+                asig.setTipado(asig.getOpnd0().getTipado());
             }
             else {
                 aviso_error(asig.getOpnd0().getTipado(), asig.getOpnd1().getTipado());
@@ -619,8 +619,8 @@ public class Tipado extends ProcesamientoDef {
     }
 
     public void procesa(Not exp) {
-        exp.getOpnd().procesa(this);
-        T t = ref(exp.getOpnd().getTipado());
+        exp.getOpnd0().procesa(this);
+        T t = ref(exp.getOpnd0().getTipado());
         if (t instanceof TipoBool) {
             exp.setTipado(t);
         }
