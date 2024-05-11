@@ -3,8 +3,6 @@ package visitantes;
 import asint.ProcesamientoDef;
 import asint.SintaxisAbstractaTiny.*;
 
-import java.util.List;
-
 public class VinculacionSegunda extends ProcesamientoDef {
     private TablaSimbolos ts;
     private boolean outputJuez;
