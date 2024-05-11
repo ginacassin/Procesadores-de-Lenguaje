@@ -640,7 +640,7 @@
                 \subitem if es-designador(ExpI) then
                     \subsubitem if compatibles(ExpI.tipo,ExpD.tipo) then 
                         \subsubitem \hspace{2em}
-                        \$.tipo = ok 
+                        \$.tipo = ExpI.tipo
                     \subsubitem else 
                         \subsubitem \hspace{2em} aviso-error(ExpI.tipo,ExpD.tipo) 
                         \subsubitem \hspace{2em} \$.tipo = error 
