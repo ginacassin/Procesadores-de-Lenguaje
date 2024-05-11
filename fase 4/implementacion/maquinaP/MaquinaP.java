@@ -664,7 +664,7 @@ public class MaquinaP {
    public void ejecuta() {
       while(pc != codigoP.size()) {
           codigoP.get(pc).ejecuta();
-      } 
+      }
    }
    public void muestraCodigo() {
      System.out.println("CodigoP");

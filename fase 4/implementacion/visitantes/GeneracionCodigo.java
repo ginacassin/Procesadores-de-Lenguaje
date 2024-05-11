@@ -78,9 +78,9 @@ public class GeneracionCodigo extends ProcesamientoDef {
     public void procesa(Instr_If_Else instrIfElse){
         instrIfElse.getExp().procesa(this);
         gen_acc_val(instrIfElse.getExp());
-        maquinaP.emit(maquinaP.ir_f(instrIfElse.getElse()));
+        maquinaP.emit(maquinaP.ir_f(instrIfElse.getBloq2().getPrim()));
         instrIfElse.getBloq1().procesa(this);
-        maquinaP.emit(maquinaP.ir_a(instrIfElse.getBloq2().getPrim()));
+        maquinaP.emit(maquinaP.ir_a(instrIfElse.getSig()));
         instrIfElse.getBloq2().procesa(this);
     }
 
@@ -297,9 +297,9 @@ public class GeneracionCodigo extends ProcesamientoDef {
         index.getOpnd().procesa(this);
         index.getIndex().procesa(this);
         gen_acc_val(index.getIndex());
-        if (ref(index.getOpnd().getTipado()) instanceof TipoArray) {
+        //if (ref(index.getOpnd().getTipado()) instanceof TipoArray) {
             maquinaP.emit(maquinaP.apila_int(index.getOpnd().getTipado().getTam()));
-        }
+        //}
         maquinaP.emit(maquinaP.mul());
         maquinaP.emit(maquinaP.suma());
     }
@@ -307,10 +307,10 @@ public class GeneracionCodigo extends ProcesamientoDef {
     @Override
     public void procesa(Acceso acceso){
         acceso.getOpnd().procesa(this);
-        if (ref(acceso.getOpnd().getTipado()) instanceof TipoStruct) {
-            TipoStruct registro = (TipoStruct) ref(acceso.getOpnd().getTipado());
-            maquinaP.emit(maquinaP.apila_int(desplazamiento(registro.getlCampos(), acceso.getIden())));
-        }
+        //if (ref(acceso.getOpnd().getTipado()) instanceof TipoStruct) {
+        TipoStruct registro = (TipoStruct) ref(acceso.getOpnd().getTipado());
+        maquinaP.emit(maquinaP.apila_int(desplazamiento(registro.getlCampos(), acceso.getIden())));
+        //}
         maquinaP.emit(maquinaP.suma());
     }
 
@@ -320,7 +320,7 @@ public class GeneracionCodigo extends ProcesamientoDef {
                 return lCampos.getCampo().getDesp();
             }
             else{
-                desplazamiento(lCampos.getlCampos(), id);
+                return desplazamiento(lCampos.getlCampos(), id);
             }
         }
         else if (lCampos instanceof Un_Campo){

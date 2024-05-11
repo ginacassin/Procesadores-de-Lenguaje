@@ -483,8 +483,7 @@ public class Tipado extends ProcesamientoDef {
 
         if (es_designador(asig.getOpnd0())) {
             if (compatibles(asig.getOpnd0().getTipado(), asig.getOpnd1().getTipado())) {
-                System.out.println("COMPATIBLES");
-                asig.setTipado(new TipoOK());
+                asig.setTipado(asig.getOpnd0().getTipado());
             }
             else {
                 aviso_error(asig.getOpnd0().getTipado(), asig.getOpnd1().getTipado());

@@ -158,7 +158,7 @@
                     \subitem end if
                 \item vincula1(tipo\_array(T, tam)): 
                     \subitem vincula1(T) 
-                    \subitem if tam $<$ 1 then \/// \textit{Pre-tipado: El tamaño de los tipos array es siempre un entero no negativo}
+                    \subitem if tam $<$ 0 then \/// \textit{Pre-tipado: El tamaño de los tipos array es siempre un entero no negativo}
                         \subsubitem error 
                     \subitem end if
                 \item vincula1(tipo\_punt(T)): 
@@ -640,7 +640,7 @@
                 \subitem if es-designador(ExpI) then
                     \subsubitem if compatibles(ExpI.tipo,ExpD.tipo) then 
                         \subsubitem \hspace{2em}
-                        \$.tipo = ok 
+                        \$.tipo = ExpI.tipo
                     \subsubitem else 
                         \subsubitem \hspace{2em} aviso-error(ExpI.tipo,ExpD.tipo) 
                         \subsubitem \hspace{2em} \$.tipo = error 
