@@ -55,12 +55,15 @@ public class DomJudge {
         Tipado t = null;
         VinculacionPrimera vp = new VinculacionPrimera(true);
         p.procesa(vp);
-        if(!vp.hayError()) {
+        if(!vp.hayErrorVinculacion() && !vp.hayErrorPretipado()) {
             t = new Tipado();
             p.procesa(t);
         }
-        else {
-            vp.imprimierErrores();
+        else if (vp.hayErrorVinculacion()) {
+            vp.imprimirErroresVinculacion();
+        }
+        else if (vp.hayErrorPretipado()) {
+            vp.imprimirErroresPretipado();
         }
         if(t != null && t.getErrors().isEmpty()) {
             p.procesa(new AsignacionEspacioPrimera());

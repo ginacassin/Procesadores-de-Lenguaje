@@ -10,35 +10,55 @@ public class VinculacionPrimera extends ProcesamientoDef {
     private TablaSimbolos ts;
     private VinculacionSegunda vs;
     private boolean outputJuez;
-    private boolean hayError = false;
-    private ErrorReporter er = new ErrorReporter();
+    private boolean hayErrorVinculacion = false;
+    private ErrorReporter er_vinculacion = new ErrorReporter();
+    private boolean hayErrorPretipado = false;
+    private ErrorReporter er_pretipado = new ErrorReporter();
 
     public VinculacionPrimera(boolean outputJuez) {
         this.outputJuez = outputJuez;
     }
 
-    public boolean hayError() {
-        return this.hayError || vs.hayError();
+    public boolean hayErrorVinculacion() {
+        return this.hayErrorVinculacion || vs.hayError();
     }
 
-    private void agregarError(int fila, int col, String razon, String variable) {
-        this.hayError = true;
+    public boolean hayErrorPretipado() {
+        return this.hayErrorPretipado || vs.hayError();
+    }
+
+    private void agregarErrorVinculacion(int fila, int col, String razon, String variable) {
+        this.hayErrorVinculacion = true;
         if (this.outputJuez) {
-           er.reportarError(fila, col, ("Errores_vinculacion fila:" + fila + " col:" + col));
+           er_vinculacion.reportarError(fila, col, ("Errores_vinculacion fila:" + fila + " col:" + col));
         }
         else {
-            er.reportarError(fila, col, (fila + "," + col + ":" + razon + ":" + variable));
+            er_vinculacion.reportarError(fila, col, (fila + "," + col + ":" + razon + ":" + variable));
         }
     }
 
-    public void imprimierErrores() {
-        er.imprimirErroresOrdenados();
+    private void agregarErrorPretipado(int fila, int col, String razon) {
+        this.hayErrorPretipado = true;
+        if (this.outputJuez) {
+           er_pretipado.reportarError(fila, col, ("Errores_pretipado fila:" + fila + " col:" + col));
+        }
+        else {
+            er_pretipado.reportarError(fila, col, (fila + "," + col + ":" + razon));
+        }
+    }
+
+    public void imprimirErroresVinculacion() {
+        er_vinculacion.imprimirErroresOrdenados();
+    }
+
+    public void imprimirErroresPretipado() {
+        er_pretipado.imprimirErroresOrdenados();
     }
 
     @Override
     public void procesa(Prog prog) {
         ts = new TablaSimbolos(); // creaTS()
-        vs = new VinculacionSegunda(ts, outputJuez, er);
+        vs = new VinculacionSegunda(ts, outputJuez, er_vinculacion);
         prog.getBloq().procesa(this); // vincula(Bloq)
     }
 
@@ -75,7 +95,7 @@ public class VinculacionPrimera extends ProcesamientoDef {
             ts.inserta(dec.getIden(), dec);
         }
         catch (TablaSimbolos.IdDuplicada e) {
-            agregarError(dec.leeFila(), dec.leeCol(), "declaracion duplicada", dec.getIden());
+            agregarErrorVinculacion(dec.leeFila(), dec.leeCol(), "declaracion duplicada", dec.getIden());
         }
     }
 
@@ -85,7 +105,7 @@ public class VinculacionPrimera extends ProcesamientoDef {
             ts.inserta(dec.getIden(), dec);
         }
         catch (TablaSimbolos.IdDuplicada e) {
-            agregarError(dec.leeFila(), dec.leeCol(), "declaracion duplicada", dec.getIden());
+            agregarErrorVinculacion(dec.leeFila(), dec.leeCol(), "declaracion duplicada", dec.getIden());
         }
     }
 
@@ -94,7 +114,7 @@ public class VinculacionPrimera extends ProcesamientoDef {
             ts.inserta(dec.getIden(), dec);
         }
         catch (TablaSimbolos.IdDuplicada e) {
-            agregarError(dec.leeFila(), dec.leeCol(), "declaracion duplicada", dec.getIden());
+            agregarErrorVinculacion(dec.leeFila(), dec.leeCol(), "declaracion duplicada", dec.getIden());
         }
         ts.abreAmbito();
         dec.getParamsF().procesa(this);
@@ -124,7 +144,7 @@ public class VinculacionPrimera extends ProcesamientoDef {
             ts.inserta(paramRef.getIden(), paramRef);
         }
         catch (TablaSimbolos.IdDuplicada e) {
-            agregarError(paramRef.leeFila(), paramRef.leeCol(), "declaracion duplicada", paramRef.getIden());
+            agregarErrorVinculacion(paramRef.leeFila(), paramRef.leeCol(), "declaracion duplicada", paramRef.getIden());
         }
     }
 
@@ -134,16 +154,15 @@ public class VinculacionPrimera extends ProcesamientoDef {
             ts.inserta(param.getIden(), param);
         }
         catch (TablaSimbolos.IdDuplicada e) {
-            agregarError(param.leeFila(), param.leeCol(), "declaracion duplicada", param.getIden());
+            agregarErrorVinculacion(param.leeFila(), param.leeCol(), "declaracion duplicada", param.getIden());
         }
     }
 
     public void procesa(TipoArray tipoArray) {
         tipoArray.getTipo().procesa(this);
-        if (Integer.parseInt(tipoArray.getLitEnt()) < 1) { // Pre-tipado
+        if (Integer.parseInt(tipoArray.getLitEnt()) < 0) { // Pre-tipado
             // El tamaño de los arrays es siempre un entero no negativo
-            // errors.add("ERROR_VINCULACION. El tamaño del array debe ser un positivo no nulo. " + tipoArray.getFilaColInfo());
-            // TODO
+            agregarErrorPretipado(tipoArray.leeFila(), tipoArray.leeCol(), "la dimension no puede ser negativa");
         }
     }
 
@@ -179,7 +198,7 @@ public class VinculacionPrimera extends ProcesamientoDef {
             ts.inserta(campo.getIden(), campo);
         }
         catch (TablaSimbolos.IdDuplicada e) {
-            agregarError(campo.leeFila(), campo.leeCol(), "declaracion duplicada", campo.getIden());
+            agregarErrorPretipado(campo.leeFila(), campo.leeCol(), "campo duplicado:" + campo.getIden());
         }
     }
 
@@ -202,8 +221,7 @@ public class VinculacionPrimera extends ProcesamientoDef {
         // deben ser declaraciones type
         Nodo vinculo = ts.vinculoDe(id.getIden());
         if(!(vinculo instanceof DecTipo)) {
-            // TODO
-            // imprimeError(id.leeFila(), id.leeCol(), "declaracion duplicada", id.getIden());
+            agregarErrorPretipado(id.leeFila(), id.leeCol(), id.getIden() + " no esta declarado como un tipo");
         }
         id.setVinculo(vinculo);
     }
@@ -266,7 +284,7 @@ public class VinculacionPrimera extends ProcesamientoDef {
         inst.getParamsR().procesa(this);
         Nodo vinculo = ts.vinculoDe(inst.getIden());
         if (vinculo == null) {
-            agregarError(inst.leeFila(), inst.leeCol(), "identificador no declarado", inst.getIden());
+            agregarErrorVinculacion(inst.leeFila(), inst.leeCol(), "identificador no declarado", inst.getIden());
         }
         else {
             inst.setVinculo(vinculo);
@@ -395,7 +413,7 @@ public class VinculacionPrimera extends ProcesamientoDef {
     public void procesa(Iden id) {
         Nodo vinculo = ts.vinculoDe(id.getId());
         if (vinculo == null) {
-            agregarError(id.leeFila(), id.leeCol(), "identificador no declarado", id.getId());
+            agregarErrorVinculacion(id.leeFila(), id.leeCol(), "identificador no declarado", id.getId());
         }
         id.setVinculo(vinculo);
     }
