@@ -78,9 +78,9 @@ public class GeneracionCodigo extends ProcesamientoDef {
     public void procesa(Instr_If_Else instrIfElse){
         instrIfElse.getExp().procesa(this);
         gen_acc_val(instrIfElse.getExp());
-        maquinaP.emit(maquinaP.ir_f(instrIfElse.getElse()));
+        maquinaP.emit(maquinaP.ir_f(instrIfElse.getBloq2().getPrim()));
         instrIfElse.getBloq1().procesa(this);
-        maquinaP.emit(maquinaP.ir_a(instrIfElse.getBloq2().getPrim()));
+        maquinaP.emit(maquinaP.ir_a(instrIfElse.getSig()));
         instrIfElse.getBloq2().procesa(this);
     }
 
