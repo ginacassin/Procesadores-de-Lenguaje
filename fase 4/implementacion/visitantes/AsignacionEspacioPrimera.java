@@ -62,7 +62,7 @@ public class AsignacionEspacioPrimera extends ProcesamientoDef {
         decVar.getTipo().procesa(this);
         decVar.setDir(this.dir);
         decVar.setNivel(this.nivel);
-        inc_dir(decVar.getTipo().getTam());
+        inc_dir(ref(decVar.getTipo()).getTam());
     }
 
     @Override
@@ -81,7 +81,7 @@ public class AsignacionEspacioPrimera extends ProcesamientoDef {
         decProc.getParamsF().procesa(this);
         decProc.getParamsF().procesa(aes);
         decProc.getBloq().procesa(this);
-        decProc.setTam(this.dir);
+        decProc.setTam(this.max_dir);
         this.dir = dir_ant;
         this.max_dir = max_dir_ant;
         this.nivel--;
@@ -160,9 +160,9 @@ public class AsignacionEspacioPrimera extends ProcesamientoDef {
 
     @Override
     public void procesa(Campo campo){
-        campo.setDesp(campo.getTipo().getTam());
+        campo.setDesp(dir);
         campo.getTipo().procesa(this);
-        this.dir += campo.getTipo().getTam();
+        this.dir += ref(campo.getTipo()).getTam();
     }
 
     @Override
