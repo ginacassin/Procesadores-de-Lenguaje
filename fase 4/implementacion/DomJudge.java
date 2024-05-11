@@ -52,11 +52,12 @@ public class DomJudge {
     }
 
     public static void procesa(Prog p, Reader datos) throws Exception {
+        boolean outputJuez = false;
         Tipado t = null;
-        VinculacionPrimera vp = new VinculacionPrimera(true);
+        VinculacionPrimera vp = new VinculacionPrimera(outputJuez);
         p.procesa(vp);
         if(!vp.hayErrorVinculacion() && !vp.hayErrorPretipado()) {
-            t = new Tipado();
+            t = new Tipado(outputJuez);
             p.procesa(t);
         }
         else if (vp.hayErrorVinculacion()) {
@@ -65,7 +66,7 @@ public class DomJudge {
         else if (vp.hayErrorPretipado()) {
             vp.imprimirErroresPretipado();
         }
-        if(t != null && t.getErrors().isEmpty()) {
+        if (t != null && !t.hayErrorTipado()) {
             p.procesa(new AsignacionEspacioPrimera());
             MaquinaP maquinaP = new MaquinaP(datos, 500, 5000,5000, 10);
 
@@ -76,6 +77,9 @@ public class DomJudge {
             p.procesa(new GeneracionCodigo(maquinaP));
 
             maquinaP.ejecuta();
+        }
+        else if (t != null) {
+            t.imprimirErroresTipado();
         }
     }
     public static void main(String[] args) throws Exception {

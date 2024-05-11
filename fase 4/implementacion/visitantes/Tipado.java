@@ -1,8 +1,6 @@
 package visitantes;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import asint.Procesamiento;
@@ -11,14 +9,30 @@ import asint.SintaxisAbstractaTiny.*;
 
 public class Tipado extends ProcesamientoDef {
 
-    private static List<String> errors;
+    private boolean outputJuez;
+    private boolean hayError = false;
+    private ErrorReporter er = new ErrorReporter();
 
-    public static List<String> getErrors() {
-        return errors;
+    public boolean hayErrorTipado() {
+        return this.hayError;
     }
 
-    public Tipado() {
-        errors = new ArrayList<>();
+    private void agregarError(int fila, int col, String razon) {
+        this.hayError = true;
+        if (this.outputJuez) {
+            er.reportarError(fila, col, ("Errores_tipado fila:" + fila + " col:" + col));
+        }
+        else {
+            er.reportarError(fila, col, (fila + "," + col + ":" + razon));
+        }
+    }
+
+    public void imprimirErroresTipado() {
+        er.imprimirErroresOrdenados();
+    }
+
+    public Tipado(boolean outputJuez) {
+        this.outputJuez = outputJuez;
     }
 
     public static class TipoOK extends T {
@@ -74,21 +88,27 @@ public class Tipado extends ProcesamientoDef {
         }
     }
 
-    private static T ambos_ok(T t1, T t2) {
+    private T ambos_ok(T t1, T t2) {
         if (t1 instanceof TipoOK && t2 instanceof TipoOK)
             return new TipoOK();
         return new TipoError();
     }
 
-    private static void aviso_error(T t1, T t2) {
-        if (!(t1 instanceof TipoError) && !(t2 instanceof TipoError)) {
-            errors.add("ERROR_TIPADO. " + t1.getFilaColInfo());
+    private void aviso_error(T t1, T t2) {
+        if (t1 instanceof TipoError) {
+            // errors.add("ERROR_TIPADO. " + t1.getFilaColInfo());
+            agregarError(t1.leeFila(), t1.leeCol(), "algunerror");
+        }
+        if (t2 instanceof TipoError) {
+            agregarError(t2.leeFila(), t2.leeCol(), "algunerror");
         }
     }
 
-    private static void aviso_error(T t) {
-        if (!(t instanceof TipoError)) {
-            errors.add("ERROR_TIPADO. " + t.getFilaColInfo());
+    private void aviso_error(T t) {
+        agregarError(t.leeFila(), t.leeCol(), "algunerror");
+        if (t instanceof TipoError) {
+            // errors.add("ERROR_TIPADO. " + t.getFilaColInfo());
+            agregarError(t.leeFila(), t.leeCol(), "algunerror");
         }
     }
     
@@ -463,6 +483,7 @@ public class Tipado extends ProcesamientoDef {
 
         if (es_designador(asig.getOpnd0())) {
             if (compatibles(asig.getOpnd0().getTipado(), asig.getOpnd1().getTipado())) {
+                System.out.println("COMPATIBLES");
                 asig.setTipado(new TipoOK());
             }
             else {
@@ -471,7 +492,7 @@ public class Tipado extends ProcesamientoDef {
             }
         }
         else {
-            errors.add("ERROR_TIPADO. " + asig.getFilaColInfo());
+            agregarError(asig.leeFila(), asig.leeCol(), "la parte izquierda debe ser un designador");
             asig.setTipado(new TipoError());
         }
     }
@@ -607,8 +628,8 @@ public class Tipado extends ProcesamientoDef {
     }
 
     public void procesa(Negativo exp) {
-        exp.getOpnd().procesa(this);
-        T t = ref(exp.getOpnd().getTipado());
+        exp.getOpnd0().procesa(this);
+        T t = ref(exp.getOpnd0().getTipado());
         if (t instanceof TipoInt || t instanceof TipoReal) {
             exp.setTipado(t);
         }
@@ -619,8 +640,8 @@ public class Tipado extends ProcesamientoDef {
     }
 
     public void procesa(Not exp) {
-        exp.getOpnd().procesa(this);
-        T t = ref(exp.getOpnd().getTipado());
+        exp.getOpnd0().procesa(this);
+        T t = ref(exp.getOpnd0().getTipado());
         if (t instanceof TipoBool) {
             exp.setTipado(t);
         }
