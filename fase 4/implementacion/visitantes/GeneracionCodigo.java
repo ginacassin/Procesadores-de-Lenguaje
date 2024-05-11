@@ -78,7 +78,7 @@ public class GeneracionCodigo extends ProcesamientoDef {
     public void procesa(Instr_If_Else instrIfElse){
         instrIfElse.getExp().procesa(this);
         gen_acc_val(instrIfElse.getExp());
-        maquinaP.emit(maquinaP.ir_f(instrIfElse.getElse()));
+        maquinaP.emit(maquinaP.ir_f(instrIfElse.getBloq2().getPrim()));
         instrIfElse.getBloq1().procesa(this);
         maquinaP.emit(maquinaP.ir_a(instrIfElse.getSig()));
         instrIfElse.getBloq2().procesa(this);
@@ -345,7 +345,7 @@ public class GeneracionCodigo extends ProcesamientoDef {
 
     @Override
     public void procesa(Lit_real litReal){
-        maquinaP.emit(maquinaP.apila_real(Double.parseDouble(litReal.getNum())));
+        maquinaP.emit(maquinaP.apila_real(Float.parseFloat(litReal.getNum())));
     }
 
     @Override

@@ -15,6 +15,7 @@
 \date{Curso 2024}
 
 % Document
+\setcounter{section}{-1}
 \begin{document}
 \begin{titlepage}
     \centering
@@ -87,9 +88,7 @@
             \begin{itemize}
                 \item var ts \/// \textit{La tabla de símbolos}
                 \item vincula(prog(Bloq)):
-                    \subitem vincula(Bloq)
                     \subitem ts = creaTS()
-                    \subitem abreAmbito(ts)
                     \subitem vincula(Bloq)       
                 \item vincula(bloq(Decs, Insts)):
                     \subitem abreAmbito(ts)
@@ -131,7 +130,8 @@
                     \subitem end if
                     \subitem abreAmbito(ts)
                     \subitem vincula1(ParamsF)
-                    \subitem vincula1(Bloq)
+                    \subitem vincula2(ParamsF)
+                    \subitem vincula(Bloq)
                     \subitem cierraAmbito(ts)
                 \item vincula1(si\_paramF(ParamsFL)):
                     \subitem vincula1(ParamsFL)
@@ -156,19 +156,17 @@
                     \subitem else 
                         \subsubitem inserta(ts, string, \$) 
                     \subitem end if
-                \item vincula1(tipo\_array(T, string)): 
+                \item vincula1(tipo\_array(T, tam)): 
                     \subitem vincula1(T) 
-                    \subitem if contiene(ts, string) then 
+                    \subitem if tam $<$ 0 then \/// \textit{Pre-tipado: El tamaño de los tipos array es siempre un entero no negativo}
                         \subsubitem error 
-                    \subitem else 
-                        \subsubitem inserta(ts, string, \$) 
                     \subitem end if
                 \item vincula1(tipo\_punt(T)): 
                     \subitem if T $\neq$ tipo\_iden(\_) then 
                         \subsubitem vincula1(T)
                     \subitem end if
                 \item vincula1(tipo\_struct(LCampos)): 
-                    \subitem abreAmbito(ts)
+                    \subitem abreAmbito(ts)  \/// \textit{Pre-tipado: Las definiciones de tipos registro no tienen campos duplicados}
                     \subitem vincula1(LCampos)
                     \subitem cierraAmbito(ts)
                 \item vincula1(muchos\_campos(LCampos, Campo)): 
@@ -178,6 +176,11 @@
                     \subitem vincula1(Campo)
                 \item vincula1(campo(T, string)): 
                     \subitem vincula1(T)
+                    \subitem if contiene(ts, string) then
+                        \subsubitem error
+                    \subitem else
+                        \subsubitem inserta(ts, string, \$)
+                    \subitem end if
                 \item vincula1(tipo\_int()): 
                     \subitem noop 
                 \item vincula1(tipo\_real()): 
@@ -186,8 +189,7 @@
                     \subitem noop
                 \item vincula1(tipo\_string()): 
                     \subitem noop
-                \item vincula1(tipo\_iden(string)): 
-                    \subitem \$.vinculo = vinculoDe(ts,string)
+                \item vincula1(tipo\_iden(string)):  \/// \textit{Pre-tipado: Los vínculos de los nombres de tipo utilizados en las declaraciones de tipo deben ser declaraciones type}                   \subitem \$.vinculo = vinculoDe(ts,string)
                     \subitem if \$.vinculo $\neq$ dec\_tipo(\_,\_) then
                         \subsubitem error
                     \subitem end if
@@ -204,8 +206,7 @@
                 \item vincula2(dec\_tipo(T, string)):
                     \subitem vincula2(T)
                 \item vincula2(dec\_proc(string, ParamsF, Bloq)):
-                    \subitem vincula2(ParamsF)
-                    \subitem vincula2(Bloq)
+                    \subitem noop
                 \item vincula2(si\_paramF(ParamsFL)):
                     \subitem vincula2(ParamsFL)
                 \item vincula2(no\_paramF()):
@@ -385,6 +386,466 @@
             \item Se asocian tipos con estas construcciones.
         \end{itemize}
         Tiny es un lenguaje fuertamente tipado. 
+        
+        \begin{itemize}
+            \item ambos-ok(T0,T1): 
+                \subitem if T0 == ok \&\&  T1 == ok then
+                    \subsubitem return ok
+                \subitem else
+                    \subsubitem return error
+                \subitem end if
+            \item ambos-ok(T0,T1):
+                \subitem if T0 $\neq$ error \&\&  T1 $\neq$ error then
+                    \subsubitem return error 
+                \subitem end if 
+            \item aviso-error(T):
+                \subitem if T $\neq$ error then
+                    \subsubitem error 
+                \subitem end if
+            \item ref!(T): \/// \textit{sigue la cadena de vínculos entre nombres de tipos sinónimos}
+                \subitem if T = tipo\_iden(iden) then
+                    \subsubitem let T.vinculo = dec\_tipo(T',iden) in 
+                        \subsubitem \hspace{2em} return ref!(T')
+                \subitem else
+                    \subsubitem return T
+                \subitem end if
+            \item es-designador(E) \/// \textit{determina cuándo una expresión es o no un designador}
+                \subitem return E == iden(\_) $\vert \vert$ E == acceso(\_,\_) $\vert \vert$ E == index(\_,\_) $\vert \vert$ E == indireccion(\_)
+            \item son\_unificables(muchos\_campos(LCampos1, Campo(T1, Iden1)), muchos\_campos(LCampos2, Campo(T2, Iden2)), esParamRef):
+                \subitem if son\_unificables(T1, T2, esParamRef) then
+                    \subsubitem return son\_unificables(LCampos1, LCampos2, esParamRef)
+                \subitem else
+                    \subsubitem return false
+                \subitem end if
+            \item son\_unificables(muchos\_campos(LCampos1, Campo1), un\_campo(Campo2), esParamRef):
+                \subitem return false
+            \item son\_unificables(un\_campo(Campo1), muchos\_campos(LCampos2, Campo2), esParamRef):
+                \subitem return false
+            \item son\_unificables(un\_campo(Campo(T1, Iden1)), un\_campo(Campo(T2, Iden2)), esParamRef): 
+                \subitem return son\_unificables(T1, T2)
+            \item son\_unificables(T1, T2, esParamRef): 
+                \subitem if (T1 = T2) $\notin \Theta$ then
+                    \subsubitem $\Theta = \Theta \cup \{T1 = T2\}$
+                    \subsubitem return unificables(T1, T2, esParamRef)
+                \subitem else
+                    \subsubitem return true
+                \subitem end if
+            \item unificables(T1, T2, esParamRef): 
+                \subitem let T1' = ref!(T1), T2' = ref!(T2) in
+                    \subsubitem if T1' == T2' then
+                        \subsubitem \hspace{2em} return true
+                    \subsubitem else if T1' == tipo\_real(n1) \&\&  T2' == tipo\_int(n2) then \/// \textit{se asigna un int a un real}
+                        \subsubitem \hspace{2em} return !esParamRef
+                    \subsubitem else if T1' == tipo\_punt(T1a) \&\&  T2' == null(n2) then \/// \textit{se asigna null a un puntero}
+                        \subsubitem \hspace{2em} return true
+                    \subsubitem else if T1' == tipo\_array(T1a, n1) \&\&  T2' == tipo\_array(T2a, n1) then
+                        \subsubitem \hspace{2em} return n1 == n2 \&\&  son\_unificables(T1a, T2a, esParamRef)
+                    \subsubitem else if T1' == tipo\_struct(LCampos1) \&\&  T2' == tipo\_struct(LCampos2) then
+                        \subsubitem \hspace{2em} return son\_unificables(LCampos1, LCampos2, esParamRef)
+                    \subsubitem else if T1' == tipo\_punt(T1a) \&\&  T2' == tipo\_punt(T2a) then
+                        \subsubitem \hspace{2em} return son\_unificables(T1a,T2a, esParamRef)
+                    \subsubitem else
+                        \subsubitem \hspace{2em} return false
+                    \subsubitem end if 
+                \subitem end let
+            \item compatibles(T1,T2): 
+                \subitem $\Theta = \{T1=T2\} $
+                \subitem return unificables(T1,T2, false)
+            \item compatibles(T1, T2, esParamRef): 
+                \subitem $\Theta = \{T1=T2\} $
+                \subitem return unificables(T1,T2, true)
+            \item tipado(prog(Bloq)): 
+                \subitem tipado(Bloq)
+                \subitem \$.tipo = Bloq.tipo
+            \item tipado(bloq(Decs, Insts)): 
+                \subitem tipado(Decs)
+                \subitem tipado(Insts)
+                \subitem \$.tipo = ambos-ok(Decs.tipo, Insts.tipo)
+            \item tipado(si\_decs(DecsAux)): 
+                \subitem tipado(DecsAux)
+                \subitem \$.tipo = DecsAux.tipo
+            \item tipado(no\_decs()): 
+                \subitem \$.tipo = ok
+            \item tipado(muchas\_decs(DecsAux, Dec)): 
+                \subitem tipado(DecsAux)
+                \subitem tipado(Dec)
+                \subitem \$.tipo = ambos-ok(DecsAux.tipo, Dec.tipo)
+            \item tipado(una\_dec(Dec)): 
+                \subitem tipado(Dec)
+                \subitem \$.tipo = Dec.tipo
+            \item tipado(dec\_var(T, Iden)): 
+                \subitem \$.tipo = ok
+            \item tipado(dec\_tipo(T, Iden)): 
+                \subitem \$.tipo = ok
+            \item tipado(dec\_proc(Iden, ParamsF, Bloq)): 
+                \subitem tipado(Bloq)
+                \subitem \$.tipo = Bloq.tipo
+            \item tipado(si\_instr(InstsAux)): 
+                \subitem tipado(InstsAux)
+                \subitem \$.tipo = InstsAux.tipo
+            \item tipado(no\_instr()): 
+                \subitem \$.tipo = ok
+            \item tipado(muchas\_instr(InstsAux, Inst)): 
+                \subitem tipado(InstsAux)
+                \subitem tipado(Inst)
+                \subitem \$.tipo = ambos-ok(InstsAux.tipo, Inst.tipo)
+            \item tipado(una\_instr(Inst)): 
+                \subitem tipado(Inst)
+                \subitem \$.tipo = Inst.tipo
+            \item tipado(instr\_expr(Exp)): 
+                \subitem tipado(Exp)
+                \subitem if Exp.tipo == error then
+                    \subsubitem \$.tipo = error
+                \subitem else
+                    \subsubitem \$.tipo = ok
+                \subitem end if
+            \item tipado(instr\_if(Exp, Bloq)): 
+                \subitem tipado(Exp)
+                \subitem tipado(Bloq)
+                \subitem if ref!(Exp.tipo) == tipo\_bool \&\& Bloq.tipo == ok then
+                    \subsubitem \$.tipo = ok
+                \subitem else
+                    \subsubitem \$.tipo = error
+                \subitem end if
+            \item tipado(instr\_if\_else(Exp, Bloq1, Bloq2)): 
+                \subitem tipado(Exp)
+                \subitem tipado(Bloq1)
+                \subitem tipado(Bloq2)
+                \subitem if ref!(Exp.tipo) == tipo\_bool \&\&  Bloq1.tipo == ok \&\&  Bloq2.tipo == ok then
+                    \subsubitem \$.tipo = ok
+                \subitem else
+                    \subsubitem \$.tipo = error
+                \subitem end if
+            \item tipado(instr\_while(Exp, Bloq)): 
+                \subitem tipado(Exp)
+                \subitem tipado(Bloq)
+                \subitem if ref!(Exp.tipo) == tipo\_bool \&\&  Bloq.tipo == ok then
+                    \subsubitem \$.tipo = ok
+                \subitem else
+                    \subsubitem \$.tipo = error
+                \subitem end if
+            \item tipado(instr\_read(Exp)): 
+                \subitem tipado(Exp)
+                \subitem t = ref!(Exp.tipo)
+                \subitem if (t == tipo\_int $\vert \vert$ t == tipo\_real $\vert \vert$ t == tipo\_string) \&\&  es-designador(Exp) then
+                    \subsubitem \$.tipo = ok
+                \subitem else
+                    \subsubitem \$.tipo = error
+                \subitem end if
+            \item tipado(instr\_write(Exp)): 
+                \subitem tipado(Exp)
+                \subitem t = ref!(Exp.tipo)
+                \subitem if t == tipo\_int $\vert \vert$ t == tipo\_real $\vert \vert$ t == tipo\_string $\vert \vert$ t == tipo\_bool then
+                    \subsubitem \$.tipo = ok
+                \subitem else
+                    \subsubitem \$.tipo = error
+                \subitem end if
+            \item tipado(instr\_nl()): 
+                \subitem \$.tipo = ok
+            \item tipado(instr\_new(Exp)): 
+                \subitem tipado(Exp)
+                \subitem if ref!(Exp.tipo) == tipo\_punt then
+                    \subsubitem \$.tipo = ok
+                \subitem else
+                    \subsubitem \$.tipo = error
+                \subitem end if
+            \item tipado(instr\_del(Exp)): 
+                \subitem tipado(Exp)
+                \subitem if ref!(Exp.tipo) == tipo\_punt then
+                    \subsubitem \$.tipo = ok
+                \subitem else
+                    \subsubitem \$.tipo = error
+                \subitem end if
+            \item llamadas\_compatibles(si\_paramF(ParamsFL), si\_paramsR(ParamsRL)): 
+                \subitem return llamadas\_compatibles(ParamsFL, ParamsRL)
+            \item llamadas\_compatibles(no\_paramF(), no\_paramsR()): 
+                \subitem return ok
+            \item llamadas\_compatibles(muchos\_paramsF(ParamsFL, param(T, Iden)), muchos\_paramsR(ParamsRL, Exp)): 
+                \subitem if es-designador(Exp) \&\&  compatibles(Exp.tipo, T) then
+                    \subsubitem return llamadas\_compatibles(ParamsFL, ParamsRL)
+                \subitem else 
+                    \subsubitem return error
+                \subitem end if
+            \item llamadas\_compatibles(muchos\_paramsF(ParamsFL, param\_ref(T, Iden)), muchos\_paramsR(ParamsRL, Exp)): 
+                \subitem if compatibles(Exp.tipo, T) then
+                    \subsubitem return llamadas\_compatibles(ParamsFL, ParamsRL)
+                \subitem else 
+                    \subsubitem return error
+                \subitem end if
+            \item llamadas\_compatibles(un\_paramF(param(T, Iden)), un\_paramsR(Exp)): 
+                \subitem if compatibles(Exp.tipo, T) then
+                    \subsubitem return ok
+                \subitem else 
+                    \subsubitem return error
+                \subitem end if
+            \item llamadas\_compatibles(un\_paramF(param\_ref(T, Iden)), un\_paramsR(Exp)): 
+                \subitem if !es-designador(Exp) then
+                    \subsubitem error
+                \subitem if compatibles(Exp.tipo, T, true) then
+                    \subsubitem return ok
+                \subitem else 
+                    \subsubitem return error
+                \subitem end if
+            \item tipado(instr\_call(Iden, ParamsR)): 
+                \subitem tipado(paramsR) \/// \textit{primero tipamos los parámetros R}
+                \subitem let Iden.vinculo = dec\_proc(Iden, ParamsF, Bloq) in
+                    \subsubitem if num\_elems(paramsF) == num\_elems(ParmsR) then \/// \textit{luego verificamos cantidad}
+                        \subsubitem \hspace{2em} \$.tipo = llamadas\_compatibles(ParamsF, ParamsR) \/// \textit{por último, compatibilidad}
+                    \subsubitem else
+                        \subsubitem \hspace{2em} \$.tipo = error
+                    \subsubitem end if
+                \subitem end let
+            \item tipado(no\_paramsR()): 
+                \subitem \$.tipo = ok
+            \item tipado(si\_paramsR(ParamsRL)): 
+                \subitem tipado(ParamsRL)
+                \subitem \$.tipo = ParamsRL.tipo
+            \item tipado(muchos\_paramsR(ParamsRL, Exp)): 
+                \subitem tipado(ParamsRL)
+                \subitem tipado(Exp)
+                \subitem if Exp.tipo == error then
+                    \subsubitem \$.tipo = error
+                \subitem else
+                    \subsubitem \$.tipo = ParamsRL.tipo
+                \subitem end if
+            \item tipado(un\_paramsR(Exp)): 
+                \subitem tipado(Exp)
+                \subitem if Exp.tipo == error then
+                    \subsubitem \$.tipo = error
+                \subitem else
+                    \subsubitem \$.tipo = ok
+                \subitem end if
+            \item num\_elems(si\_paramF(ParamsFL)):
+                \subitem num\_elems(ParamsFL)
+            \item num\_elems(no\_paramF()): 
+                \subitem return 0
+            \item num\_elems(muchos\_paramsF(ParamsFL,\_)): 
+                \subitem return 1 + num\_elems(ParamsFL)
+            \item num\_elems(un\_paramF(\_)): 
+                \subitem return 1
+            \item num\_elems(si\_paramsR(ParamsRL)): 
+                \subitem num\_elems(ParamsRL) 
+            \item num\_elems(no\_paramsR()): 
+                \subitem return 0
+            \item num\_elems(muchos\_paramsR(ParamsRL,\_)): 
+                \subitem return 1 + num\_elems(ParamsRL)
+            \item num\_elems(un\_paramsR(\_)): 
+                \subitem return 1
+            \item tipado(instr\_bloque(Bloq)): 
+                \subitem tipado(Bloq)
+                \subitem \$.tipo = Bloq.tipo
+            \item tipado(asig(ExpI,ExpD)): 
+                \subitem tipado(ExpI) 
+                \subitem tipado(ExpD) 
+                \subitem if es-designador(ExpI) then
+                    \subsubitem if compatibles(ExpI.tipo,ExpD.tipo) then 
+                        \subsubitem \hspace{2em}
+                        \$.tipo = ok 
+                    \subsubitem else 
+                        \subsubitem \hspace{2em} aviso-error(ExpI.tipo,ExpD.tipo) 
+                        \subsubitem \hspace{2em} \$.tipo = error 
+                    \subsubitem end if 
+                \subitem else 
+                    \subsubitem error \/// \textit{la parte izq. debe ser un designador}
+                    \subsubitem \$.tipo = error 
+                \subitem end if
+            \item tipado-bin-comp(E1, E2, E): 
+                \subitem tipado(E1) 
+                \subitem tipado(E2) 
+                \subitem t1 = ref!(E1.tipo) 
+                \subitem t2 = ref!(E2.tipo) 
+                \subitem if ((t1 == tipo\_int $\vert \vert$ t1 == tipo\_real) \&\&  (t2 == tipo\_int $\vert \vert$ t2 == tipo\_real)) $\vert \vert$ 
+                    (t1 == tipo\_bool \&\&  t2 == tipo\_bool) $\vert \vert$ 
+                    (t1 == tipo\_string \&\&  t2 == tipo\_string) then
+                    \subsubitem E.tipo = tipo\_bool
+                \subitem else 
+                    \subsubitem aviso-error(t1, t2) 
+                    \subsubitem E.tipo = error
+                \subitem end if
+            \item tipado(menor(Exp1, Exp2)):
+                \subitem tipado-bin-comp(Exp1, Exp2, \$)
+            \item tipado(mayor(Exp1, Exp2)): 
+                \subitem tipado-bin-comp(Exp1, Exp2, \$)
+            \item tipado(menor\_igual(Exp1, Exp2)): 
+                \subitem tipado-bin-comp(Exp1, Exp2, \$)
+            \item tipado(mayor\_igual(Exp1, Exp2)): 
+                \subitem tipado-bin-comp(Exp1, Exp2, \$)
+            \item tipado-bin-igualdad(E1, E2, E): 
+                \subitem tipado(E1) 
+                \subitem tipado(E2) 
+                \subitem t1 = ref!(E1.tipo) 
+                \subitem t2 = ref!(E2.tipo) 
+                \subitem if ((t1 == tipo\_int $\vert \vert$ t1 == tipo\_real) \&\&  (t2 == tipo\_int $\vert \vert$ t2 == tipo\_real)) $\vert \vert$ 
+                    (t1 == tipo\_bool \&\&  t2 == tipo\_bool) $\vert \vert$ 
+                    (t1 == tipo\_string \&\&  t2 == tipo\_string) $\vert \vert$ 
+                    ((t1 == tipo\_punt $\vert \vert$ t1 == null) \&\&  (t2 == tipo\_punt $\vert \vert$ t2 == null)) then
+                    \subsubitem E.tipo = tipo\_bool
+                \subitem else
+                    \subsubitem aviso-error(t1, t2)
+                    \subsubitem E.tipo = error
+                \subitem end if
+            \item tipado(igual(Exp1, Exp2)): 
+                \subitem tipado-bin-igualdad(Exp1, Exp2, \$)
+            \item tipado(no\_igual(Exp1, Exp2)): 
+                \subitem tipado-bin-igualdad(Exp1, Exp2, \$)
+            \item tipado-bin-arit(E1, E2, E): 
+                \subitem tipado(E1) 
+                \subitem tipado(E2) 
+                \subitem t1 = ref!(E1.tipo) 
+                \subitem t2 = ref!(E2.tipo) 
+                \subitem if t1 == tipo\_int \&\&  t2 == tipo\_int then
+                    \subsubitem E.tipo = tipo\_int
+                \subitem else if (t1 == tipo\_int $\vert \vert$ t1 == tipo\_real) \&\&  (t2 == tipo\_int $\vert \vert$ t2 == tipo\_real) then
+                    \subsubitem E.tipo = tipo\_real
+                \subitem else 
+                    \subsubitem aviso-error(t1, t2)
+                    \subsubitem E.tipo = error
+                \subitem end if
+            \item tipado(suma(Exp1, Exp2)): 
+                \subitem tipado-bin-arit(Exp1, Exp2, \$)
+            \item tipado(resta(Exp1, Exp2)): 
+                \subitem tipado-bin-arit(Exp1, Exp2, \$)
+            \item tipado(mul(Exp1, Exp2)): 
+                \subitem tipado-bin-arit(Exp1, Exp2, \$)
+            \item tipado(div(Exp1, Exp2)): 
+                \subitem tipado-bin-arit(Exp1, Exp2, \$)
+            \item tipado-bin-logi(E1, E2, E): 
+                \subitem tipado(E1) 
+                \subitem tipado(E2) 
+                \subitem t1 = ref!(E1.tipo) 
+                \subitem t2 = ref!(E2.tipo) 
+                \subitem if t1 == tipo\_bool \&\&  t2 == tipo\_bool then
+                    \subsubitem E.tipo = tipo\_bool
+                \subitem else
+                    \subsubitem aviso-error(t1, t2)
+                    \subsubitem E.tipo = error
+                \subitem end if
+            \item tipado(and(Exp1, Exp2)): 
+                \subitem tipado-bin-logi(Exp1, Exp2, \$)
+            \item tipado(or(Exp1, Exp2)): 
+                \subitem tipado-bin-logi(Exp1, Exp2, \$)
+            \item tipado(mod(Exp1, Exp2)): 
+                \subitem tipado(Exp1) 
+                \subitem tipado(Exp2) 
+                \subitem t1 = ref!(Exp1.tipo) 
+                \subitem t2 = ref!(Exp2.tipo) 
+                \subitem if t1 == tipo\_int \&\&  t2 == tipo\_int then
+                    \subsubitem \$.tipo = tipo\_int
+                \subitem else 
+                    \subsubitem aviso-error(t1, t2)
+                    \subsubitem \$.tipo = error
+                \subitem end if
+            \item tipado(negativo(Exp)): 
+                \subitem tipado(Exp) 
+                \subitem t = ref!(Exp.tipo) 
+                \subitem if t == tipo\_int $\vert \vert$ t == tipo\_real then
+                    \subsubitem \$.tipo = t
+                \subitem else 
+                    \subsubitem aviso-error(t)
+                    \subsubitem \$.tipo = error
+                \subitem end if
+            \item tipado(not(Exp)): 
+                \subitem tipado(Exp) 
+                \subitem if ref!(Exp.tipo) == tipo\_bool then
+                    \subsubitem \$.tipo = tipo\_bool
+                \subitem else 
+                    \subsubitem aviso-error(t)
+                    \subsubitem \$.tipo = error
+                \subitem end if
+            \item tipado(index(Exp, LitEnt)): 
+                \subitem tipado(Exp) 
+                \subitem tipado(LitEnt) 
+                \subitem if ref!(Exp.tipo) == tipo\_array(T, LitEnt) \&\&  ref!(LitEnt.tipo) == tipo\_int then
+                    \subsubitem \$.tipo = T
+                \subitem else 
+                    \subsubitem aviso-error(T, LitEnt.tipo)
+                    \subsubitem \$.tipo = error
+                \subitem end if
+            \item tipado(acceso(Exp, Iden)): 
+                \subitem tipado(Exp) 
+                \subitem if ref!(Exp.tipo) == tipo\_struct(LCampos) then
+                    \subsubitem \$.tipo = esCampoDe(Iden, LCampos)
+                \subitem else 
+                    \subsubitem aviso-error(Exp.tipo)
+                    \subsubitem \$.tipo = error
+                \subitem end if
+            \item esCampoDe(Iden, muchos\_campos(LCampos, Campo)): 
+                \subitem t = esCampoDe(Iden, Campo) 
+                \subitem if t == error then
+                    \subsubitem return esCampoDe(Iden, LCampos)
+                \subitem else 
+                    \subsubitem return t
+                \subitem end if
+            \item esCampoDe(Iden, un\_campo(LCampos, Campo)): 
+                \subitem return esCampoDe(Iden, Campo)
+            \item esCampoDe(Iden1(N1), campo(T, Iden2(N2))): 
+                \subitem if N1 == N2 then
+                    \subsubitem return T
+                \subitem else 
+                    \subsubitem return error
+                \subitem end if
+            \item tipado(indireccion(Exp)): 
+                \subitem tipado(Exp) 
+                \subitem if Exp.tipo == tipo\_punt(T) then
+                    \subsubitem \$.tipo = T
+                \subitem else 
+                    \subsubitem aviso-error(Exp.tipo)
+                    \subsubitem \$.tipo = error
+                \subitem end if
+            \item tipado(lit\_ent(N)): 
+                \subitem \$.tipo = tipo\_int
+            \item tipado(lit\_real(N)): 
+                \subitem \$.tipo = tipo\_real
+            \item tipado(true(N)): 
+                \subitem \$.tipo = tipo\_bool
+            \item tipado(false(N)): 
+                \subitem \$.tipo = tipo\_bool
+            \item tipado(lit\_cadena(N)): 
+                \subitem \$.tipo = tipo\_string
+            \item tipado(iden(N)): 
+                \subitem if \$.vinculo == Dec\_var(T, I) then
+                    \subsubitem let \$.vinculo = Dec\_var(T, I) in 
+                        \subsubitem \hspace{2em} \$.tipo = T
+                    \subsubitem end let
+                \subitem else if \$.vinculo == param\_ref(T, I) then
+                    \subsubitem let \$.vinculo = param\_ref(T, I) in 
+                        \subsubitem \hspace{2em} \$.tipo = T
+                    \subsubitem end let
+                \subitem else if \$.vinculo == param(T, I) then
+                    \subsubitem let \$.vinculo = param(T, I) in 
+                        \subsubitem \hspace{2em} \$.tipo = T
+                    \subsubitem end let
+                \subitem else
+                    \subsubitem error
+                \subitem end if
+            \item tipado(null()): 
+                \subitem \$.tipo = null
+        \end{itemize}
 
+
+    \section{Especificación del proceso de asignación de espacio}
+
+        Dado que, para acceder a los objetos designados, es necesario computar direcciones, será necesario también equipar la máquina con instrucciones que funcionen con direccionamiento indirecto. A continuación se definirá la asignación de espacio.
+        Esta se hará en dos pasadas, como el proceso de vinculación. 
+
+        \begin{itemize}
+            \item var dir = 0 \/// \textit{contador de direcciones}
+            \item var max\_dir = 0 \/// \textit{mantiene la máxima dirección asignada}
+            \item var nivel = 0
+            \item asig-espacio(prog(Bloq)): 
+                \subitem asig-espacio(Bloq)
+            \item asig-espacio(bloq(Decs, Insts)): 
+                \subitem dir\_ant = dir
+                \subitem asig-espacio1(Decs)
+                \subitem asig-espacio2(Decs)
+                \subitem asig-espacio(Insts)
+                \subitem dir = dir\_ant
+            \item inc\_dir(inc): \/// \textit{se incrementa dir y se mantiene max\_dir} 
+                \subitem dir += inc
+                \subitem if dir $>$ max\_dir then 
+                    \subsubitem max\_dir = dir            
+        \end{itemize}
+        \textbf{\/// Primera pasada}
+        
         
 \end{document}
