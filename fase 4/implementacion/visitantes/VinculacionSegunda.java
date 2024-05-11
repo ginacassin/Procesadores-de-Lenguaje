@@ -3,15 +3,32 @@ package visitantes;
 import asint.ProcesamientoDef;
 import asint.SintaxisAbstractaTiny.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class VinculacionSegunda extends ProcesamientoDef {
     private TablaSimbolos ts;
-    private List<String> errors;
-    public VinculacionSegunda(TablaSimbolos ts, List<String> errors) {
+    private boolean outputJuez;
+    private boolean hayError = false;
+    private ErrorReporter er;
+
+    public VinculacionSegunda(TablaSimbolos ts, boolean outputJuez, ErrorReporter er) {
         this.ts = ts;
-        this.errors = errors;
+        this.outputJuez = outputJuez;
+        this.er = er;
+    }
+
+    public boolean hayError() {
+        return this.hayError;
+    }
+
+    private void agregarError(int fila, int col, String razon, String variable) {
+        this.hayError = true;
+        if (this.outputJuez) {
+            er.reportarError(fila, col, ("Errores_vinculacion fila:" + fila + " col:" + col));
+        }
+        else {
+            er.reportarError(fila, col, (fila + "," + col + ":" + razon + ":" + variable));
+        }
     }
 
     @Override
@@ -77,7 +94,7 @@ public class VinculacionSegunda extends ProcesamientoDef {
         if (tipoPunt.getTipo() instanceof Identificador) {
             Nodo vinculo = ts.vinculoDe(tipoPunt.getTipo().getIden());
             if (!(vinculo instanceof DecTipo)) {
-                errors.add("ERROR_VINCULACION. Vinculo debe ser declaración de tipo. " + tipoPunt.getFilaColInfo());
+                agregarError(tipoPunt.getTipo().leeFila(), tipoPunt.getTipo().leeCol(), "identificador no declarado", tipoPunt.getTipo().getIden());
             }
             tipoPunt.getTipo().setVinculo(vinculo);
         } else {

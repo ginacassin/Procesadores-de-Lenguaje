@@ -53,11 +53,14 @@ public class DomJudge {
 
     public static void procesa(Prog p, Reader datos) throws Exception {
         Tipado t = null;
-        VinculacionPrimera vp = new VinculacionPrimera();
+        VinculacionPrimera vp = new VinculacionPrimera(true);
         p.procesa(vp);
-        if(vp.getErrors().isEmpty()) {
+        if(!vp.hayError()) {
             t = new Tipado();
             p.procesa(t);
+        }
+        else {
+            vp.imprimierErrores();
         }
         if(t != null && t.getErrors().isEmpty()) {
             p.procesa(new AsignacionEspacioPrimera());
