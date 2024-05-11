@@ -15,6 +15,7 @@
 \date{Curso 2024}
 
 % Document
+\setcounter{section}{-1}
 \begin{document}
 \begin{titlepage}
     \centering
@@ -820,6 +821,31 @@
             \item tipado(null()): 
                 \subitem \$.tipo = null
         \end{itemize}
-    
-           
+
+
+    \section{Especificación del proceso de asignación de espacio}
+
+        Dado que, para acceder a los objetos designados, es necesario computar direcciones, será necesario también equipar la máquina con instrucciones que funcionen con direccionamiento indirecto. A continuación se definirá la asignación de espacio.
+        Esta se hará en dos pasadas, como el proceso de vinculación. 
+
+        \begin{itemize}
+            \item var dir = 0 \/// \textit{contador de direcciones}
+            \item var max\_dir = 0 \/// \textit{mantiene la máxima dirección asignada}
+            \item var nivel = 0
+            \item asig-espacio(prog(Bloq)): 
+                \subitem asig-espacio(Bloq)
+            \item asig-espacio(bloq(Decs, Insts)): 
+                \subitem dir\_ant = dir
+                \subitem asig-espacio1(Decs)
+                \subitem asig-espacio2(Decs)
+                \subitem asig-espacio(Insts)
+                \subitem dir = dir\_ant
+            \item inc\_dir(inc): \/// \textit{se incrementa dir y se mantiene max\_dir} 
+                \subitem dir += inc
+                \subitem if dir $>$ max\_dir then 
+                    \subsubitem max\_dir = dir            
+        \end{itemize}
+        \textbf{\/// Primera pasada}
+        
+        
 \end{document}
