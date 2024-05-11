@@ -361,10 +361,7 @@ public class Etiquetado extends ProcesamientoDef {
     public void procesa(Acceso acceso){
         acceso.setPrim(etq);
         acceso.getOpnd().procesa(this);
-        if (ref(acceso.getOpnd().getTipado()) instanceof TipoStruct) {
-            etq++;
-        }
-        etq++;
+        etq += 2;
         acceso.setSig(etq);
     }
 

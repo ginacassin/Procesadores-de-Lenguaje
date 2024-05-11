@@ -44,7 +44,7 @@ public class MainPrincipal {
         }
 
         // Proceso de vinculacion
-        prog.procesa(new VinculacionPrimera());
+        //prog.procesa(new VinculacionPrimera());
 
         // Proceso de comprobacion de tipos
         prog.procesa(new Tipado());
