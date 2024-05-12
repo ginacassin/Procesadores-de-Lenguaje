@@ -860,6 +860,242 @@
                     \subsubitem max\_dir = dir            
         \end{itemize}
         \textbf{\/// Primera pasada}
-        
-        
+        \begin{itemize}
+            \item asig-espacio1(si\_decs(DecsAux)): 
+                \subitem asig-espacio1(DecsAux)
+            \item asig-espacio1(no\_decs()): 
+                \subitem noop
+            \item asig-espacio1(muchas\_decs(DecsAux, Dec)): 
+                \subitem asig-espacio1(DecsAux)
+                \subitem asig-espacio1(Dec)
+            \item asig-espacio1(una\_dec(Dec)): 
+                \subitem asig-espacio1(Dec)
+            \item asig-espacio1(dec\_var(T, string)): 
+                \subitem asig-tam1(T)
+                \subitem \$.dir = dir
+                \subitem \$.nivel = nivel
+                \subitem inc\_dir(T.tam)
+            \item asig-espacio1(dec\_tipo(T, string)): 
+                \subitem asig-tam1(T)
+            \item asig-espacio1(dec\_proc(string, ParamsF, Bloq)): 
+                \subitem dir\_ant = dir
+                \subitem max\_dir\_ant = max\_dir
+                \subitem nivel$++$
+                \subitem \$.nivel = nivel
+                \subitem dir = 0
+                \subitem max\_dir = 0
+                \subitem asig-espacio1(ParamsF)
+                \subitem asig-espacio2(ParamsF)
+                \subitem asig-espacio(Bloq)
+                \subitem \$.tam = max\_dir
+                \subitem dir = dir\_ant
+                \subitem max\_dir = max\_dir\_ant
+                \subitem nivel$--$
+            \item asig-espacio1(si\_paramF(ParamsFL)): 
+                \subitem asig-espacio1(ParamsFL)
+            \item asig-espacio1(no\_paramF()): 
+                \subitem noop
+            \item asig-espacio1(muchos\_paramsF(ParamsFL, Param)): 
+                \subitem asig-espacio1(ParamsFL)
+                \subitem asig-espacio1(Param)
+            \item asig-espacio1(un\_paramF(Param)): 
+                \subitem asig-espacio1(Param)
+            \item asig-espacio1(param\_ref(T, string)): 
+                \subitem asig-tam1(T)
+                \subitem \$.nivel = nivel
+                \subitem \$.dir = dir
+                \subitem inc\_dir(T.tam)
+            \item asig-espacio1(param\_no\_ref(T, string)): 
+                \subitem asig-tam1(T)
+                \subitem \$.nivel = nivel
+                \subitem \$.dir = dir
+                \subitem inc\_dir(T.tam)
+            \item asig-tam1(tipo\_array(T, tam)): 
+                \subitem asig-tam1(T)
+                \subitem \$.tam = T.tam * tam
+            \item asig-tam1(tipo\_punt(T)): 
+                \subitem if T $\neq$ tipo\_iden(iden) then
+                    \subsubitem asig-tam1(T)
+                \subitem \$.tam = 1
+            \item asig-tam1(tipo\_struct(LCampos)): 
+                \subitem dir\_ant = dir
+                \subitem dir = 0
+                \subitem asig-espacio1(LCampos)
+                \subitem \$.tam = dir
+                \subitem dir = dir\_ant
+            \item asig-espacio1(muchos\_campos(LCampos, Campo)): 
+                \subitem asig-espacio1(LCampos)
+                \subitem asig-espacio1(Campo)
+            \item asig-espacio1(un\_campo(Campo)): 
+                \subitem asig-espacio1(Campo)
+            \item asig-espacio1(campo(T, string)): 
+                \subitem \$.desp = dir
+                \subitem asig.tam1(T)
+                \subitem dir += T.tam
+            \item asig-tam1(tipo\_int()): 
+                \subitem \$.tam = 1
+            \item asig-tam1(tipo\_real()): 
+                \subitem \$.tam = 1
+            \item asig-tam1(tipo\_bool()): 
+                \subitem \$.tam = 1
+            \item asig-tam1(tipo\_string()): 
+                \subitem \$.tam = 1
+            \item asig-tam1(tipo\_iden(string)): 
+                \subitem \$.tam = 1
+        \end{itemize}
+        \textbf{\/// Segunda pasada}
+        \begin{itemize}
+            \item asig-espacio2(si\_decs(DecsAux)): 
+                \subitem asig-espacio2(DecsAux)
+            \item asig-espacio2(no\_decs()): 
+                \subitem noop
+            \item asig-espacio2(muchas\_decs(DecsAux, Dec)): 
+                \subitem asig-espacio2(DecsAux)
+                \subitem asig-espacio2(Dec)
+            \item asig-espacio2(una\_dec(Dec)): 
+                \subitem asig-espacio2(Dec)
+            \item asig-espacio2(dec\_var(T, string)): 
+                \subitem asig-tam2(T)
+            \item asig-espacio2(dec\_tipo(T, string)): 
+                \subitem asig-tam2(T)
+            \item asig-espacio2(dec\_proc(string, ParamsF, Bloq)): 
+                \subitem noop
+            \item asig-espacio2(si\_paramF(ParamsFL)): 
+                \subitem asig-espacio2(ParamsFL)
+            \item asig-espacio2(no\_paramF()): 
+                \subitem noop
+            \item asig-espacio2(muchos\_paramsF(ParamsFL, Param)): 
+                \subitem asig-espacio2(ParamsFL)
+                \subitem asig-espacio2(Param)
+            \item asig-espacio2(un\_paramF(Param)): 
+                \subitem asig-espacio2(Param) 
+            \item asig-espacio2(param\_ref(T, string)): 
+                \subitem asig-tam2(T)
+            \item asig-espacio2(param(T, string)): 
+                \subitem asig-tam2(T)
+            \item asig-tam2(tipo\_array(T, string)): 
+                \subitem asig-tam2(T)
+            \item asig-tam2(tipo\_punt(T)): 
+                \subitem if T = tipo\_iden(iden) then
+                    \subsubitem let T.vinculo = dec\_tipo(T’,id) in
+                    \subsubitem T.tam = T’.tam
+                \subitem else
+                    \subsubitem asig-tam2(T)
+                \subitem end if
+            \item asig-tam2(tipo\_struct(LCampos)): 
+                \subitem asig-espacio2(LCampos)
+            \item asig-espacio2(muchos\_campos(LCampos, Campo)): 
+                \subitem asig-espacio2(LCampos)
+                \subitem asig-espacio2(Campo)
+            \item asig-espacio2(un\_campo(Campo)): 
+                \subitem asig-espacio2(Campo)
+            \item asig-espacio2(campo(T, string)): 
+                \subitem asig.tam2(T)
+            \item asig-tam2(tipo\_int()): 
+                \subitem noop
+            \item asig-tam2(tipo\_real()): 
+                \subitem noop
+            \item asig-tam2(tipo\_bool()): 
+                \subitem noop
+            \item asig-tam2(tipo\_string()): 
+                \subitem noop
+            \item asig-tam2(tipo\_iden(string)): 
+                \subitem noop
+        \end{itemize} 
+        \textbf{\/// Única pasada}
+        \begin{itemize}
+            \item asig-espacio(si\_instr(InstsAux)): 
+                \subitem asig-espacio(InstsAux)
+            \item asig-espacio(no\_instr()): 
+                \subitem noop
+            \item asig-espacio(muchas\_instr(InstsAux, Inst)): 
+                \subitem asig-espacio(InstsAux)
+                \subitem asig-espacio(Inst)
+            \item asig-espacio(una\_instr(Inst)): 
+                \subitem asig-espacio(Inst)
+            \item asig-espacio(instr\_expr(Exp)): 
+                \subitem noop
+            \item asig-espacio(instr\_if(Exp, Bloq)): 
+                \subitem asig-espacio(Bloq)
+            \item asig-espacio(instr\_if\_else(Exp, Bloq1, Bloq2)): 
+                \subitem asig-espacio(Bloq1)
+                \subitem asig-espacio(Bloq2)
+            \item asig-espacio(instr\_while(Exp, Bloq)): 
+                \subitem asig-espacio(Bloq)
+            \item asig-espacio(instr\_read(Exp)): 
+                \subitem noop
+            \item asig-espacio(instr\_write(Exp)): 
+                \subitem noop
+            \item asig-espacio(instr\_nl()): 
+                \subitem noop
+            \item asig-espacio(instr\_new(Exp)): 
+                \subitem noop
+            \item asig-espacio(instr\_del(Exp)): 
+                \subitem noop
+            \item asig-espacio(instr\_call(string, ParamsR)): 
+                \subitem asig-espacio(ParamsR)
+            \item asig-espacio(instr\_bloque(Bloq)): 
+                \subitem asig-espacio(Bloq)
+            \item asig-espacio(si\_paramsR(ParamsRL)): 
+                \subitem asig-espacio(ParamsRL)
+            \item asig-espacio(no\_paramsR()): 
+                \subitem noop
+            \item asig-espacio(muchos\_paramsR(ParamsRL, Exp)): 
+                \subitem asig-espacio(ParamsRL)
+            \item asig-espacio(un\_paramsR(Exp)): 
+                \subitem noop
+            \item asig-espacio(asig(Exp1, Exp2)): 
+                \subitem noop
+            \item asig-espacio(menor(Exp1, Exp2)): 
+                \subitem noop
+            \item asig-espacio(mayor(Exp1, Exp2)): 
+                \subitem noop
+            \item asig-espacio(menor\_igual(Exp1, Exp2)): 
+                \subitem noop
+            \item asig-espacio(mayor\_igual(Exp1, Exp2)): 
+                \subitem noop
+            \item asig-espacio(igual(Exp1, Exp2)): 
+                \subitem noop
+            \item asig-espacio(no\_igual(Exp1, Exp2)): 
+                \subitem noop
+            \item asig-espacio(suma(Exp1, Exp2)): 
+                \subitem noop
+            \item asig-espacio(resta(Exp1, Exp2)): 
+                \subitem noop
+            \item asig-espacio(and(Exp1, Exp2)): 
+                \subitem noop
+            \item asig-espacio(or(Exp1, Exp2)): 
+                \subitem noop
+            \item asig-espacio(mult(Exp1, Exp2)): 
+                \subitem noop
+            \item asig-espacio(div(Exp1, Exp2)): 
+                \subitem noop
+            \item asig-espacio(mod(Exp1, Exp2)): 
+                \subitem noop
+            \item asig-espacio(negativo(Exp)): 
+                \subitem noop
+            \item asig-espacio(not(Exp)): 
+                \subitem noop
+            \item asig-espacio(index(Exp1, Exp2)): 
+                \subitem noop
+            \item asig-espacio(acceso(Exp, string)): 
+                \subitem noop
+            \item asig-espacio(indireccion(Exp)): 
+                \subitem noop
+            \item asig-espacio(lit\_ent(string)): 
+                \subitem noop
+            \item asig-espacio(lit\_real(string)): 
+                \subitem noop
+            \item asig-espacio(true()): 
+                \subitem noop
+            \item asig-espacio(false()): 
+                \subitem noop
+            \item asig-espacio(lit\_cadena(string)): 
+                \subitem noop
+            \item asig-espacio(iden(string)): 
+                \subitem noop
+            \item asig-espacio(null()): 
+                \subitem noop
+        \end{itemize}
+    
 \end{document}
