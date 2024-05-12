@@ -4,6 +4,9 @@ import asint.ProcesamientoDef;
 import asint.SintaxisAbstractaTiny.*;
 
 public class AsignacionEspacioPrimera extends ProcesamientoDef {
+    /*
+        Procesa es sintácticamente equivalente a asig-tam y asig-espacio en la memoria
+     */
     private int dir;
     private int max_dir;
     private int nivel;
