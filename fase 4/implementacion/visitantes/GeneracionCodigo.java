@@ -492,12 +492,26 @@ public class GeneracionCodigo extends ProcesamientoDef {
             maquinaP.emit(maquinaP.suma());
             paramsRL.getExp().procesa(this);
 
-            if (paramsFL.getParam() instanceof ParamRef ||
-                !(es_designador(paramsRL.getExp()))){
+            if (paramsFL.getParam() instanceof ParamRef)
                 maquinaP.emit(maquinaP.desapila_ind());
-            }
             else {
-                maquinaP.emit(maquinaP.copia(paramsFL.getParam().getTipo().getTam()));
+                if (!(es_designador(paramsRL.getExp()))) {
+                    if ( ref(paramsRL.getExp().getTipado()) instanceof TipoInt &&
+                            ref(paramsFL.getParam().getTipado()) instanceof TipoReal){
+                        maquinaP.emit(maquinaP.int2real());
+                    }
+                    maquinaP.emit(maquinaP.desapila_ind());
+                }
+                else {
+                    if (ref(paramsRL.getExp().getTipado()) instanceof TipoInt &&
+                            ref(paramsFL.getParam().getTipado()) instanceof TipoReal) {
+                        maquinaP.emit(maquinaP.apila_ind());
+                        maquinaP.emit(maquinaP.int2real());
+                        maquinaP.emit(maquinaP.desapila_ind());
+                    } else {
+                        maquinaP.emit(maquinaP.copia(paramsFL.getParam().getTipo().getTam()));
+                    }
+                }
             }
         }
         else if (paramsFL instanceof UnParamF &&
@@ -507,12 +521,26 @@ public class GeneracionCodigo extends ProcesamientoDef {
             maquinaP.emit(maquinaP.suma());
             paramsRL.getExp().procesa(this);
 
-            if (paramsFL.getParam() instanceof ParamRef ||
-                    !(es_designador(paramsRL.getExp()))){
+            if (paramsFL.getParam() instanceof ParamRef)
                 maquinaP.emit(maquinaP.desapila_ind());
-            }
             else {
-                maquinaP.emit(maquinaP.copia(paramsFL.getParam().getTipo().getTam()));
+                if (!(es_designador(paramsRL.getExp()))) {
+                    if ( ref(paramsRL.getExp().getTipado()) instanceof TipoInt &&
+                            ref(paramsFL.getParam().getTipado()) instanceof TipoReal){
+                        maquinaP.emit(maquinaP.int2real());
+                    }
+                    maquinaP.emit(maquinaP.desapila_ind());
+                }
+                else {
+                    if (ref(paramsRL.getExp().getTipado()) instanceof TipoInt &&
+                            ref(paramsFL.getParam().getTipado()) instanceof TipoReal) {
+                        maquinaP.emit(maquinaP.apila_ind());
+                        maquinaP.emit(maquinaP.int2real());
+                        maquinaP.emit(maquinaP.desapila_ind());
+                    } else {
+                        maquinaP.emit(maquinaP.copia(paramsFL.getParam().getTipo().getTam()));
+                    }
+                }
             }
         }
     }

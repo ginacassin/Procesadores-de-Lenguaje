@@ -538,12 +538,48 @@ public class Etiquetado extends ProcesamientoDef {
             etiquetado_paso_param_aux(paramsFL.getParamsFL(), paramsRL.getParamrl());
             etq += 3;
             paramsRL.getExp().procesa(this);
-            etq++;
+            if (paramsFL.getParam() instanceof ParamRef)
+                etq++;
+            else {
+                if (!(es_designador(paramsRL.getExp()))) {
+                    if ( ref(paramsRL.getExp().getTipado()) instanceof TipoInt &&
+                            ref(paramsFL.getParam().getTipado()) instanceof TipoReal){
+                        etq++;
+                    }
+                    etq++;
+                }
+                else {
+                    if (ref(paramsRL.getExp().getTipado()) instanceof TipoInt &&
+                            ref(paramsFL.getParam().getTipado()) instanceof TipoReal) {
+                        etq += 3;
+                    } else {
+                        etq++;
+                    }
+                }
+            }
         }
         else if (paramsFL instanceof UnParamF && paramsRL instanceof Un_ParamsR) {
             etq += 3;
             paramsRL.getExp().procesa(this);
-            etq++;
+            if (paramsFL.getParam() instanceof ParamRef)
+                etq++;
+            else {
+                if (!(es_designador(paramsRL.getExp()))) {
+                    if ( ref(paramsRL.getExp().getTipado()) instanceof TipoInt &&
+                            ref(paramsFL.getParam().getTipado()) instanceof TipoReal){
+                        etq++;
+                    }
+                    etq++;
+                }
+                else {
+                    if (ref(paramsRL.getExp().getTipado()) instanceof TipoInt &&
+                            ref(paramsFL.getParam().getTipado()) instanceof TipoReal) {
+                        etq += 3;
+                    } else {
+                        etq++;
+                    }
+                }
+            }
         }
     }
 }
