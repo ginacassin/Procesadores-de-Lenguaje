@@ -273,7 +273,7 @@ public class Tipado extends ProcesamientoDef {
 
     public void procesa(Instr_Expr instrExpr) {
         instrExpr.getExp().procesa(this);
-        if (instrExpr.getTipado() instanceof TipoOK)
+        if (instrExpr.getTipado() instanceof TipoError)
             instrExpr.setTipado(new TipoError());
         else
             instrExpr.setTipado(new TipoOK());
