@@ -656,7 +656,7 @@
                         \subsubitem \hspace{2em}
                         \$.tipo = ExpI.tipo
                     \subsubitem else 
-                        \subsubitem \hspace{2em} aviso-error(ExpI.tipo,ExpD.tipo) 
+                        \subsubitem \hspace{2em} aviso-error(\$)
                         \subsubitem \hspace{2em} \$.tipo = error 
                     \subsubitem end if 
                 \subitem else 
@@ -772,7 +772,7 @@
                 \subitem if ref!(Exp.tipo) == tipo\_array(T, LitEnt) \&\&  ref!(LitEnt.tipo) == tipo\_int then
                     \subsubitem \$.tipo = T
                 \subitem else 
-                    \subsubitem aviso-error(T, LitEnt.tipo)
+                    \subsubitem aviso-error(Exp)
                     \subsubitem \$.tipo = error
                 \subitem end if
             \item tipado(acceso(Exp, Iden)): 
