@@ -44,10 +44,10 @@ public class MainPrincipal {
         }
 
         // Proceso de vinculacion
-        //prog.procesa(new VinculacionPrimera());
+        prog.procesa(new VinculacionPrimera(false));
 
         // Proceso de comprobacion de tipos
-        prog.procesa(new Tipado());
+        prog.procesa(new Tipado(false));
 
         // Proceso de asignacion de espacio
         prog.procesa(new AsignacionEspacioPrimera());
