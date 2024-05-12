@@ -1392,11 +1392,11 @@
             \subitem \$.sig = etq
         \item etiquetado(iden(string)): 
             \subitem \$.prim = etq
-            \subitem if \$.vinculo == dec\_var 
+            \subitem if \$.vinculo == dec\_var then
                 \subsubitem etiquetado-acc-id(\$.vinculo)
-            \subitem else if \$.vinculo == param 
+            \subitem else if \$.vinculo == param then
                 \subsubitem etiquetado-acc-id(\$.vinculo)
-            \subitem else if \$.vinculo == param\_ref 
+            \subitem else if \$.vinculo == param\_ref then
                 \subsubitem etiquetado-acc-id(\$.vinculo)
             \subitem end if
             \subitem \$.sig = etq
@@ -1500,4 +1500,302 @@
         \item recolecta\_subs(dec\_proc(string, ParamsF, Bloq)): 
             \subitem apila(sub\_pendientes, \$)
     \end{itemize} 
+
+    \section{Especificación del proceso de generación de código}
+        \begin{itemize}
+            \item var sub\_pendientes = pila-vacia()
+            \item gen-cod(prog(Bloq)): 
+                \subitem gen-cod(Bloq)
+                \subitem emit stop()
+                \subitem while !es-vacia(sub\_pendientes)
+                    \subsubitem sub = cima(sub\_pendientes)
+                    \subsubitem desapila\_ind(sub\_pendientes)
+                    \subsubitem let sub = dec\_proc(string,ParamsFL,Bloq) in
+                        \subsubitem \hspace{2em} emit desapilad(sub.nivel)
+                        \subsubitem \hspace{2em} gen-cod(Bloq)
+                        \subsubitem \hspace{2em} emit desactiva(sub.nivel,sub.tam)
+                        \subsubitem \hspace{2em} emit ir-ind()
+                    \subsubitem end let
+                \subitem end while
+            \item gen-cod(bloq(Decs, Insts)): 
+                \subitem recolecta\_subs(Decs)
+                \subitem gen-cod(Insts)
+            \item gen-cod(si\_instr(InstAux)): 
+                \subitem gen-cod(InstAux)
+            \item gen-cod(no\_instr()): 
+                \subitem noop
+            \item gen-cod(muchas\_instr(InstsAux, Inst)): 
+                \subitem gen-cod(InstsAux)
+                \subitem gen-cod(Inst)
+            \item gen-cod(una\_instr(Inst)): 
+                \subitem gen-cod(Inst)
+            \item gen-cod(instr\_expr(Exp)): 
+                \subitem gen-cod(Exp)
+                \subitem emit desapila\_ind()
+            \item gen-cod(instr\_if(Exp, Bloq)): 
+                \subitem gen-cod(Exp)
+                \subitem gen-acc-val(Exp)
+                \subitem emit ir-f(\$.sig)
+                \subitem gen-cod(Bloq)
+            \item gen-cod(instr\_if\_else(Exp, Bloq1, Bloq2)): 
+                \subitem gen-cod(Exp)
+                \subitem gen-acc-val(Exp)
+                \subitem emit ir-f(Bloq2.prim)
+                \subitem gen-cod(Bloq1)
+                \subitem emit ir-a(\$.sig)
+                \subitem gen-cod(Bloq2)
+            \item gen-cod(instr\_while(Exp, Bloq)): 
+                \subitem gen-cod(Exp)
+                \subitem gen-acc-val(Exp)
+                \subitem emit ir-f(\$.sig)
+                \subitem gen-cod(Bloq)
+                \subitem emit ir-a(\$.prim)
+            \item gen-cod(instr\_read(Exp)): 
+                \subitem gen-cod(Exp)
+                \subitem emit read()
+                \subitem emit desapila-ind()
+            \item gen-cod(instr\_write(Exp)): 
+                \subitem gen-cod(Exp)
+                \subitem gen-acc-val(Exp)
+                \subitem emit write()
+            \item gen-cod(instr\_nl()): 
+                \subitem emit nl()
+            \item gen-cod(instr\_new(Exp)): 
+                \subitem gen-cod(Exp)
+                \subitem let ref!(Exp.tipo) == tipo\_puntero(T) in
+                    \subsubitem emit alloc(T.tam)
+                \subitem end let
+                \subitem emit desapila-ind()
+            \item gen-cod(instr\_del(Exp)): 
+                \subitem gen-cod(Exp)
+                \subitem emit apila-ind()
+                \subitem let ref!(E.tipo) == tipo\_puntero(T) in
+                    \subsubitem emit dealloc(T.tam)
+                \subitem end let
+            \item gen-cod(instr\_call(string, ParamsR)): 
+                \subitem emit activa(\$.vinculo.nivel,\$.vinculo.tam,\$.sig)
+                \subitem gen-paso-param(\$.vinculo,ParamsR)
+                \subitem emit ir-a(\$.vinculo.prim)
+            \item gen-cod(instr\_bloque(Bloq)): 
+                \subitem gen-cod(Bloq)
+            \item gen-cod(si\_paramsR(ParamsRL)): 
+                \subitem gen-cod(ParamsRL)
+            \item gen-cod(no\_paramsR()): 
+                \subitem noop 
+            \item gen-cod(muchos\_paramsR(ParamsRL, Exp)): 
+                \subitem gen-cod(ParamsRL)
+                \subitem gen-cod(Exp)
+            \item gen-cod(un\_paramsR(Exp)): 
+                \subitem gen-cod(Exp)
+            \item gen-cod(asig(Exp1, Exp2)): 
+                \subitem gen-cod(Exp1)
+                \subitem gen-cod(Exp2)
+                \subitem if ref!(Exp1.tipo) == tipo\_real \&\& ref!(Exp2.tipo) == tipo\_int
+                    \subsubitem gen-asig-prom(Exp2)
+                \subitem else
+                    \subsubitem gen-asig(Exp2)
+                \subitem end if
+            \item gen-asig(Exp): 
+                \subitem if es-designador(Exp) then
+                    \subsubitem emit copia(Exp.tipo.tam)
+                \subitem else
+                    \subsubitem emit desapila-ind()
+                \subsubitem end if
+            \item gen-asig-prom(Exp): 
+                \subitem if es-designador(Exp) then
+                    \subsubitem emit apila-ind()
+                    \subsubitem emit int2real()
+                    \subsubitem emit desapila-ind()
+                \subitem else
+                    \subsubitem emit int2real()
+                    \subsubitem emit desapila-ind()
+                \subitem end if
+            \item gen-cod(menor(Exp1, Exp2)): 
+                \subitem gen-cod-opnds(Exp1, Exp2)
+                \subitem emit menor()
+            \item gen-cod(mayor(Exp1, Exp2)): 
+                \subitem gen-cod-opnds(Exp1, Exp2)
+                \subitem emit mayor()
+            \item gen-cod(menor\_igual(Exp1, Exp2)): 
+                \subitem gen-cod-opnds(Exp1, Exp2)
+                \subitem emit menor\_igual()
+            \item gen-cod(mayor\_igual(Exp1, Exp2)): 
+                \subitem gen-cod-opnds(Exp1, Exp2)
+                \subitem emit mayor\_igual()
+            \item gen-cod(igual(Exp1, Exp2)): 
+                \subitem gen-cod-opnds(Exp1, Exp2)
+                \subitem emit igual()
+            \item gen-cod(no\_igual(Exp1, Exp2)): 
+                \subitem gen-cod-opnds(Exp1, Exp2)
+                \subitem emit no\_igual()
+            \item gen-cod(suma(Exp1, Exp2)): 
+                \subitem gen-cod-opnds(Exp1, Exp2)
+                \subitem emit suma()
+            \item gen-cod(resta(Exp1, Exp2)): 
+                \subitem gen-cod-opnds(Exp1, Exp2)
+                \subitem emit resta()
+            \item gen-cod(and(Exp1, Exp2)): 
+                \subitem gen-cod-opnds(Exp1, Exp2)
+                \subitem emit and()
+            \item gen-cod(or(Exp1, Exp2)): 
+                \subitem gen-cod-opnds(Exp1, Exp2)
+                \subitem emit or()
+            \item gen-cod(mult(Exp1, Exp2)): 
+                \subitem gen-cod-opnds(Exp1, Exp2)
+                \subitem emit mult()
+            \item gen-cod(div(Exp1, Exp2)): 
+                \subitem gen-cod-opnds(Exp1, Exp2)
+                \subitem emit div()
+            \item gen-cod(mod(Exp1, Exp2)): 
+                \subitem gen-cod-opnds(Exp1, Exp2)
+                \subitem emit mod()
+            \item gen-cod(negativo(Exp)): 
+                \subitem gen-cod(Exp)
+                \subitem gen-acc-val(Exp)
+                \subitem emit negativo()
+            \item gen-cod(not(Exp)): 
+                \subitem gen-cod(Exp)
+                \subitem gen-acc-val(Exp)
+                \subitem emit not()
+            \item gen-cod(index(Exp1, Exp2)): 
+                \subitem gen-cod(Exp1)
+                \subitem gen-cod(Exp2)
+                \subitem gen-acc-val(Exp2)
+                \subitem let ref!(Exp2.tipo) = tipo\_array(T,string) in
+                    \subsubitem emit apila-int(T.tam)
+                \subitem end let
+                \subitem emit mul()
+                \subitem emit suma()
+            \item gen-cod(acceso(Exp, string)): 
+                \subitem gen-cod(Exp)
+                \subitem let ref!(Exp.tipo) = struct(Cs) in
+                    \subsubitem emit apila-int(desplazamiento(Cs,string))
+                \subitem end let
+                \subitem emit suma()
+            \item gen-cod(indireccion(Exp)): 
+                \subitem gen-cod(Exp)
+                \subitem emit apila-ind()
+            \item gen-cod(lit\_ent(string)): 
+                \subitem emit apila-int(string)
+            \item gen-cod(lit\_real(string)): 
+                \subitem emit apila-real(string)
+            \item gen-cod(true()): 
+                \subitem emit apila-bool(True)
+            \item gen-cod(false()): 
+                \subitem emit apila-bool(False)
+            \item gen-cod(lit\_cadena(string)): 
+                \subitem emit apila-string(string)
+            \item gen-cod(iden(string)): 
+                \subitem if \$.vinculo == dec\_var then 
+                    \subsubitem gen-acc-id(\$.vinculo)
+                \subitem else if \$.vinculo == param then 
+                    \subsubitem gen-acc-id(\$.vinculo)
+                \subitem else if \$.vinculo == param\_ref then 
+                    \subsubitem gen-acc-id(\$.vinculo)
+                \subitem end if
+            \item gen-cod(null()): 
+                \subitem emit apila-null()
+            \item gen-cod-opnds(Opnd0,Opnd1): 
+                \subitem if ref!(Opnd0.tipo) == tipo\_int \&\& ref!(Opnd1.tipo) == tipo\_real then
+                    \subsubitem gen-cod(Opnd0)
+                    \subsubitem gen-acc-val(Opnd0)
+                    \subsubitem emit int2real()
+                    \subsubitem gen-cod(Opnd1)
+                    \subsubitem gen-acc-val(Opnd1)
+                \subitem else if ref!(Opnd0.tipo) == tipo\_real \&\& ref!(Opnd1.tipo) == tipo\_int then
+                    \subsubitem gen-cod(Opnd0)
+                    \subsubitem gen-acc-val(Opnd0)
+                    \subsubitem gen-cod(Opnd1)
+                    \subsubitem gen-acc-val(Opnd1)
+                    \subsubitem emit int2real()
+                \subitem else
+                    \subsubitem gen-cod(Opnd0)
+                    \subsubitem gen-acc-val(Opnd0)
+                    \subsubitem gen-cod(Opnd1)
+                    \subsubitem gen-acc-val(Opnd1)
+                \subitem end if
+            \item gen-acc-val(Exp): 
+                \subitem if es-designador(Exp) then
+                    \subsubitem emit apila-ind()
+                \subitem end if
+            \item gen-acc-id(dec\_var(T,string)): 
+                \subitem if \$.nivel = 0 then
+                    \subsubitem emit apila-int(\$.dir)
+                \subitem else
+                    \subsubitem gen-acc-var(\$)
+                \subitem end if
+            \item gen-acc-id(param\_ref(T,string)): 
+                \subitem gen-acc-var(\$)
+                \subitem emit apila-ind()
+            \item gen-acc-id(param(T,id)): 
+                \subitem gen-acc-var(\$)
+            \item gen-acc-var(V): 
+                \subitem emit apilad(V.nivel)
+                \subitem emit apila-int(V.dir)
+                \subitem emit suma()
+            \item recolecta\_subs(si\_decs(DecsAux)): 
+                \subitem recolecta\_subs(DecsAux)
+            \item recolecta\_subs(no\_decs()): 
+                \subitem noop
+            \item recolecta\_subs(muchas\_decs(DecsAux, Dec)): 
+                \subitem recolecta\_subs(DecsAux)
+                \subitem recolecta\_subs(Dec)
+            \item recolecta\_subs(una\_dec(Dec)): 
+                \subitem recolecta\_subs(Dec)
+            \item recolecta\_subs(dec\_var(T, string)): 
+                \subitem noop
+            \item recolecta\_subs(dec\_tipo(T, string)): 
+                \subitem noop
+            \item recolecta\_subs(dec\_proc(string, ParamsF, Bloq)): 
+                \subitem apila(sub\_pendientes, \$)
+            \item gen-paso-param(dec\_proc(string,ParamsF,Bloq),ParamsR): 
+                \subitem gen-paso-param-aux(ParamsF, ParamsR)
+            \item gen-paso-param-aux(si\_paramF(ParamsFL), si\_paramsR(ParamsRL)): 
+                \subitem gen-paso-param-aux(ParamsFL, ParamsRL)
+            \item gen-paso-param-aux(no\_paramFL(), no\_paramsRL()): 
+                \subitem noop
+            \item gen-paso-param-aux(muchos\_paramsF(ParamsFL, Param), muchos\_paramsR(ParamsRL, Exp)): 
+                \subitem gen-paso-param-aux(ParamsFL, ParamsRL)
+                \subitem emit dup()
+                \subitem emit apila-int(Param.dir)
+                \subitem emit suma()
+                \subitem gen-cod(Exp)
+                \subitem if Param = param\_ref(T,id) then
+                    \subsubitem emit desapila-ind()
+                \subitem else if !es-designador(Exp) then
+                    \subsubitem if ref!(Exp.tipo) == tipo\_int \&\& ref!(Param.tipo) == tipo\_real then
+                        \subsubitem \hspace{2em} emit int2real()
+                    \subsubitem emit desapila-ind()
+                    \subsubitem else
+                        \subsubitem \hspace{2em} if ref!(Exp.tipo) == tipo\_int \&\& ref!(Param.tipo) == tipo\_real then
+                            \subsubitem \hspace{4em} emit apila-ind()
+                            \subsubitem \hspace{4em} emit int2real()
+                            \subsubitem \hspace{4em} emit desapila-ind()
+                        \subsubitem \hspace{2em} else
+                            \subsubitem \hspace{4em} emit copia(T.tam)
+                        \subsubitem \hspace{2em} end if
+                    \subsubitem end if
+                \subitem end if
+            \item gen-paso-param-aux(un\_paramF(Param), un\_paramsR(Exp)): 
+                \subitem emit dup()
+                \subitem emit apila-int(Param.dir)
+                \subitem emit suma()
+                \subitem gen-cod(Exp)
+                \subitem if Param = param\_ref(T,id) then
+                    \subsubitem \hspace{2em} emit desapila-ind()
+                \subitem else if !es-designador(Exp) then
+                    \subsubitem \hspace{2em} if ref!(Exp.tipo) == tipo\_int \&\& ref!(Param.tipo) == tipo\_real then
+                        \subsubitem \hspace{4em} emit int2real()
+                    \subsubitem \hspace{2em} emit desapila-ind()
+                    \subsubitem \hspace{2em} else
+                    \subsubitem \hspace{4em} if ref!(Exp.tipo) == tipo\_int \&\& ref!(Param.tipo) == tipo\_real then
+                        \subsubitem \hspace{6em} emit apila-ind()
+                        \subsubitem \hspace{6em} emit int2real()
+                        \subsubitem \hspace{6em} emit desapila-ind()
+                    \subsubitem \hspace{4em} else
+                        \subsubitem \hspace{6em} emit copia(T.tam)
+                    \subsubitem \hspace{4em} end if
+                    \subsubitem \hspace{2em} end if
+                \subitem end if
+        \end{itemize} 
 \end{document}
