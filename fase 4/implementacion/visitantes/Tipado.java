@@ -94,27 +94,30 @@ public class Tipado extends ProcesamientoDef {
         return new TipoError();
     }
 
-    private void aviso_error(T t1, T t2) {
-        if (t1 instanceof TipoError) {
-            // errors.add("ERROR_TIPADO. " + t1.getFilaColInfo());
-            agregarError(t1.leeFila(), t1.leeCol(), "algunerror");
+    private void aviso_error(Nodo t1, Nodo t2) {
+        if (!(t1 instanceof TipoError)) {
+            agregarError(t1.leeFila(), t1.leeCol(), "algun error");
         }
-        if (t2 instanceof TipoError) {
-            agregarError(t2.leeFila(), t2.leeCol(), "algunerror");
+        if (!(t2 instanceof TipoError)) {
+            agregarError(t2.leeFila(), t2.leeCol(), "algun error");
         }
     }
 
-    private void aviso_error(T t) {
-        agregarError(t.leeFila(), t.leeCol(), "algunerror");
-        if (t instanceof TipoError) {
-            // errors.add("ERROR_TIPADO. " + t.getFilaColInfo());
-            agregarError(t.leeFila(), t.leeCol(), "algunerror");
+    private void aviso_error(Nodo t) {
+        if (!(t instanceof TipoError)) {
+            agregarError(t.leeFila(), t.leeCol(), "algun error");
         }
     }
-    
-    private static Set<String> theta;
+    public class Pair {
+        private final T t1, t2;
+        public Pair(T t1, T t2) {
+            this.t1 = t1;
+            this.t2 = t2;
+        }
+    }
+    private Set<Pair> theta;
 
-    private static boolean son_unificables(LCampos l1, LCampos l2, boolean esParamRef) {
+    private boolean son_unificables(LCampos l1, LCampos l2, boolean esParamRef) {
         if (l1 instanceof Muchos_Campos && l2 instanceof Muchos_Campos) {
             LCampos l1Prime = l1.getlCampos();
             LCampos l2Prime = l2.getlCampos();
@@ -139,17 +142,17 @@ public class Tipado extends ProcesamientoDef {
         return false;
     }
 
-    private static boolean son_unificables(T t1, T t2, boolean esParamRef) {
-        String equation = t1.toString() + "=" + t1.toString();
-        if (!theta.contains(equation)) {
-            theta.add(equation);
+    private boolean son_unificables(T t1, T t2, boolean esParamRef) {
+        Pair p = new Pair(t1, t2);
+        if (!theta.contains(p)) {
+            theta.add(p);
             return unificables(t1, t2, esParamRef);
         } else {
             return true;
         }
     }
 
-    private static boolean unificables(T t1, T t2, boolean esParamRef) {
+    private boolean unificables(T t1, T t2, boolean esParamRef) {
         T t1Prime = ref(t1);
         T t2Prime = ref(t2);
 
@@ -178,12 +181,12 @@ public class Tipado extends ProcesamientoDef {
         }
     }
 
-    private static boolean compatibles(T t1, T t2) {
-        theta = new HashSet<>();
-        return unificables(t1, t2, false);
+    private boolean compatibles(T t1, T t2) {
+        return compatibles(t1, t2, false);
     }
 
-    private static boolean compatibles(T t1, T t2, boolean esParamRef) {
+    private boolean compatibles(T t1, T t2, boolean esParamRef) {
+        // System.out.println("Comparando: " + t1.getClass() +", "+t2.getClass());
         theta = new HashSet<>();
         return unificables(t1, t2, esParamRef);
     }
@@ -282,8 +285,10 @@ public class Tipado extends ProcesamientoDef {
         if (ref(instrIf.getExp().getTipado()) instanceof TipoBool
             && instrIf.getBloq().getTipado() instanceof TipoOK) 
             instrIf.setTipado(new TipoOK());
-        else
+        else {
+            aviso_error(instrIf.getExp()); // TODO esperada expresion booleana
             instrIf.setTipado(new TipoError());
+        }
     }
 
     public void procesa(Instr_If_Else instrIfElse) {
@@ -294,8 +299,10 @@ public class Tipado extends ProcesamientoDef {
             && instrIfElse.getBloq1().getTipado() instanceof TipoOK
             && instrIfElse.getBloq2().getTipado() instanceof TipoOK) 
             instrIfElse.setTipado(new TipoOK());
-        else
-            instrIfElse.setTipado(new TipoError());
+            else {
+                aviso_error(instrIfElse.getExp()); // TODO esperada expresion booleana
+                instrIfElse.setTipado(new TipoError());
+            }
     }
 
     public void procesa(Instr_While instrWhile) {
@@ -304,8 +311,10 @@ public class Tipado extends ProcesamientoDef {
         if (ref(instrWhile.getExp().getTipado()) instanceof TipoBool
             && instrWhile.getBloq().getTipado() instanceof TipoOK) 
             instrWhile.setTipado(new TipoOK());
-        else
-            instrWhile.setTipado(new TipoError());
+            else {
+                aviso_error(instrWhile.getExp()); // TODO esperada expresion booleana
+                instrWhile.setTipado(new TipoError());
+            }
     }
 
     public void procesa(Instr_Read inst) {
@@ -317,8 +326,10 @@ public class Tipado extends ProcesamientoDef {
             && es_designador(inst.getExp())) {
             inst.setTipado(new TipoOK());
         }
-        else
+        else {
+            aviso_error(inst.getExp()); // TODO designador esperado y un segundo error de valor no legible
             inst.setTipado(new TipoError());
+        }
     }
 
     public void procesa(Instr_Write inst) {
@@ -330,8 +341,10 @@ public class Tipado extends ProcesamientoDef {
             || t instanceof TipoBool) {
             inst.setTipado(new TipoOK());
         }
-        else
+        else {
+            aviso_error(inst.getExp()); // TODO valor no imprimible
             inst.setTipado(new TipoError());
+        }
     }
 
     public void procesa(Instr_Nl inst) {
@@ -342,27 +355,40 @@ public class Tipado extends ProcesamientoDef {
         inst.getExp().procesa(this);
         if (ref(inst.getExp().getTipado()) instanceof TipoPunt)
             inst.setTipado(new TipoOK());
-        else
+        else {
+            aviso_error(inst.getExp()); // TODO Esperado tipo puntero
             inst.setTipado(new TipoError());
+        }
     }
 
     public void procesa(Instr_Del inst) {
         inst.getExp().procesa(this);
         if (ref(inst.getExp().getTipado()) instanceof TipoPunt)
             inst.setTipado(new TipoOK());
-        else
+        else {
+            aviso_error(inst.getExp()); // TODO Esperado tipo puntero
             inst.setTipado(new TipoError());
+        }
     }
 
     public void procesa(Instr_Call inst) {
         inst.getParamsR().procesa(this);
+        
+        if (!(inst.getVinculo() instanceof DecProc)) {
+            aviso_error(inst); // TODO tipos incompatibles en operacion
+            inst.setTipado(new TipoError());
+            return;
+        }
+
         DecProc dec = ((DecProc)inst.getVinculo());
         if (num_elems(inst.getParamsR()) == num_elems(dec.getParamsF())) {
             T t = llamadas_compatibles(dec.getParamsF(), inst.getParamsR());
             inst.setTipado(t);
         }
-        else
+        else {
+            aviso_error(inst); // TODO el numero de parametros reales no coincide con el numero de parametros formales
             inst.setTipado(new TipoError());
+        }
     }
 
     public void procesa(No_ParamsR no_ParamsR) {
@@ -377,8 +403,9 @@ public class Tipado extends ProcesamientoDef {
     public void procesa(Muchos_ParamsR muchos_ParamsR) {
         muchos_ParamsR.getParamrl().procesa(this);
         muchos_ParamsR.getExp().procesa(this);
-        if (muchos_ParamsR.getExp().getTipado() instanceof TipoError)
+        if (muchos_ParamsR.getExp().getTipado() instanceof TipoError){
             muchos_ParamsR.setTipado(new TipoError());
+        }
         else 
             muchos_ParamsR.setTipado(muchos_ParamsR.getParamrl().getTipado());
     }
@@ -436,16 +463,18 @@ public class Tipado extends ProcesamientoDef {
     
             Param paramF = paramsFL.getParam();
             if (paramF instanceof ParamNoRef) { // Param normal
-                if (es_designador(exp_paramR) 
-                    && compatibles(exp_paramR.getTipado(), tipo_paramF)) {
+                if (compatibles(tipo_paramF, exp_paramR.getTipado())) {
                     return llamadas_compatibles(mas_ParamsFL, mas_ParamsRL);
                 }
+                aviso_error(exp_paramR);
                 return new TipoError();
             }
             else { // Param ref
-                if (compatibles(exp_paramR.getTipado(), tipo_paramF, true)) {
+                if (es_designador(exp_paramR) 
+                    && compatibles(tipo_paramF, exp_paramR.getTipado(), true)) {
                     return llamadas_compatibles(mas_ParamsFL, mas_ParamsRL);
                 }
+                aviso_error(exp_paramR);
                 return new TipoError();
             }
         }
@@ -454,17 +483,19 @@ public class Tipado extends ProcesamientoDef {
             Exp exp_paramR = paramsRL.getExp();
 
             if (param instanceof ParamNoRef) { // Param normal
-                if (compatibles(exp_paramR.getTipado(), param.getTipo())) {
+                if (compatibles(param.getTipo(), exp_paramR.getTipado())) {
                     return new TipoOK();
                 }
-                else return new TipoError();
+                aviso_error(exp_paramR);
+                return new TipoError();
             }
             else if (param instanceof ParamRef) {
                 if (!es_designador(exp_paramR)) return new TipoError();
-                if (compatibles(exp_paramR.getTipado(), param.getTipo())) {
+                if (compatibles(param.getTipo(), exp_paramR.getTipado())) {
                     return new TipoOK();
                 }
-                else return new TipoError();
+                aviso_error(exp_paramR);
+                return new TipoError();
             }
         }
         return null;
@@ -486,7 +517,7 @@ public class Tipado extends ProcesamientoDef {
                 asig.setTipado(asig.getOpnd0().getTipado());
             }
             else {
-                aviso_error(asig.getOpnd0().getTipado(), asig.getOpnd1().getTipado());
+                aviso_error(asig);
                 asig.setTipado(new TipoError());
             }
         }
@@ -508,7 +539,7 @@ public class Tipado extends ProcesamientoDef {
             e.setTipado(new TipoBool());
         }
         else {
-            aviso_error(t1, t2);
+            aviso_error(e);
             e.setTipado(new TipoError());
         }
     }
@@ -543,7 +574,7 @@ public class Tipado extends ProcesamientoDef {
             e.setTipado(new TipoBool());
         }
         else {
-            aviso_error(t1, t2);
+            aviso_error(e);
             e.setTipado(new TipoError());
         }
     }
@@ -561,6 +592,7 @@ public class Tipado extends ProcesamientoDef {
         e2.procesa(this);
         T t1 = ref(e1.getTipado());
         T t2 = ref(e2.getTipado());
+        
         if (t1 instanceof TipoInt && t2 instanceof TipoInt) {
             e.setTipado(new TipoInt());
         }
@@ -569,7 +601,7 @@ public class Tipado extends ProcesamientoDef {
             e.setTipado(new TipoReal());
         }
         else {
-            aviso_error(t1, t2);
+            if (!(t1 instanceof TipoError) && !(t2 instanceof TipoError)) aviso_error(e);
             e.setTipado(new TipoError());
         }
     }
@@ -599,7 +631,7 @@ public class Tipado extends ProcesamientoDef {
             e.setTipado(new TipoBool());
         }
         else {
-            aviso_error(t1, t2);
+            aviso_error(e);
             e.setTipado(new TipoError());
         }
     }
@@ -621,7 +653,7 @@ public class Tipado extends ProcesamientoDef {
             exp.setTipado(new TipoInt());
         }
         else {
-            aviso_error(t1, t2);
+            aviso_error(exp);
             exp.setTipado(new TipoError());
         }
     }
@@ -629,11 +661,11 @@ public class Tipado extends ProcesamientoDef {
     public void procesa(Negativo exp) {
         exp.getOpnd0().procesa(this);
         T t = ref(exp.getOpnd0().getTipado());
-        if (t instanceof TipoInt || t instanceof TipoReal) {
+        if (t instanceof TipoInt || t instanceof TipoReal || t instanceof TipoError) {
             exp.setTipado(t);
         }
         else {
-            aviso_error(t);
+            aviso_error(exp);
             exp.setTipado(new TipoError());
         }
     }
@@ -645,7 +677,7 @@ public class Tipado extends ProcesamientoDef {
             exp.setTipado(t);
         }
         else {
-            aviso_error(t);
+            aviso_error(exp);
             exp.setTipado(new TipoError());
         }
     }
@@ -659,7 +691,7 @@ public class Tipado extends ProcesamientoDef {
             exp.setTipado(t1.getTipo());
         }
         else {
-            aviso_error(t1,t2);
+            aviso_error(exp);
             exp.setTipado(new TipoError());
         }
     }
@@ -668,15 +700,19 @@ public class Tipado extends ProcesamientoDef {
         exp.getOpnd().procesa(this);
         T t = ref(exp.getOpnd().getTipado());
         if (t instanceof TipoStruct) {
-            exp.setTipado(esCampoDe(exp.getIden(), t.getlCampos()));
+            T t2 = esCampoDe(exp.getIden(), t.getlCampos());
+            if (t2 instanceof TipoError) {
+                aviso_error(exp);
+            }
+            exp.setTipado(t2);
         }
         else {
-            aviso_error(t);
+            aviso_error(exp);
             exp.setTipado(new TipoError());
         }
     }
 
-    private static T esCampoDe(String iden, LCampos lcampos) {
+    private T esCampoDe(String iden, LCampos lcampos) {
         if (lcampos instanceof Muchos_Campos) {
             T t = esCampoDe(iden, lcampos.getCampo());
             if (t instanceof TipoError) {
@@ -690,11 +726,11 @@ public class Tipado extends ProcesamientoDef {
         return null;
     }
 
-    private static T esCampoDe(String iden, Campo campo) {
+    private T esCampoDe(String iden, Campo campo) {
         if (iden.equals(campo.getIden())) {
             return campo.getTipo();
         }
-        else return new TipoError();
+        return new TipoError();
     }
 
     public void procesa(Indireccion exp) {
@@ -741,6 +777,7 @@ public class Tipado extends ProcesamientoDef {
             iden.setTipado(((ParamNoRef)vinculo).getTipo());
         }
         else {
+            aviso_error(iden);
             iden.setTipado(new TipoError());
         }
     }

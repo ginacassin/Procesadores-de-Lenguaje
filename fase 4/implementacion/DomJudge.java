@@ -52,7 +52,7 @@ public class DomJudge {
     }
 
     public static void procesa(Prog p, Reader datos) throws Exception {
-        boolean outputJuez = false;
+        boolean outputJuez = true;
         Tipado t = null;
         VinculacionPrimera vp = new VinculacionPrimera(outputJuez);
         p.procesa(vp);
