@@ -94,18 +94,18 @@ public class Tipado extends ProcesamientoDef {
         return new TipoError();
     }
 
-    private void aviso_error(Nodo t1, Nodo t2) {
+    private void aviso_error(Nodo t1, Nodo t2, String mensaje) {
         if (!(t1 instanceof TipoError)) {
-            agregarError(t1.leeFila(), t1.leeCol(), "algun error");
+            agregarError(t1.leeFila(), t1.leeCol(), mensaje);
         }
         if (!(t2 instanceof TipoError)) {
             agregarError(t2.leeFila(), t2.leeCol(), "algun error");
         }
     }
 
-    private void aviso_error(Nodo t) {
+    private void aviso_error(Nodo t, String mensaje) {
         if (!(t instanceof TipoError)) {
-            agregarError(t.leeFila(), t.leeCol(), "algun error");
+            agregarError(t.leeFila(), t.leeCol(), mensaje);
         }
     }
     public class Pair {
@@ -286,7 +286,7 @@ public class Tipado extends ProcesamientoDef {
             && instrIf.getBloq().getTipado() instanceof TipoOK) 
             instrIf.setTipado(new TipoOK());
         else {
-            aviso_error(instrIf.getExp()); // TODO esperada expresion booleana
+            aviso_error(instrIf.getExp(), " esperada expresion booleana");
             instrIf.setTipado(new TipoError());
         }
     }
@@ -300,7 +300,7 @@ public class Tipado extends ProcesamientoDef {
             && instrIfElse.getBloq2().getTipado() instanceof TipoOK) 
             instrIfElse.setTipado(new TipoOK());
             else {
-                aviso_error(instrIfElse.getExp()); // TODO esperada expresion booleana
+                aviso_error(instrIfElse.getExp(), " esperada expresion booleana");
                 instrIfElse.setTipado(new TipoError());
             }
     }
@@ -312,7 +312,7 @@ public class Tipado extends ProcesamientoDef {
             && instrWhile.getBloq().getTipado() instanceof TipoOK) 
             instrWhile.setTipado(new TipoOK());
             else {
-                aviso_error(instrWhile.getExp()); // TODO esperada expresion booleana
+                aviso_error(instrWhile.getExp(), " esperada expresion booleana");
                 instrWhile.setTipado(new TipoError());
             }
     }
@@ -320,14 +320,19 @@ public class Tipado extends ProcesamientoDef {
     public void procesa(Instr_Read inst) {
         inst.getExp().procesa(this);
         T t = ref(inst.getExp().getTipado());
-        if ((t instanceof TipoInt
-            || t instanceof TipoReal
-            || t instanceof TipoString)
-            && es_designador(inst.getExp())) {
-            inst.setTipado(new TipoOK());
+        if (es_designador(inst.getExp())) {
+            if (t instanceof TipoInt
+                || t instanceof TipoReal
+                || t instanceof TipoString) {
+                inst.setTipado(new TipoOK());
+            }
+            else {
+                aviso_error(inst.getExp(), "valor no legible");
+                inst.setTipado(new TipoError());
+            }
         }
         else {
-            aviso_error(inst.getExp()); // TODO designador esperado y un segundo error de valor no legible
+            aviso_error(inst.getExp(), "designador esperado");
             inst.setTipado(new TipoError());
         }
     }
@@ -342,7 +347,7 @@ public class Tipado extends ProcesamientoDef {
             inst.setTipado(new TipoOK());
         }
         else {
-            aviso_error(inst.getExp()); // TODO valor no imprimible
+            aviso_error(inst.getExp(), "valor no imprimible");
             inst.setTipado(new TipoError());
         }
     }
@@ -356,7 +361,7 @@ public class Tipado extends ProcesamientoDef {
         if (ref(inst.getExp().getTipado()) instanceof TipoPunt)
             inst.setTipado(new TipoOK());
         else {
-            aviso_error(inst.getExp()); // TODO Esperado tipo puntero
+            aviso_error(inst.getExp(), "esperado tipo puntero");
             inst.setTipado(new TipoError());
         }
     }
@@ -366,7 +371,7 @@ public class Tipado extends ProcesamientoDef {
         if (ref(inst.getExp().getTipado()) instanceof TipoPunt)
             inst.setTipado(new TipoOK());
         else {
-            aviso_error(inst.getExp()); // TODO Esperado tipo puntero
+            aviso_error(inst.getExp(), "esperado tipo puntero");
             inst.setTipado(new TipoError());
         }
     }
@@ -375,7 +380,7 @@ public class Tipado extends ProcesamientoDef {
         inst.getParamsR().procesa(this);
         
         if (!(inst.getVinculo() instanceof DecProc)) {
-            aviso_error(inst); // TODO tipos incompatibles en operacion
+            aviso_error(inst, "tipos incompatibles en operacion");
             inst.setTipado(new TipoError());
             return;
         }
@@ -386,7 +391,7 @@ public class Tipado extends ProcesamientoDef {
             inst.setTipado(t);
         }
         else {
-            aviso_error(inst); // TODO el numero de parametros reales no coincide con el numero de parametros formales
+            aviso_error(inst, "el numero de parametros reales no coincide con el numero de parametros formales");
             inst.setTipado(new TipoError());
         }
     }
@@ -466,7 +471,7 @@ public class Tipado extends ProcesamientoDef {
                 if (compatibles(tipo_paramF, exp_paramR.getTipado())) {
                     return llamadas_compatibles(mas_ParamsFL, mas_ParamsRL);
                 }
-                aviso_error(exp_paramR);
+                aviso_error(exp_paramR, "tipo incompatible con tipo de parametro formal");
                 return new TipoError();
             }
             else { // Param ref
@@ -474,7 +479,7 @@ public class Tipado extends ProcesamientoDef {
                     && compatibles(tipo_paramF, exp_paramR.getTipado(), true)) {
                     return llamadas_compatibles(mas_ParamsFL, mas_ParamsRL);
                 }
-                aviso_error(exp_paramR);
+                aviso_error(exp_paramR, "tipo incompatible con tipo de parametro formal");
                 return new TipoError();
             }
         }
@@ -486,7 +491,7 @@ public class Tipado extends ProcesamientoDef {
                 if (compatibles(param.getTipo(), exp_paramR.getTipado())) {
                     return new TipoOK();
                 }
-                aviso_error(exp_paramR);
+                aviso_error(exp_paramR, "tipo incompatible con tipo de parametro formal");
                 return new TipoError();
             }
             else if (param instanceof ParamRef) {
@@ -494,7 +499,7 @@ public class Tipado extends ProcesamientoDef {
                 if (compatibles(param.getTipo(), exp_paramR.getTipado())) {
                     return new TipoOK();
                 }
-                aviso_error(exp_paramR);
+                aviso_error(exp_paramR, "tipo incompatible con tipo de parametro formal");
                 return new TipoError();
             }
         }
@@ -517,7 +522,7 @@ public class Tipado extends ProcesamientoDef {
                 asig.setTipado(asig.getOpnd0().getTipado());
             }
             else {
-                aviso_error(asig);
+                aviso_error(asig, "tipos incompatibles en asignacion");
                 asig.setTipado(new TipoError());
             }
         }
@@ -539,7 +544,7 @@ public class Tipado extends ProcesamientoDef {
             e.setTipado(new TipoBool());
         }
         else {
-            aviso_error(e);
+            aviso_error(e, "tipos incompatibles en operacion");
             e.setTipado(new TipoError());
         }
     }
@@ -574,7 +579,7 @@ public class Tipado extends ProcesamientoDef {
             e.setTipado(new TipoBool());
         }
         else {
-            aviso_error(e);
+            aviso_error(e, "tipos incompatibles en operacion");
             e.setTipado(new TipoError());
         }
     }
@@ -601,7 +606,7 @@ public class Tipado extends ProcesamientoDef {
             e.setTipado(new TipoReal());
         }
         else {
-            if (!(t1 instanceof TipoError) && !(t2 instanceof TipoError)) aviso_error(e);
+            if (!(t1 instanceof TipoError) && !(t2 instanceof TipoError)) aviso_error(e, "tipos incompatibles en operacion");
             e.setTipado(new TipoError());
         }
     }
@@ -631,7 +636,7 @@ public class Tipado extends ProcesamientoDef {
             e.setTipado(new TipoBool());
         }
         else {
-            aviso_error(e);
+            aviso_error(e, "error9");
             e.setTipado(new TipoError());
         }
     }
@@ -653,7 +658,7 @@ public class Tipado extends ProcesamientoDef {
             exp.setTipado(new TipoInt());
         }
         else {
-            aviso_error(exp);
+            aviso_error(exp, "tipos incompatibles en operacion");
             exp.setTipado(new TipoError());
         }
     }
@@ -665,7 +670,7 @@ public class Tipado extends ProcesamientoDef {
             exp.setTipado(t);
         }
         else {
-            aviso_error(exp);
+            aviso_error(exp, "tipo incompatible en operacion");
             exp.setTipado(new TipoError());
         }
     }
@@ -677,7 +682,7 @@ public class Tipado extends ProcesamientoDef {
             exp.setTipado(t);
         }
         else {
-            aviso_error(exp);
+            aviso_error(exp, "tipo incompatible en operacion");
             exp.setTipado(new TipoError());
         }
     }
@@ -691,7 +696,7 @@ public class Tipado extends ProcesamientoDef {
             exp.setTipado(t1.getTipo());
         }
         else {
-            aviso_error(exp);
+            aviso_error(exp, "tipos incompatibles en indexacion");
             exp.setTipado(new TipoError());
         }
     }
@@ -702,12 +707,12 @@ public class Tipado extends ProcesamientoDef {
         if (t instanceof TipoStruct) {
             T t2 = esCampoDe(exp.getIden(), t.getlCampos());
             if (t2 instanceof TipoError) {
-                aviso_error(exp);
+                aviso_error(exp, "campo inexistente:"+exp.getIden());
             }
             exp.setTipado(t2);
         }
         else {
-            aviso_error(exp);
+            aviso_error(exp, "se trata de acceder a un campo de un objeto que no es un registro");
             exp.setTipado(new TipoError());
         }
     }
@@ -740,7 +745,7 @@ public class Tipado extends ProcesamientoDef {
             exp.setTipado(t.getTipo());
         }
         else {
-            aviso_error(t);
+            aviso_error(t, "error16");
             exp.setTipado(new TipoError());
         }
     }
@@ -777,7 +782,7 @@ public class Tipado extends ProcesamientoDef {
             iden.setTipado(((ParamNoRef)vinculo).getTipo());
         }
         else {
-            aviso_error(iden);
+            aviso_error(iden, iden.getId() + " no es variable ni parametro");
             iden.setTipado(new TipoError());
         }
     }
