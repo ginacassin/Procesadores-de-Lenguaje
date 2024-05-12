@@ -189,8 +189,10 @@ public class MaquinaP {
            Valor opnd1 = pilaEvaluacion.pop();
            if (opnd1 instanceof ValorInt && opnd2 instanceof ValorInt)
                pilaEvaluacion.push(new ValorBool(opnd1.valorInt() < opnd2.valorInt()));
-           else
+           else if (opnd1 instanceof ValorReal && opnd2 instanceof ValorReal)
                pilaEvaluacion.push(new ValorBool(opnd1.valorReal() < opnd2.valorReal()));
+           else
+               pilaEvaluacion.push(new ValorBool(opnd1.valorString().compareTo(opnd2.valorString()) < 0));
            pc++;
        }
        public String toString() {return "menor";};
@@ -202,8 +204,10 @@ public class MaquinaP {
            Valor opnd1 = pilaEvaluacion.pop();
            if (opnd1 instanceof ValorInt && opnd2 instanceof ValorInt)
                pilaEvaluacion.push(new ValorBool(opnd1.valorInt() > opnd2.valorInt()));
+           else if (opnd1 instanceof ValorReal && opnd2 instanceof ValorReal)
+               pilaEvaluacion.push(new ValorBool(opnd1.valorReal() < opnd2.valorReal()));
            else
-               pilaEvaluacion.push(new ValorBool(opnd1.valorReal() > opnd2.valorReal()));
+               pilaEvaluacion.push(new ValorBool(opnd1.valorString().compareTo(opnd2.valorString()) > 0));
            pc++;
        }
        public String toString() {return "mayor";};
@@ -215,8 +219,10 @@ public class MaquinaP {
            Valor opnd1 = pilaEvaluacion.pop();
            if (opnd1 instanceof ValorInt && opnd2 instanceof ValorInt)
                pilaEvaluacion.push(new ValorBool(opnd1.valorInt() <= opnd2.valorInt()));
+           else if (opnd1 instanceof ValorReal && opnd2 instanceof ValorReal)
+               pilaEvaluacion.push(new ValorBool(opnd1.valorReal() < opnd2.valorReal()));
            else
-               pilaEvaluacion.push(new ValorBool(opnd1.valorReal() <= opnd2.valorReal()));
+               pilaEvaluacion.push(new ValorBool(opnd1.valorString().compareTo(opnd2.valorString()) <= 0));
            pc++;
        }
        public String toString() {return "menor-igual";};
@@ -228,8 +234,10 @@ public class MaquinaP {
             Valor opnd1 = pilaEvaluacion.pop();
             if (opnd1 instanceof ValorInt && opnd2 instanceof ValorInt)
                 pilaEvaluacion.push(new ValorBool(opnd1.valorInt() >= opnd2.valorInt()));
+            else if (opnd1 instanceof ValorReal && opnd2 instanceof ValorReal)
+                pilaEvaluacion.push(new ValorBool(opnd1.valorReal() < opnd2.valorReal()));
             else
-                pilaEvaluacion.push(new ValorBool(opnd1.valorReal() >= opnd2.valorReal()));
+                pilaEvaluacion.push(new ValorBool(opnd1.valorString().compareTo(opnd2.valorString()) >= 0));
             pc++;
         }
         public String toString() {return "mayor-igual";};
@@ -241,8 +249,10 @@ public class MaquinaP {
            Valor opnd1 = pilaEvaluacion.pop();
            if (opnd1 instanceof ValorInt && opnd2 instanceof ValorInt)
                pilaEvaluacion.push(new ValorBool(opnd1.valorInt() == opnd2.valorInt()));
+           else if (opnd1 instanceof ValorReal && opnd2 instanceof ValorReal)
+               pilaEvaluacion.push(new ValorBool(opnd1.valorReal() < opnd2.valorReal()));
            else
-               pilaEvaluacion.push(new ValorBool(opnd1.valorReal() == opnd2.valorReal()));
+               pilaEvaluacion.push(new ValorBool(opnd1.valorString().compareTo(opnd2.valorString()) == 0));
            pc++;
        }
        public String toString() {return "igual";};
@@ -254,8 +264,10 @@ public class MaquinaP {
            Valor opnd1 = pilaEvaluacion.pop();
            if (opnd1 instanceof ValorInt && opnd2 instanceof ValorInt)
                pilaEvaluacion.push(new ValorBool(opnd1.valorInt() != opnd2.valorInt()));
+           else if (opnd1 instanceof ValorReal && opnd2 instanceof ValorReal)
+               pilaEvaluacion.push(new ValorBool(opnd1.valorReal() < opnd2.valorReal()));
            else
-               pilaEvaluacion.push(new ValorBool(opnd1.valorReal() != opnd2.valorReal()));
+               pilaEvaluacion.push(new ValorBool(opnd1.valorString().compareTo(opnd2.valorString()) != 0));
            pc++;
        }
        public String toString() {return "no-igual";};
