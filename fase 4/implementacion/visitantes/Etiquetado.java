@@ -141,9 +141,9 @@ public class Etiquetado extends ProcesamientoDef {
     public void procesa(Instr_New instrNew){
         instrNew.setPrim(etq);
         instrNew.getExp().procesa(this);
-        if (ref(instrNew.getExp().getTipado()) instanceof TipoPunt) {
+        //if (ref(instrNew.getExp().getTipado()) instanceof TipoPunt) {
             etq++;
-        }
+        //}
         etq++;
         instrNew.setSig(etq);
     }
@@ -153,9 +153,9 @@ public class Etiquetado extends ProcesamientoDef {
         instrDel.setPrim(etq);
         instrDel.getExp().procesa(this);
         etq++;
-        if (ref(instrDel.getExp().getTipado()) instanceof TipoPunt) {
+        //if (ref(instrDel.getExp().getTipado()) instanceof TipoPunt) {
             etq++;
-        }
+        //}
         instrDel.setSig(etq);
     }
 

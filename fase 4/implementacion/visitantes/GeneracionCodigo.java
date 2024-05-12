@@ -119,9 +119,9 @@ public class GeneracionCodigo extends ProcesamientoDef {
     @Override
     public void procesa(Instr_New instrNew){
         instrNew.getExp().procesa(this);
-        if (ref(instrNew.getExp().getTipado()) instanceof TipoPunt) {
-            maquinaP.emit(maquinaP.alloc(instrNew.getExp().getTipado().getTam()));
-        }
+        //if (ref(instrNew.getExp().getTipado()) instanceof TipoPunt) {
+            maquinaP.emit(maquinaP.alloc(ref(instrNew.getExp().getTipado()).getTam()));
+        //}
         maquinaP.emit(maquinaP.desapila_ind());
     }
 
@@ -129,9 +129,9 @@ public class GeneracionCodigo extends ProcesamientoDef {
     public void procesa(Instr_Del instrDel){
         instrDel.getExp().procesa(this);
         maquinaP.emit(maquinaP.apila_ind());
-        if (ref(instrDel.getExp().getTipado()) instanceof TipoPunt) {
-            maquinaP.emit(maquinaP.dealloc(instrDel.getExp().getTipado().getTam()));
-        }
+        //if (ref(instrDel.getExp().getTipado()) instanceof TipoPunt) {
+            maquinaP.emit(maquinaP.dealloc(ref(instrDel.getExp().getTipado()).getTam()));
+        //}
     }
 
     @Override
@@ -421,7 +421,7 @@ public class GeneracionCodigo extends ProcesamientoDef {
         maquinaP.emit(maquinaP.apila_ind());
     }
 
-    void gen_acc_id(Param param){
+    void gen_acc_id(ParamNoRef param){
         this.procesa_acc_var(param);
     }
 
