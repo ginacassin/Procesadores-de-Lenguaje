@@ -1131,5 +1131,373 @@
                 \item \textbf{emit(Instruccion i):} emite una instrucción de la máquina virtual.
                 \item \textbf{desplazamiento(LCampos Cs, string tam):} recupera el desplazamiento de un campo de una lista de campos.
             \end{itemize}
-
+        
+    \section{Especificación del proceso de etiquetado}
+    Cada vez que se genera una instrucción de salto, es necesario conocer a qué dirección saltar. Se realiza entonces un procesamiento previo que, para cada nodo del AST que dé lugar a código, fije la dirección de la primera instrucción que conforma dicho código, así como la dirección de la instrucción que sigue a la última instrucción (instrucción siguiente). Durante el  etiquetado se cuentan las instrucciones que se van a
+    emitir posteriormente, durante la generación.
+    
+    \begin{itemize}
+        \item var sub\_pendientes = pila-vacia()
+        \item var etq = 0 \/// \textit{cuenta la
+        dirección de la instrucción que habrá de emitirse actualmente}
+        \item etiquetado(prog(Bloq)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado(Bloq)
+            \subitem etq++
+            \subitem while !es-vacia(sub\_pendientes)
+                \subsubitem sub = cima(sub\_pendientes)
+                \subsubitem desapila\_ind(sub\_pendientes)
+                \subsubitem let sub = dec\_proc(string,ParamsFL,Bloq) in
+                    \subsubitem \hspace{2em} sub.prim = etq
+                    \subsubitem \hspace{2em} etq$++$
+                    \subsubitem \hspace{2em} etiquetado(Bloq)
+                    \subsubitem \hspace{2em} etq += 2
+                    \subsubitem \hspace{2em} sub.sig = etq
+                \subsubitem end let
+            \subitem end while
+            \subitem \$.sig = etq
+        \item etiquetado(bloq(Decs, Insts)): 
+            \subitem \$.prim = etq
+            \subitem recolecta\_subs(Decs)
+            \subitem etiquetado(Insts)
+            \subitem \$.sig = etq
+        \item etiquetado(si\_instr(InstAux)): 
+            \subitem etiquetado(InstAux)
+        \item etiquetado(no\_instr()): 
+            \subitem noop
+        \item etiquetado(muchas\_instr(InstsAux, Inst)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado(InstsAux)
+            \subitem etiquetado(Inst)
+            \subitem \$.sig = etq
+        \item etiquetado(una\_instr(Inst)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado(Inst)
+            \subitem \$.sig = etq
+        \item etiquetado(instr\_expr(Exp)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado(Exp)
+            \subitem etq++
+            \subitem \$.sig = etq
+        \item etiquetado(instr\_if(Exp, Bloq)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado(Exp)
+            \subitem etiquetado-acc-val(Exp)
+            \subitem etq++
+            \subitem etiquetado(Bloq)
+            \subitem \$.sig = etq
+        \item etiquetado(instr\_if\_else(Exp, Bloq1, Bloq2)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado(Exp)
+            \subitem etiquetado-acc-val(Exp)
+            \subitem etq++
+            \subitem etiquetado(Bloq1)
+            \subitem etq++
+            \subitem \$.else = etq
+            \subitem etiquetado(Bloq2)
+            \subitem \$.sig = etq
+        \item etiquetado(instr\_while(Exp, Bloq)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado(Exp)
+            \subitem etiquetado-acc-val(Exp)
+            \subitem etq++
+            \subitem etiquetado(Bloq)
+            \subitem etq++
+            \subitem \$.sig = etq
+        \item etiquetado(instr\_read(Exp)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado(Exp)
+            \subitem etq += 2
+            \subitem \$.sig = etq
+        \item etiquetado(instr\_write(Exp)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado(Exp)
+            \subitem etq++
+            \subitem \$.sig = etq
+        \item etiquetado(instr\_nl()): 
+            \subitem \$.prim = etq
+            \subitem etq++
+            \subitem \$.sig = etq
+        \item etiquetado(instr\_new(Exp)):  
+            \subitem \$.prim = etq
+            \subitem etiquetado(Exp)
+            \subitem if ref!(Exp.tipo) == tipo\_punt
+                \subsubitem etq++
+            \subitem end if
+            \subitem etq ++
+            \subitem \$.sig = etq
+        \item etiquetado(instr\_del(Exp)):
+            \subitem \$.prim = etq
+            \subitem if ref!(Exp.tipo) == tipo\_punt
+                \subsubitem etq++
+            \subitem end if 
+            \subitem etq ++ 
+            \subitem \$.sig = etq
+        \item etiquetado(instr\_call(string, ParamsR)): 
+            \subitem \$.prim = etq
+            \subitem etq++
+            \subitem etiquetado-paso-param(\$.vinculo,ParamsR)
+            \subitem etq++
+            \subitem \$.sig = etq
+        \item etiquetado(instr\_bloque(Bloq)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado(Bloq)
+            \subitem \$.sig = etq
+        \item etiquetado(si\_paramsR(ParamsRL)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado(ParamsRL)
+            \subitem \$.sig = etq
+        \item etiquetado(no\_paramsR()): 
+            \subitem \$.prim = etq
+            \subitem \$.sig = etq
+        \item etiquetado(muchos\_paramsR(ParamsRL, Exp)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado(ParamsRL)
+            \subitem etiquetado(Exp)
+            \subitem \$.sig = etq
+        \item etiquetado(un\_paramsR(Exp)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado(Exp)
+            \subitem \$.sig = etq
+        \item etiquetado(asig(Exp1, Exp2)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado(Exp1)
+            \subitem etiquetado(Exp2)
+            \subitem if ref!(Exp1.tipo) == tipo\_real \&\& ref!(Exp2.tipo) == tipo\_int
+                \subsubitem if es-designador(Exp2)
+                    \subsubitem \hspace{2em} etq += 3
+                \subsubitem else
+                    \subsubitem \hspace{2em} etq += 2
+                \subsubitem end if
+            \subitem else
+                \subsubitem etq++
+            \subitem end if
+            \subitem \$.sig = etq
+        \item etiquetado(menor(Exp1, Exp2)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado-opnds(Exp1, Exp2)
+            \subitem etq++
+            \subitem \$.sig = etq
+        \item etiquetado(mayor(Exp1, Exp2)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado-opnds(Exp1, Exp2)
+            \subitem etq++
+            \subitem \$.sig = etq
+        \item etiquetado(menor\_igual(Exp1, Exp2)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado-opnds(Exp1, Exp2)
+            \subitem etq++
+            \subitem \$.sig = etq
+        \item etiquetado(mayor\_igual(Exp1, Exp2)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado-opnds(Exp1, Exp2)
+            \subitem etq++
+            \subitem \$.sig = etq
+        \item etiquetado(igual(Exp1, Exp2)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado-opnds(Exp1, Exp2)
+            \subitem etq++
+            \subitem \$.sig = etq
+        \item etiquetado(no\_igual(Exp1, Exp2)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado-opnds(Exp1, Exp2)
+            \subitem etq++
+            \subitem \$.sig = etq
+        \item etiquetado(suma(Exp1, Exp2)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado-opnds(Exp1, Exp2)
+            \subitem etq++
+            \subitem \$.sig = etq
+        \item etiquetado(resta(Exp1, Exp2)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado-opnds(Exp1, Exp2)
+            \subitem etq++
+            \subitem \$.sig = etq
+        \item etiquetado(and(Exp1, Exp2)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado-opnds(Exp1, Exp2)
+            \subitem etq++
+            \subitem \$.sig = etq
+        \item etiquetado(or(Exp1, Exp2)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado-opnds(Exp1, Exp2)
+            \subitem etq++
+            \subitem \$.sig = etq
+        \item etiquetado(mult(Exp1, Exp2)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado-opnds(Exp1, Exp2)
+            \subitem etq++
+            \subitem \$.sig = etq
+        \item etiquetado(div(Exp1, Exp2)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado-opnds(Exp1, Exp2)
+            \subitem etq++
+            \subitem \$.sig = etq
+        \item etiquetado(mod(Exp1, Exp2)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado-opnds(Exp1, Exp2)
+            \subitem etq++
+            \subitem \$.sig = etq
+        \item etiquetado(negativo(Exp)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado(Exp)
+            \subitem etq-acc-val(Exp)
+            \subitem etq++
+            \subitem \$.sig = etq
+        \item etiquetado(not(Exp)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado(Exp)
+            \subitem etq-acc-val(Exp)
+            \subitem etq++
+            \subitem \$.sig = etq
+        \item etiquetado(index(Exp1, Exp2)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado(Exp1)
+            \subitem etiquetado(Exp2)
+            \subitem etq-acc-val(Exp2)
+            \subitem if ref!(Exp1.tipo) == tipo\_array
+                \subsubitem etq++
+            \subitem end if
+            \subitem etq += 2
+            \subitem \$.sig = etq
+        \item etiquetado(acceso(Exp, string)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado(Exp)
+            \subitem etq += 2
+            \subitem \$.sig = etq
+        \item etiquetado(indireccion(Exp)): 
+            \subitem \$.prim = etq
+            \subitem etiquetado(Exp)
+            \subitem etq++
+            \subitem \$.sig = etq
+        \item etiquetado(lit\_ent(string)): 
+            \subitem \$.prim = etq
+            \subitem etq++
+            \subitem \$.sig = etq
+        \item etiquetado(lit\_real(string)): 
+            \subitem \$.prim = etq
+            \subitem etq++
+            \subitem \$.sig = etq
+        \item etiquetado(true()): 
+            \subitem \$.prim = etq
+            \subitem etq++
+            \subitem \$.sig = etq
+        \item etiquetado(false()): 
+            \subitem \$.prim = etq
+            \subitem etq++
+            \subitem \$.sig = etq
+        \item etiquetado(lit\_cadena(string)): 
+            \subitem \$.prim = etq
+            \subitem etq++
+            \subitem \$.sig = etq
+        \item etiquetado(iden(string)): 
+            \subitem \$.prim = etq
+            \subitem if \$.vinculo == dec\_var 
+                \subsubitem etiquetado-acc-id(\$.vinculo)
+            \subitem else if \$.vinculo == param 
+                \subsubitem etiquetado-acc-id(\$.vinculo)
+            \subitem else if \$.vinculo == param\_ref 
+                \subsubitem etiquetado-acc-id(\$.vinculo)
+            \subitem end if
+            \subitem \$.sig = etq
+        \item etiquetado(null()): 
+            \subitem \$.prim = etq
+            \subitem etq++
+            \subitem \$.sig = etq
+        \item etiquetado-opnds(Opnd0,Opnd1): 
+            \subitem if ref!(Opnd0.tipo) == tipo\_int \&\& ref!(Opnd1.tipo) == tipo\_real
+                \subsubitem etiquetado(Opnd0)
+                \subsubitem etiquetado-acc-val(Opnd0)
+                \subsubitem etq++
+                \subsubitem etiquetado(Opnd1)
+                \subsubitem etiquetado-acc-val(Opnd1)
+            \subitem else if ref!(Opnd0.tipo) == tipo\_real \&\& ref!(Opnd1.tipo) == tipo\_int
+                \subsubitem etiquetado(Opnd0)
+                \subsubitem etiquetado-acc-val(Opnd0)
+                \subsubitem etiquetado(Opnd1)
+                \subsubitem etiquetado-acc-val(Opnd1)
+                \subsubitem etq++
+            \subitem else
+                \subsubitem etiquetado(Opnd0)
+                \subsubitem etiquetado-acc-val(Opnd0)
+                \subsubitem etiquetado(Opnd1)
+                \subsubitem etiquetado-acc-val(Opnd1)
+            \subitem end if
+        \item etiquetado-acc-id(dec\_var(T, string)): 
+            \subitem if \$.nivel = 0 then
+                \subsubitem etq++
+            \subitem else
+                \subsubitem etiquetado-acc-var(\$.vinculo)
+            \subitem end if
+        \item etiquetado-acc-id(param(T, string)): 
+            \subitem etiquetado-acc-var(\$.vinculo)
+        \item etiquetado-acc-id(param\_ref(T, string)): 
+            \subitem etiquetado-acc-var(\$.vinculo)
+            \subitem etq++
+        \item etiquetado-acc-var(V): 
+            \subitem etq += 3
+        \item etiquetado-acc-val(E): 
+            \subitem if es-designador(E) then
+                \subsubitem etq++
+            \subitem end if
+        \item etiquetado-paso-param(dec\_proc(string,ParamsF,Bloq),ParamsR): 
+            \subitem etiquetado-paso-param-aux(ParamsF, ParamsR)
+        \item etiquetado-paso-param-aux(si\_paramF(ParamsFL), si\_paramsR(ParamsRL)): 
+            \subitem etiquetado-paso-param-aux(ParamsFL, ParamsRL)
+        \item etiquetado-paso-param-aux(no\_paramFL(), no\_paramsRL()): 
+            \subitem noop
+        \item etiquetado-paso-param-aux(muchos\_paramsF(ParamsFL, Param), muchos\_paramsR(ParamsRL, Exp)): 
+            \subitem etiquetado-paso-param-aux(ParamsFL, ParamsRL)
+            \subitem etq =+ 3
+            \subitem etiquetado(Exp)
+            \subitem if Param = param\_ref(T,id) then
+                \subsubitem etq++
+            \subitem else
+                \subsubitem if !es-designador(Exp) then
+                    \subsubitem \hspace{2em} if ref!(Exp.tipo) == tipo\_int \&\& ref!(Param.tipo) == tipo\_real then
+                        \subsubitem \hspace{4em} etq++
+                    \subsubitem \hspace{2em} end if
+                    \subsubitem \hspace{2em} etq++
+                \subsubitem else
+                    \subsubitem \hspace{2em} if ref!(Exp.tipo) == tipo\_int \&\& ref!(Param.tipo) == tipo\_real then
+                        \subsubitem \hspace{4em} etq += 3
+                    \subsubitem \hspace{2em} else
+                        \subsubitem \hspace{4em} etq++
+                    \subsubitem \hspace{2em} end if
+                \subsubitem end if
+            \subitem end if
+        \item etiquetado-paso-param-aux(un\_paramF(Param), un\_paramsR(Exp)): 
+            \subitem etq =+ 3
+            \subitem etiquetado(Exp)
+            \subitem if Param = param\_ref(T,id) then
+                \subsubitem etq++
+            \subitem else
+                \subsubitem if !es-designador(Exp) then
+                    \subsubitem \hspace{2em} if ref!(Exp.tipo) == tipo\_int \&\& ref!(Param.tipo) == tipo\_real then
+                        \subsubitem \hspace{4em} etq++
+                    \subsubitem \hspace{2em} end if
+                    \subsubitem \hspace{2em} etq++
+                \subsubitem else
+                    \subsubitem \hspace{2em} if ref!(Exp.tipo) == tipo\_int \&\& ref!(Param.tipo) == tipo\_real then
+                        \subsubitem \hspace{4em} etq += 3
+                    \subsubitem \hspace{2em} end if
+                    \subsubitem \hspace{2em} etq++
+                \subsubitem end if
+            \subitem end if
+        \item recolecta\_subs(si\_decs(DecsAux)): 
+            \subitem recolecta\_subs(DecsAux)
+        \item recolecta\_subs(no\_decs()): 
+            \subitem noop
+        \item recolecta\_subs(muchas\_decs(DecsAux, Dec)): 
+            \subitem recolecta\_subs(DecsAux)
+            \subitem recolecta\_subs(Dec)
+        \item recolecta\_subs(una\_dec(Dec)): 
+            \subitem recolecta\_subs(Dec)
+        \item recolecta\_subs(dec\_var(T, string)): 
+            \subitem noop
+        \item recolecta\_subs(dec\_tipo(T, string)): 
+            \subitem noop
+        \item recolecta\_subs(dec\_proc(string, ParamsF, Bloq)): 
+            \subitem apila(sub\_pendientes, \$)
+    \end{itemize} 
 \end{document}
