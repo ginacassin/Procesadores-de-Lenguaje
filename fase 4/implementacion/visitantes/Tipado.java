@@ -117,14 +117,14 @@ public class Tipado extends ProcesamientoDef {
     }
     private Set<Pair> theta;
 
-    private boolean son_unificables(LCampos l1, LCampos l2, boolean esParamRef) {
+    private boolean son_unificables(LCampos l1, LCampos l2, String info) {
         if (l1 instanceof Muchos_Campos && l2 instanceof Muchos_Campos) {
             LCampos l1Prime = l1.getlCampos();
             LCampos l2Prime = l2.getlCampos();
             Campo c1 = l1.getCampo();
             Campo c2 = l2.getCampo();
-            if (son_unificables(c1.getTipo(), c2.getTipo(), esParamRef)) {
-                return son_unificables(l1Prime, l2Prime, esParamRef);
+            if (son_unificables(c1.getTipo(), c2.getTipo(), info)) {
+                return son_unificables(l1Prime, l2Prime, info);
             }
             else return false;
         }
@@ -137,58 +137,68 @@ public class Tipado extends ProcesamientoDef {
         else if (l1 instanceof Un_Campo && l2 instanceof Un_Campo) {
             return son_unificables(((Un_Campo)l1).getCampo().getTipo(), 
                                    ((Un_Campo)l2).getCampo().getTipo(),
-                                   esParamRef);
+                                   info);
         }
         return false;
     }
 
-    private boolean son_unificables(T t1, T t2, boolean esParamRef) {
-        Pair p = new Pair(t1, t2);
+    private boolean son_unificables(Nodo t1, Nodo t2, String info) {
+        Pair p = new Pair(t1.getTipado(), t2.getTipado());
         if (!theta.contains(p)) {
             theta.add(p);
-            return unificables(t1, t2, esParamRef);
+            return unificables(t1, t2, info);
         } else {
             return true;
         }
     }
 
-    private boolean unificables(T t1, T t2, boolean esParamRef) {
-        T t1Prime = ref(t1);
-        T t2Prime = ref(t2);
+    private boolean unificables(Nodo t1, Nodo t2, String info) {
+        T t1Prime = ref(t1.getTipado());
+        T t2Prime = ref(t2.getTipado());
 
         // Lógica de unificación
         if (t1Prime.getClass() == t2Prime.getClass()) {
             return true;
         } else if (t1Prime instanceof TipoReal && t2Prime instanceof TipoInt) {
-            return !esParamRef; // Se asigna un int a un real
+            if (info.equals("paramRef")) {
+                aviso_error(t2, "el tipo debe ser real");
+                return false;
+            }
+            return true;
         } else if (t1Prime instanceof TipoPunt && t2Prime instanceof TipoNull) {
             return true; // Se asigna null a un puntero
         } else if (t1Prime instanceof TipoArray && t2Prime instanceof TipoArray) {
             TipoArray array1 = (TipoArray) t1Prime;
             TipoArray array2 = (TipoArray) t2Prime;
             return Integer.parseInt(array1.getLitEnt()) == Integer.parseInt(array2.getLitEnt())
-                && son_unificables(array1.getTipo(), array2.getTipo(), esParamRef);
+                && son_unificables(array1.getTipo(), array2.getTipo(), info);
         } else if (t1Prime instanceof TipoPunt && t2Prime instanceof TipoPunt) {
             TipoPunt punt1 = (TipoPunt) t1Prime;
             TipoPunt punt2 = (TipoPunt) t2Prime;
-            return son_unificables(punt1.getTipo(), punt2.getTipo(), esParamRef);
+            return son_unificables(punt1.getTipo(), punt2.getTipo(), info);
         } else if (t1Prime instanceof TipoStruct && t2Prime instanceof TipoStruct) {
             TipoStruct struct1 = (TipoStruct) t1Prime;
             TipoStruct struct2 = (TipoStruct) t2Prime;
-            return son_unificables(struct1.getlCampos(), struct2.getlCampos(), esParamRef);
+            return son_unificables(struct1.getlCampos(), struct2.getlCampos(), info);
         } else {
+            if (info.equals("asig")) {
+                aviso_error(t1, "tipos incompatibles en asignacion");
+            } else {
+                aviso_error(t2, "tipo incompatible con tipo de parametro formal");
+            }
+
             return false;
         }
     }
 
-    private boolean compatibles(T t1, T t2) {
-        return compatibles(t1, t2, false);
+    private boolean compatibles(Nodo t1, Nodo t2) {
+        return compatibles(t1, t2, "asig");
     }
 
-    private boolean compatibles(T t1, T t2, boolean esParamRef) {
+    private boolean compatibles(Nodo t1, Nodo t2, String info) {
         // System.out.println("Comparando: " + t1.getClass() +", "+t2.getClass());
         theta = new HashSet<>();
-        return unificables(t1, t2, esParamRef);
+        return unificables(t1, t2, info);
     }
 
     @Override
@@ -465,21 +475,27 @@ public class Tipado extends ProcesamientoDef {
             T tipo_paramF = paramsFL.getParam().getTipo();
             ParamsRL mas_ParamsRL = paramsRL.getParamrl();
             Exp exp_paramR = paramsRL.getExp();
-    
+
             Param paramF = paramsFL.getParam();
             if (paramF instanceof ParamNoRef) { // Param normal
-                if (compatibles(tipo_paramF, exp_paramR.getTipado())) {
+                Nodo aux = new TipoError();
+                aux.setTipado(tipo_paramF);
+                if (compatibles(aux, exp_paramR, "paramNormal")) {
                     return llamadas_compatibles(mas_ParamsFL, mas_ParamsRL);
                 }
                 aviso_error(exp_paramR, "tipo incompatible con tipo de parametro formal");
                 return new TipoError();
             }
             else { // Param ref
-                if (es_designador(exp_paramR) 
-                    && compatibles(tipo_paramF, exp_paramR.getTipado(), true)) {
+                if (!es_designador(exp_paramR)) {
+                    aviso_error(exp_paramR, "se esperaba un designador");
+                    return new TipoError();
+                }
+                Nodo aux = new TipoError();
+                aux.setTipado(tipo_paramF);
+                if (compatibles(aux, exp_paramR, "paramRef")) {
                     return llamadas_compatibles(mas_ParamsFL, mas_ParamsRL);
                 }
-                aviso_error(exp_paramR, "tipo incompatible con tipo de parametro formal");
                 return new TipoError();
             }
         }
@@ -488,18 +504,24 @@ public class Tipado extends ProcesamientoDef {
             Exp exp_paramR = paramsRL.getExp();
 
             if (param instanceof ParamNoRef) { // Param normal
-                if (compatibles(param.getTipo(), exp_paramR.getTipado())) {
+                Nodo aux = new TipoError();
+                aux.setTipado(param.getTipo());
+                if (compatibles(aux, exp_paramR, "paramNormal")) {
                     return new TipoOK();
                 }
                 aviso_error(exp_paramR, "tipo incompatible con tipo de parametro formal");
                 return new TipoError();
             }
             else if (param instanceof ParamRef) {
-                if (!es_designador(exp_paramR)) return new TipoError();
-                if (compatibles(param.getTipo(), exp_paramR.getTipado())) {
+                if (!es_designador(exp_paramR)) {
+                    aviso_error(exp_paramR, "se esperaba un designador");
+                    return new TipoError();
+                }
+                Nodo aux = new TipoError();
+                aux.setTipado(param.getTipo());
+                if (compatibles(aux, exp_paramR, "paramRef")) {
                     return new TipoOK();
                 }
-                aviso_error(exp_paramR, "tipo incompatible con tipo de parametro formal");
                 return new TipoError();
             }
         }
@@ -518,11 +540,10 @@ public class Tipado extends ProcesamientoDef {
         asig.getOpnd1().procesa(this);
 
         if (es_designador(asig.getOpnd0())) {
-            if (compatibles(asig.getOpnd0().getTipado(), asig.getOpnd1().getTipado())) {
+            if (compatibles(asig.getOpnd0(), asig.getOpnd1())) {
                 asig.setTipado(asig.getOpnd0().getTipado());
             }
             else {
-                aviso_error(asig, "tipos incompatibles en asignacion");
                 asig.setTipado(new TipoError());
             }
         }
