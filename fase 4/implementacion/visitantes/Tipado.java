@@ -390,7 +390,7 @@ public class Tipado extends ProcesamientoDef {
         inst.getParamsR().procesa(this);
         
         if (!(inst.getVinculo() instanceof DecProc)) {
-            aviso_error(inst, "tipos incompatibles en operacion");
+            aviso_error(inst, "no es un subprograma");
             inst.setTipado(new TipoError());
             return;
         }
