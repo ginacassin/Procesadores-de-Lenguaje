@@ -636,7 +636,7 @@ public class Tipado extends ProcesamientoDef {
             e.setTipado(new TipoBool());
         }
         else {
-            aviso_error(e, "error9");
+            aviso_error(e, "tipos incompatibles en operacion");
             e.setTipado(new TipoError());
         }
     }
@@ -745,7 +745,7 @@ public class Tipado extends ProcesamientoDef {
             exp.setTipado(t.getTipo());
         }
         else {
-            aviso_error(t, "error16");
+            aviso_error(t, "esperado tipo puntero");
             exp.setTipado(new TipoError());
         }
     }
