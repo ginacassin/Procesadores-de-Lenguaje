@@ -381,7 +381,7 @@
             correctamente tipadas.
             \item Se asocian tipos con estas construcciones.
         \end{itemize}
-        Tiny es un lenguaje fuertamente tipado. 
+        Tiny es un lenguaje fuertemente tipado. Se crean dos nuevos tipos: ok y error para la gestión de errores.
         
         \begin{itemize}
             \item ambos-ok(T0,T1): 
@@ -390,18 +390,22 @@
                 \subitem else
                     \subsubitem return error
                 \subitem end if
-            \item ambos-ok(T0,T1):
-                \subitem if T0 $\neq$ error \&\&  T1 $\neq$ error then
-                    \subsubitem return error 
-                \subitem end if 
+            \item aviso-error(T0,T1):
+                \subitem if T0 == error then
+                    \subsubitem error
+                \subitem end if
+                \subitem if T1 == error then
+                    \subsubitem error
+                \subitem end if
             \item aviso-error(T):
-                \subitem if T $\neq$ error then
+                \subitem if T == error then
                     \subsubitem error 
                 \subitem end if
             \item ref!(T): \/// \textit{sigue la cadena de vínculos entre nombres de tipos sinónimos}
                 \subitem if T = tipo\_iden(iden) then
                     \subsubitem let T.vinculo = dec\_tipo(T',iden) in 
                         \subsubitem \hspace{2em} return ref!(T')
+                    \subsubitem end let
                 \subitem else
                     \subsubitem return T
                 \subitem end if
@@ -493,6 +497,7 @@
                 \subitem if Exp.tipo == error then
                     \subsubitem \$.tipo = error
                 \subitem else
+                    \subsubitem aviso-error(Exp.tipo)
                     \subsubitem \$.tipo = ok
                 \subitem end if
             \item tipado(instr\_if(Exp, Bloq)): 
@@ -510,6 +515,7 @@
                 \subitem if ref!(Exp.tipo) == tipo\_bool \&\&  Bloq1.tipo == ok \&\&  Bloq2.tipo == ok then
                     \subsubitem \$.tipo = ok
                 \subitem else
+                    \subsubitem aviso-error(Exp.tipo)
                     \subsubitem \$.tipo = error
                 \subitem end if
             \item tipado(instr\_while(Exp, Bloq)): 
@@ -518,6 +524,7 @@
                 \subitem if ref!(Exp.tipo) == tipo\_bool \&\&  Bloq.tipo == ok then
                     \subsubitem \$.tipo = ok
                 \subitem else
+                    \subsubitem aviso-error(Exp.tipo)
                     \subsubitem \$.tipo = error
                 \subitem end if
             \item tipado(instr\_read(Exp)): 
@@ -526,6 +533,7 @@
                 \subitem if (t == tipo\_int $\vert \vert$ t == tipo\_real $\vert \vert$ t == tipo\_string) \&\&  es-designador(Exp) then
                     \subsubitem \$.tipo = ok
                 \subitem else
+                    \subsubitem aviso-error(Exp.tipo)
                     \subsubitem \$.tipo = error
                 \subitem end if
             \item tipado(instr\_write(Exp)): 
@@ -543,6 +551,7 @@
                 \subitem if ref!(Exp.tipo) == tipo\_punt then
                     \subsubitem \$.tipo = ok
                 \subitem else
+                    \subsubitem aviso-error(Exp.tipo)
                     \subsubitem \$.tipo = error
                 \subitem end if
             \item tipado(instr\_del(Exp)): 
@@ -550,6 +559,7 @@
                 \subitem if ref!(Exp.tipo) == tipo\_punt then
                     \subsubitem \$.tipo = ok
                 \subitem else
+                    \subsubitem aviso-error(Exp.tipo)
                     \subsubitem \$.tipo = error
                 \subitem end if
             \item llamadas\_compatibles(si\_paramF(ParamsFL), si\_paramsR(ParamsRL)): 
@@ -559,31 +569,39 @@
             \item llamadas\_compatibles(muchos\_paramsF(ParamsFL, param(T, Iden)), muchos\_paramsR(ParamsRL, Exp)): 
                 \subitem if es-designador(Exp) \&\&  compatibles(Exp.tipo, T) then
                     \subsubitem return llamadas\_compatibles(ParamsFL, ParamsRL)
-                \subitem else 
+                \subitem else
+                    \subsubitem aviso-error(Exp)
                     \subsubitem return error
                 \subitem end if
             \item llamadas\_compatibles(muchos\_paramsF(ParamsFL, param\_ref(T, Iden)), muchos\_paramsR(ParamsRL, Exp)): 
                 \subitem if compatibles(Exp.tipo, T) then
                     \subsubitem return llamadas\_compatibles(ParamsFL, ParamsRL)
-                \subitem else 
+                \subitem else
+                    \subsubitem aviso-error(Exp)
                     \subsubitem return error
                 \subitem end if
             \item llamadas\_compatibles(un\_paramF(param(T, Iden)), un\_paramsR(Exp)): 
-                \subitem if compatibles(Exp.tipo, T) then
+                \subitem if compatibles(T, Exp.tipo) then
                     \subsubitem return ok
-                \subitem else 
+                \subitem else
+                    \subsubitem aviso-error(Exp)
                     \subsubitem return error
                 \subitem end if
             \item llamadas\_compatibles(un\_paramF(param\_ref(T, Iden)), un\_paramsR(Exp)): 
                 \subitem if !es-designador(Exp) then
                     \subsubitem error
-                \subitem if compatibles(Exp.tipo, T, true) then
+                \subitem if compatibles(T, Exp.tipo, true) then
                     \subsubitem return ok
-                \subitem else 
+                \subitem else
+                    \subsubitem aviso-error(Exp)
                     \subsubitem return error
                 \subitem end if
             \item tipado(instr\_call(Iden, ParamsR)): 
                 \subitem tipado(paramsR) \/// \textit{primero tipamos los parámetros R}
+                \subitem if Iden.vinculo $\neq$ dec\_proc(\_,\_) then
+                    \subsubitem aviso-error(Iden)
+                    \subsubitem \$.tipo = error
+                    \subsubitem return
                 \subitem let Iden.vinculo = dec\_proc(Iden, ParamsF, Bloq) in
                     \subsubitem if num\_elems(paramsF) == num\_elems(ParmsR) then \/// \textit{luego verificamos cantidad}
                         \subsubitem \hspace{2em} \$.tipo = llamadas\_compatibles(ParamsF, ParamsR) \/// \textit{por último, compatibilidad}
@@ -642,7 +660,7 @@
                         \subsubitem \hspace{2em} \$.tipo = error 
                     \subsubitem end if 
                 \subitem else 
-                    \subsubitem error \/// \textit{la parte izq. debe ser un designador}
+                    \subsubitem aviso-error(\$) \/// \textit{la parte izq. debe ser un designador}
                     \subsubitem \$.tipo = error 
                 \subitem end if
             \item tipado-bin-comp(E1, E2, E): 
@@ -655,7 +673,7 @@
                     (t1 == tipo\_string \&\&  t2 == tipo\_string) then
                     \subsubitem E.tipo = tipo\_bool
                 \subitem else 
-                    \subsubitem aviso-error(t1, t2) 
+                    \subsubitem aviso-error(E)
                     \subsubitem E.tipo = error
                 \subitem end if
             \item tipado(menor(Exp1, Exp2)):
@@ -677,7 +695,7 @@
                     ((t1 == tipo\_punt $\vert \vert$ t1 == null) \&\&  (t2 == tipo\_punt $\vert \vert$ t2 == null)) then
                     \subsubitem E.tipo = tipo\_bool
                 \subitem else
-                    \subsubitem aviso-error(t1, t2)
+                    \subsubitem aviso-error(E)
                     \subsubitem E.tipo = error
                 \subitem end if
             \item tipado(igual(Exp1, Exp2)): 
@@ -694,7 +712,7 @@
                 \subitem else if (t1 == tipo\_int $\vert \vert$ t1 == tipo\_real) \&\&  (t2 == tipo\_int $\vert \vert$ t2 == tipo\_real) then
                     \subsubitem E.tipo = tipo\_real
                 \subitem else 
-                    \subsubitem aviso-error(t1, t2)
+                    \subsubitem aviso-error(E)
                     \subsubitem E.tipo = error
                 \subitem end if
             \item tipado(suma(Exp1, Exp2)): 
@@ -713,7 +731,7 @@
                 \subitem if t1 == tipo\_bool \&\&  t2 == tipo\_bool then
                     \subsubitem E.tipo = tipo\_bool
                 \subitem else
-                    \subsubitem aviso-error(t1, t2)
+                    \subsubitem aviso-error(E)
                     \subsubitem E.tipo = error
                 \subitem end if
             \item tipado(and(Exp1, Exp2)): 
@@ -728,7 +746,7 @@
                 \subitem if t1 == tipo\_int \&\&  t2 == tipo\_int then
                     \subsubitem \$.tipo = tipo\_int
                 \subitem else 
-                    \subsubitem aviso-error(t1, t2)
+                    \subsubitem aviso-error(\$)
                     \subsubitem \$.tipo = error
                 \subitem end if
             \item tipado(negativo(Exp)): 
